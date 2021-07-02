@@ -18,7 +18,7 @@ services:
       - "9600:9600"
       - "5701:5701"
     volumes:
-      - ./zeebe_data:/usr/local/zeebe/data
+      - ./volumes/zeebe_data:/usr/local/zeebe/data
     networks:
       - zeebe_network
   monitor:
@@ -32,18 +32,28 @@ services:
       - "8082:8082"
     depends_on:
       - zeebe
+      - db
     networks:
       - zeebe_network
-  zeeqs:
-    container_name: zeeqs
-    image: ghcr.io/camunda-community-hub/zeeqs:latest
+  db:
+    image: postgres:12.2
+    restart: always
     environment:
-      - zeebe.hazelcast.connection=zeebe:5701
-    #volumes:
-    #  - ./simple-monitor-application.yaml:/usr/local/zeebe/config/application.yaml
-    ports:
-      - "9001:9000"
-    depends_on:
-      - zeebe
+      POSTGRES_PASSWORD: zeebe
+    volumes:
+      - ./volumes/simple-monitor-data:/var/lib/postgresql/data/
     networks:
       - zeebe_network
+#  zeeqs:
+#    container_name: zeeqs
+#    image: ghcr.io/camunda-community-hub/zeeqs:latest
+#    environment:
+#      - zeebe.hazelcast.connection=zeebe:5701
+#    #volumes:
+#    #  - ./simple-monitor-application.yaml:/usr/local/zeebe/config/application.yaml
+#    ports:
+#      - "9001:9000"
+#    depends_on:
+#      - zeebe
+#    networks:
+#      - zeebe_network
