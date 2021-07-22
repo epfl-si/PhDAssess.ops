@@ -44,6 +44,8 @@ services:
       - ./volumes/simple-monitor-data:/var/lib/postgresql/data/
     networks:
       - zeebe_network
+    ports:
+      - "5432:5432"
 #  zeeqs:
 #    container_name: zeeqs
 #    image: ghcr.io/camunda-community-hub/zeeqs:latest
