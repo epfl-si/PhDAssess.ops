@@ -23,31 +23,32 @@ services:
       - ./volumes/zeebe_data:/usr/local/zeebe/data
     networks:
       - zeebe_network
-  mongo:
-    image: mongo:latest
-    command:
-      - --storageEngine=wiredTiger
-    volumes:
-      - ./volumes/mongo-data:/data/db
-    networks:
-      - meteor_network
-  meteor:
-    build:
-      context: ..
-      dockerfile: Dockerfile
-    ports:
-      - '80:3000'
-    #    depends_on:
-    #      - mongo
-    environment:
-      ROOT_URL: ${APP_ROOT_URL:-http://localhost}
-      MONGO_URL: mongodb://mongo:27017/meteor
-      PORT: 3000
-    volumes:
-      - ../.env:/usr/bundle/.env
-    networks:
-      - zeebe_network
-      - meteor_network
+  #  mongo:
+  #    image: mongo:latest
+  #    command:
+  #      - --storageEngine=wiredTiger
+  #    volumes:
+  #      - ./volumes/mongo-data:/data/db
+  #    networks:
+  #      - meteor_network
+  #  meteor:
+  #    build:
+  #      context: ..
+  #      dockerfile: Dockerfile
+  #    ports:
+  #      - '80:3000'
+  #    #    depends_on:
+  #    #      - mongo
+  #    environment:
+  #      ROOT_URL: ${APP_ROOT_URL:-http://localhost}
+  #      MONGO_URL: mongodb://mongo:27017/meteor
+  #      PORT: 3000
+  #    volumes:
+  #      - ../.env:/usr/bundle/.env
+  #    networks:
+  #      - zeebe_network
+  #      - meteor_network
+>>>>>>> Stashed changes
   monitor:
     container_name: zeebe_monitor
     build: simple-monitor
