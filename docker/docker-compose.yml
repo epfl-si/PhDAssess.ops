@@ -48,7 +48,6 @@ services:
   #    networks:
   #      - zeebe_network
   #      - meteor_network
->>>>>>> Stashed changes
   monitor:
     container_name: zeebe_monitor
     build: simple-monitor
