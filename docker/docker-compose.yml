@@ -48,21 +48,21 @@ services:
       - zeebe_network
     ports:
       - "5432:5432"
-  notifier:
-    build:
-      context: ../../PhDAssess-Notifier
-    networks:
-      - zeebe_network
-    depends_on:
-      - zeebe
-    env_file:
-      - ../../PhDAssess-Notifier/.env
-  pdf:
-    build:
-      context: ../../PhDAssess-PDF
-    networks:
-      - zeebe_network
-    depends_on:
-      - zeebe
-    env_file:
-      - ../../PhDAssess-PDF/.env
+#  notifier:
+#    build:
+#      context: ../../PhDAssess-Notifier
+#    networks:
+#      - zeebe_network
+#    depends_on:
+#      - zeebe
+#    env_file:
+#      - ../../PhDAssess-Notifier/.env
+#  pdf:
+#    build:
+#      context: ../../PhDAssess-PDF
+#    networks:
+#      - zeebe_network
+#    depends_on:
+#      - zeebe
+#    env_file:
+#      - ../../PhDAssess-PDF/.env
