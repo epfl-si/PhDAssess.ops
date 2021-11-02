@@ -4,6 +4,7 @@
   "description": "Some Prometheus metrics for the PhDAssess application",
   "main": "server.ts",
   "scripts": {
+    "start": "npx ts-node server.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
