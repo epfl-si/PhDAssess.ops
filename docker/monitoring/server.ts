@@ -2,10 +2,34 @@
 
 import express from 'express'
 import * as prom from 'prom-client'
+import dotenv from 'dotenv'
+
+dotenv.config()
 
 const Registry = prom.Registry
 const register = new Registry()
 prom.collectDefaultMetrics({ register })
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+let diskUsageRunning = false
+setInterval(async function() {
+  if (! diskUsageRunning) {
+    diskUsageRunning = true
+    try {
+      await measureDiskUsage()
+    } finally {
+      diskUsageRunning = false
+    }
+  }
+}, 1000 * Number(process.env.DISK_USAGE_PERIOD_SECONDS || 10))
+
+async function measureDiskUsage() {
+  console.log("coucou")
+  await new Promise((resolve) => setTimeout(resolve, 5000))
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
 
 function main() {
   const app = express()
