@@ -1,7 +1,7 @@
 FROM node:alpine
 
 WORKDIR /app
-COPY package.json yarn.lock .
+COPY package.json yarn.lock ./
 RUN yarn
 
 ADD server.ts .
