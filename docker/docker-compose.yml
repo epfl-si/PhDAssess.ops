@@ -28,7 +28,7 @@ services:
     build: simple-monitor
     image: epfl-idevfsd/simple-monitor
     environment:
-      - zeebe.client.broker.contactPoint=zeebe:26500
+      - zeebe.client.broker.contactPoint=zeebe:26501
       - zeebe.client.worker.hazelcast.connection=zeebe:5701
     ports:
       - "8082:8082"
