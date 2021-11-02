@@ -13,23 +13,33 @@ prom.collectDefaultMetrics({ register })
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-let diskUsageRunning = false
-setInterval(async function() {
-  if (! diskUsageRunning) {
-    diskUsageRunning = true
-    try {
-      await measureDiskUsage()
-    } catch (e) {
-      console.error(e)
-    } finally {
-      diskUsageRunning = false
-    }
-  }
-}, 1000 * Number(process.env.DISK_USAGE_PERIOD_SECONDS || 10))
+function addDiskUsageGauge (register : prom.Registry, path : string, everySeconds: number) {
+  const diskGauge = new prom.Gauge({
+    name: 'disk_usage_kilobytes',
+    help: 'Disk usage in a particular directory, in kilobytes',
+    labelNames: ['path']
+  })
+  register.registerMetric(diskGauge)
 
-async function measureDiskUsage() {
-  const usage = await getDiskUsage(process.env.DISK_USAGE_TARGET || ".")
-  console.log(usage)
+  let running = false
+  setInterval(async function() {
+    if (! running) {
+      running = true
+      try {
+        await measureDiskUsage(diskGauge, path)
+      } catch (e) {
+        console.error(e)
+      } finally {
+        running = false
+      }
+    }
+  }, 1000 * everySeconds)
+}
+
+/////////////////////////////////////////////////////////////////////////////////////
+
+async function measureDiskUsage(diskGauge: prom.Gauge<string>, path: string) {
+  diskGauge.set({ path }, await getDiskUsage(path))
 }
 
 async function getDiskUsage(path : string) {
@@ -51,12 +61,17 @@ async function getDiskUsage(path : string) {
   })
 
   const stdout = Buffer.concat(out).toString("ascii")
-  return stdout ? Number(stdout.match(/^\d+/)[0]) : undefined
+  if (stdout === null) throw new Error("du returned no text")
+
+  const matched = stdout.match(/^\d+/)
+  if (! matched) throw new Error(`Bad format for 'du' output: ${stdout}`)
+
+  return Number(matched[0])
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-function main() {
+function serve(register : prom.Registry) {
   const app = express()
   app.get('/metrics', async (_req, res) => {
     res.contentType('text/plain; version=0.0.4')
@@ -66,4 +81,10 @@ function main() {
   app.listen(3000, () => console.log("Please visit http://localhost:3000/metrics/"))
 }
 
-main()
+/////////////////////////////////////////////////////////////////////////////////////
+
+addDiskUsageGauge(
+  register,
+  process.env.DISK_USAGE_TARGET || ".",
+  Number(process.env.DISK_USAGE_PERIOD_SECONDS || "10"))
+serve(register)
