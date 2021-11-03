@@ -83,8 +83,10 @@ function serve(register : prom.Registry) {
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-addDiskUsageGauge(
-  register,
-  process.env.DISK_USAGE_TARGET || ".",
-  Number(process.env.DISK_USAGE_PERIOD_SECONDS || "10"))
+for(const path of (process.env.DISK_USAGE_TARGET || ".").split(";")) {
+  addDiskUsageGauge(
+    register,
+    path,
+    Number(process.env.DISK_USAGE_PERIOD_SECONDS || "10"))
+}
 serve(register)
