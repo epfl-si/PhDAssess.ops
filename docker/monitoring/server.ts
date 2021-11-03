@@ -83,7 +83,7 @@ const diskGauge = new prom.Gauge({
 })
 register.registerMetric(diskGauge)
 
-for(const path of (process.env.DISK_USAGE_TARGET || ".").split(";")) {
+for(const path of (process.env.DISK_USAGE_TARGETS || ".").split(";")) {
   addDiskUsageWatcher(
     diskGauge,
     path,
