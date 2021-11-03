@@ -13,14 +13,7 @@ prom.collectDefaultMetrics({ register })
 
 /////////////////////////////////////////////////////////////////////////////////////
 
-function addDiskUsageGauge (register : prom.Registry, path : string, everySeconds: number) {
-  const diskGauge = new prom.Gauge({
-    name: 'disk_usage_kilobytes',
-    help: 'Disk usage in a particular directory, in kilobytes',
-    labelNames: ['path']
-  })
-  register.registerMetric(diskGauge)
-
+function addDiskUsageWatcher (diskGauge: prom.Gauge<string>, path: string, everySeconds: number) {
   let running = false
   setInterval(async function() {
     if (! running) {
@@ -83,9 +76,16 @@ function serve(register : prom.Registry) {
 
 /////////////////////////////////////////////////////////////////////////////////////
 
+const diskGauge = new prom.Gauge({
+  name: 'disk_usage_kilobytes',
+  help: 'Disk usage in a particular directory, in kilobytes',
+  labelNames: ['path']
+})
+register.registerMetric(diskGauge)
+
 for(const path of (process.env.DISK_USAGE_TARGET || ".").split(";")) {
-  addDiskUsageGauge(
-    register,
+  addDiskUsageWatcher(
+    diskGauge,
     path,
     Number(process.env.DISK_USAGE_PERIOD_SECONDS || "10"))
 }
