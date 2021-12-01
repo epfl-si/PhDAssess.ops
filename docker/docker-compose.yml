@@ -9,8 +9,8 @@ networks:
 services:
   zeebe:
     container_name: zeebe_broker
-    build: zeebe-hazelcast
-    image: epfl-idevfsd/zeebe-hazelcast
+    # See `make pull` in ../Makefile:
+    image: os-docker-registry.epfl.ch/phd-assess-test/zeebe-broker-with-exporters
     environment:
       - ZEEBE_LOG_LEVEL=info
     ports:
