@@ -48,6 +48,22 @@ services:
       - zeebe_network
     ports:
       - "5432:5432"
+
+  mongo:
+    image: mongo
+    restart: always
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
+    depends_on:
+      - mongo
+
 #  notifier:
 #    build:
 #      context: ../../PhDAssess-Notifier
@@ -57,6 +73,7 @@ services:
 #      - zeebe
 #    env_file:
 #      - ../../PhDAssess-Notifier/.env
+
 #  pdf:
 #    build:
 #      context: ../../PhDAssess-PDF
@@ -66,6 +83,7 @@ services:
 #      - zeebe
 #    env_file:
 #      - ../../PhDAssess-PDF/.env
+#
 #  phd-assess:
 #    build:
 #      context: ..
@@ -74,5 +92,15 @@ services:
 #      - zeebe_network
 #    depends_on:
 #      - zeebe
+#      - mongo
 #    env_file:
 #      - ../.env
+#    environment:
+#      ROOT_URL: https://127.0.0.1
+#      PORT: 3000
+#      MONGO_URL: mongodb://mongo:27017/meteor
+#      MONGO_PERSISTENT_URL: mongodb://mongo:27017/meteor
+#      PHDASSESS_ENCRYPTION_KEY: ${PHDASSESS_ENCRYPTION_KEY}
+#      ISA_LOCAL_DATA: 'true'
+#    ports:
+#      - "3000:3000"
