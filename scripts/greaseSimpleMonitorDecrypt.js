@@ -4,7 +4,7 @@
 // @version      0.1
 // @description  Encrypt and decrypt messages
 // @author       epfl-devfsd
-// @match        https://simple-monitor.128.178.222.83.nip.io/views/instances/*
+// @match        http://localhost
 // @require      https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js
 // @require      https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js
 // @grant        none
