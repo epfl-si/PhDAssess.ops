@@ -15,6 +15,7 @@ services:
       - ZEEBE_LOG_LEVEL=info
       - ZEEBE_BROKER_EXPORTERS_HAZELCAST_CLASSNAME=io.zeebe.hazelcast.exporter.HazelcastExporter
       - ZEEBE_BROKER_EXPORTERS_HAZELCAST_JARPATH=lib/zeebe-hazelcast-exporter.jar
+      - ZEEBE_BROKER_DATA_DISKUSAGEMONITORINGENABLED=false
     ports:
       - "26501:26500"
       - "9600:9600"
@@ -49,7 +50,7 @@ services:
     image: mongo-express
     restart: always
     ports:
-      - "8081:8081"
+      - "127.0.0.1:8081:8081"
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: root
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
