@@ -31,7 +31,7 @@ services:
     volumes:
       - ./volumes/simple_monitor_h2_db:/h2-db
     environment:
-      - white-label.custom.title=PhD Asssess Monitor
+      - white-label.custom.title=PhD Assess Monitor
       - zeebe.client.broker.contactPoint=zeebe:26501
       - zeebe.client.worker.hazelcast.connection=zeebe:5701
       - spring.datasource.url=jdbc:h2:file:/h2-db/simple-monitor;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;
