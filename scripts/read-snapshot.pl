@@ -67,7 +67,7 @@ sub parse_key {
   }
 
   TOK: while(length $key) {
-    if (my $tok = Tok::Int64->take($key) ||
+    if (my $tok = Tok::ZeebeKey->take($key) ||
         Tok::String->take($key)) {
       push @toks, $tok;
     } else {
@@ -78,14 +78,6 @@ sub parse_key {
   }
 
   return join(" ", map { $_->pretty } @toks);
-}
-
-sub unpack_int64 {
-  my ($bytes) = @_;
-  die unless length($bytes) == 8;
-  my $num = unpack("Q", reverse($bytes));
-  return undef unless $num % (2**48) < 2**32;
-  return $num;
 }
 
 package Tok;
@@ -107,11 +99,20 @@ sub peek {
   my $class = shift;
   return undef unless 8 == length(my $bytes = substr($_[0], 0, 8));
   my $num = unpack("Q", reverse($bytes));
-  return undef unless $num % (2**48) < 2**32;
   bless \$num, $class;
 }
 
 sub pretty { ${$_[0]} }
+
+package Tok::ZeebeKey;
+
+use base qw(Tok::Int64);
+
+sub peek {
+  my $class = shift;
+  return unless my $self = $class->SUPER::peek(@_);
+  return ($$self % (2**48) < 2**32) ? $self : undef;
+}
 
 package Tok::ColumnFamily;
 
