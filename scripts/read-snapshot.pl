@@ -9,7 +9,7 @@ use URI::Escape;
 
 binmode STDOUT, ':utf8';
 
-my $db = RocksDB->new('/Users/quatrava/Dev/PhDassess/snapshots/65006208-50-65412316-65412297');
+my $db = RocksDB->new($ARGV[0]);
 
 my $iter = $db->new_iterator->seek_to_first;
 while (my ($key, $value) = $iter->each) {
