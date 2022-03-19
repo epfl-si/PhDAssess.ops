@@ -62,8 +62,8 @@ sub Data::MessagePack::Boolean::TO_JSON {
 sub parse_key {
   my ($key) = @_;
   my @toks;
-  unless (@toks = Tok::Int64Tag->take($key)) {
-    return sprintf("<no tag? %s>", parse_value($key));
+  unless (@toks = Tok::ColumnFamily->take($key)) {
+    return sprintf("<No column family? %s>", parse_value($key));
   }
 
   TOK: while(length $key) {
@@ -113,13 +113,63 @@ sub peek {
 
 sub pretty { ${$_[0]} }
 
-package Tok::Int64Tag;
+package Tok::ColumnFamily;
 
 use base qw(Tok::Int64);
 
+# as per `public enum ZbColumnFamilies`, from the Book of
+# zeebe/engine/src/main/java/io/camunda/zeebe/engine/state/ZbColumnFamilies.java:
+
+our @ZbColumnFamilies; BEGIN { @ZbColumnFamilies = qw(
+  DEFAULT
+  KEY
+  PROCESS_VERSION
+
+  PROCESS_CACHE PROCESS_CACHE_BY_ID_AND_VERSION PROCESS_CACHE_DIGEST_BY_ID
+
+  ELEMENT_INSTANCE_PARENT_CHILD ELEMENT_INSTANCE_KEY
+  NUMBER_OF_TAKEN_SEQUENCE_FLOWS
+
+  ELEMENT_INSTANCE_CHILD_PARENT  VARIABLES
+  TEMPORARY_VARIABLE_STORE
+
+  TIMERS  TIMER_DUE_DATES  PENDING_DEPLOYMENT  DEPLOYMENT_RAW
+
+  JOBS JOB_STATES JOB_DEADLINES JOB_ACTIVATABLE
+
+  MESSAGE_KEY MESSAGES MESSAGE_DEADLINES MESSAGE_IDS
+  MESSAGE_CORRELATED MESSAGE_PROCESSES_ACTIVE_BY_CORRELATION_KEY
+  MESSAGE_PROCESS_INSTANCE_CORRELATION_KEYS
+
+  MESSAGE_SUBSCRIPTION_BY_KEY MESSAGE_SUBSCRIPTION_BY_SENT_TIME
+  MESSAGE_SUBSCRIPTION_BY_NAME_AND_CORRELATION_KEY
+
+  MESSAGE_START_EVENT_SUBSCRIPTION_BY_NAME_AND_KEY
+  MESSAGE_START_EVENT_SUBSCRIPTION_BY_KEY_AND_NAME
+
+  PROCESS_SUBSCRIPTION_BY_KEY
+  PROCESS_SUBSCRIPTION_BY_SENT_TIME
+
+  INCIDENTS
+  INCIDENT_PROCESS_INSTANCES
+  INCIDENT_JOBS
+
+  EVENT_SCOPE
+  EVENT_TRIGGER
+
+  BLACKLIST
+
+  EXPORTER
+
+  AWAIT_WORKLOW_RESULT
+
+  JOB_BACKOFF
+)};
+
 sub pretty {
   my ($self) = @_;
-  sprintf("<tag %d>", $self->SUPER::pretty);
+  my $cf_name = $ZbColumnFamilies[$$self] || "(unknown)";
+  "<$cf_name>";
 }
 
 package Tok::String;
