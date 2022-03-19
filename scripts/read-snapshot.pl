@@ -18,7 +18,7 @@ while (my ($key, $value) = $iter->each) {
   printf "%s: %s\n", $key, $value;
 }
 
-our $jsonist; BEGIN { $jsonist = JSON->new->convert_blessed; }
+our $jsonist; BEGIN { $jsonist = JSON->new->canonical->convert_blessed; }
 sub parse_value {
   my $packed = shift;
 
