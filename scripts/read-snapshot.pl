@@ -68,7 +68,8 @@ sub parse_key {
 
   TOK: while(length $key) {
     if (my $tok = Tok::ZeebeKey->take($key) ||
-        Tok::String->take($key)) {
+        Tok::String->take($key) ||
+        Tok::Timestamp->take($key)) {
       push @toks, $tok;
     } else {
       # Skip one byte, try again
@@ -202,4 +203,29 @@ sub cram {
 
 sub pretty {
   main::parse_value(shift->{bin})
+}
+
+package Tok::Timestamp;
+
+use base qw(Tok::Int64);
+use Date::Parse;
+use Math::BigInt;
+
+our ($timestamp_min, $timestamp_max); BEGIN {
+  ($timestamp_min, $timestamp_max) =
+    map { 1000 * Math::BigInt->new(str2time($_)) }
+    ("Jan  1 00:00:00 2020",
+     "Jan  1 00:00:00 2030");
+}
+
+sub peek {
+  my $class = shift;
+  return unless my $self = $class->SUPER::peek(@_);
+  return ($$self >= $timestamp_min && $$self <= $timestamp_max) ?
+    bless { millis => new Math::BigInt($$self) }, $class        :
+    undef;
+}
+
+sub pretty {
+  scalar localtime(shift->{millis}->bdiv(1000));
 }
