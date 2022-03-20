@@ -61,10 +61,11 @@ sub Data::MessagePack::Boolean::TO_JSON {
 
 sub parse_key {
   my ($key) = @_;
-  my @toks;
-  unless (@toks = Tok::ColumnFamily->take($key)) {
+  my $cf;
+  unless ($cf = Tok::ColumnFamily->take($key)) {
     return sprintf("<No column family? %s>", parse_value($key));
   }
+  my @toks = ($cf);
 
   TOK: while(length $key) {
     if (my $tok = Tok::ZeebeKey->take($key) ||
@@ -168,9 +169,11 @@ our @ZbColumnFamilies; BEGIN { @ZbColumnFamilies = qw(
   JOB_BACKOFF
 )};
 
+sub name { my $self = shift; $ZbColumnFamilies[$$self] || "(unknown)" }
+
 sub pretty {
   my ($self) = @_;
-  my $cf_name = $ZbColumnFamilies[$$self] || "(unknown)";
+  my $cf_name = $self->name;
   "<$cf_name>";
 }
 
