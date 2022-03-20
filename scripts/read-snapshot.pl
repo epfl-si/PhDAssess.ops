@@ -184,7 +184,7 @@ use base qw(Tok);
 sub peek {
   my ($class, $bytes) = @_;
   return unless my $len = unpack("N", $bytes);  # Not zero
-  return unless $len == length(my $str = substr($bytes, 4, 4 + $len));
+  return unless $len == length(my $str = substr($bytes, 4, $len));
   return if $str =~ m/[\N{U+00}-\N{U+1f}]/;
   bless {
     str => $str
