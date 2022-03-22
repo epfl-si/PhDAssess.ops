@@ -9,7 +9,7 @@ RUN set -e -x; \
     build_packages="build-essential libperl-dev git cpanminus"; \
     apt -qy update; \
     DEBIAN_FRONTEND=noninteractive apt -qy install $runtime_packages $build_packages; \
-    cpanm Date::Parse URI::Escape; \
+    cpanm Date::Parse URI::Escape Crypt::Rhash File::Find File::Slurp; \
     cpanm --installdeps RocksDB; \
     git clone -b fix/build-on-modern-ubuntu https://github.com/epfl-si/RocksDB; \
     ( cd RocksDB; \

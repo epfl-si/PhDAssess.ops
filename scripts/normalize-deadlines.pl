@@ -16,7 +16,7 @@ through the Docker image built from C<../docker/zeebe-tools>.
 
 use FindBin qw($Bin $Script);
 use File::Spec;
-# For ZeebeDB::Key while outside the container - Doesn't harm inside it:
+# For ZeebeDB::* libs while outside the container - Doesn't harm inside it:
 use lib "$Bin/perllib";
 
 # If we can't have RocksDB, run the same script inside Docker:
@@ -40,9 +40,10 @@ BEGIN {
 
 use v5.21;
 use Data::MessagePack;
+use ZeebeDB;
 use ZeebeDB::Key;
 
-my $db = RocksDB->new($ARGV[0]);
+my $db = ZeebeDB->open($ARGV[0]);
 
 my %job_deadlines;
 
@@ -97,6 +98,8 @@ foreach my $deadline (sort { $a->{timestamp} <=> $b->{timestamp}} (values %job_d
   $db->put(ZeebeDB::Key->serialize($deadline_cf, @{$deadline->{key}}), $nil)
 }
 warn "... " . values(%job_deadlines) . " entries added.\n";
+
+$db->close();
 
 sub walk_column_family ($&) {
   my ($cf_name, $walker) = @_;
