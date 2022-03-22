@@ -52,7 +52,7 @@ warn "Scanning JOB_STATES...\n";
 walk_column_family JOB_STATES => sub {
   my (undef, $state, undef, $jobKey) = @_;
   $jobKey = $jobKey->pretty;
-  if ($state->{jobState} eq "ACTIVATED") {
+  if ($state->{jobState} =~ m/ACTIVATED|ACTIVATABLE/) {
     $job_deadlines{$jobKey} = 1;
   }
 };
