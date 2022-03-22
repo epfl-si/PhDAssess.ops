@@ -68,7 +68,7 @@ my %fds;
 sub emit_structured_json {
   my ($targetdir, @kv) = @_;
   my $cf = shift @kv;
-  my $cfname = $cf->name;
+  my $cfname = UNIVERSAL::can($cf, "name") ? $cf->name : $cf;
   $fds{$cfname} ||= do {
     my $filename = "$targetdir/$cfname.json";
     my $fd = IO::File->new($filename, "w")
