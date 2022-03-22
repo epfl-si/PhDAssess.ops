@@ -51,10 +51,10 @@ sub peek {
   my $class = shift;
   return undef unless 8 == length(my $bytes = substr($_[0], 0, 8));
   my $num = unpack("Q", reverse($bytes));
-  bless \$num, $class;
+  bless { num => $num }, $class;
 }
 
-sub pretty  { ${$_[0]} }
+sub pretty  { shift->{num} }
 
 package ZeebeDB::Key::Tok::ZeebeKey;
 
@@ -63,7 +63,7 @@ use base qw(ZeebeDB::Key::Tok::Int64);
 sub peek {
   my $class = shift;
   return unless my $self = $class->SUPER::peek(@_);
-  return ($$self % (2**48) < 2**32) ? $self : undef;
+  return ($self->{num} % (2**48) < 2**32) ? $self : undef;
 }
 
 package ZeebeDB::Key::Tok::ColumnFamily;
@@ -119,7 +119,7 @@ our @ZbColumnFamilies; BEGIN { @ZbColumnFamilies = qw(
   JOB_BACKOFF
 )};
 
-sub name { my $self = shift; $ZbColumnFamilies[$$self] || "(unknown)" }
+sub name { my $self = shift; $ZbColumnFamilies[$self->{num}] || "(unknown)" }
 
 sub pretty {
   my ($self) = @_;
@@ -184,8 +184,8 @@ our ($timestamp_min, $timestamp_max); BEGIN {
 sub peek {
   my $class = shift;
   return unless my $self = $class->SUPER::peek(@_);
-  return ($$self >= $timestamp_min && $$self <= $timestamp_max) ?
-    bless { millis => new Math::BigInt($$self) }, $class        :
+  return ($self->{num} >= $timestamp_min && $self->{num} <= $timestamp_max) ?
+    bless { millis => new Math::BigInt($self->{num}) }, $class            :
     undef;
 }
 
