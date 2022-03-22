@@ -7,10 +7,11 @@ FROM ubuntu:bionic
 
 RUN set -e -x; \
     runtime_packages="curl librocksdb5.8 openjdk-17-jre-headless perl-modules-5.26 \
-                    libdata-messagepack-perl"; \
+                    libdata-messagepack-perl libjson-perl"; \
     build_packages="build-essential librocksdb-dev libperl-dev git cpanminus"; \
     apt -qy update; \
     apt -qy install $runtime_packages $build_packages; \
+    cpanm Date::Parse URI::Escape; \
     cpanm --installdeps RocksDB; \
     cpanm --force RocksDB; \
     apt -qy remove --auto-remove $build_packages; \
