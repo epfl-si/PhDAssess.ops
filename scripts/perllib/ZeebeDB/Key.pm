@@ -29,6 +29,10 @@ sub parse {
   return wantarray ? @toks : join(" ", map { $_->pretty } @toks);
 }
 
+sub serialize {
+  my ($class, @toks) = @_;
+  return join("", map { $_->{bytes} } @toks);
+}
 
 package ZeebeDB::Key::Tok;
 
@@ -37,6 +41,11 @@ sub take {
   return unless my $self = $class->peek(@_);
   substr($_[0], 0, $self->bytes_length, "");
   return $self;
+}
+
+sub new {
+  my ($class, $bytes) = @_;
+  bless { bytes => $bytes // "" }, $class;
 }
 
 sub TO_JSON { shift->pretty }
@@ -50,11 +59,17 @@ sub bytes_length { 8 }
 sub peek {
   my $class = shift;
   return undef unless 8 == length(my $bytes = substr($_[0], 0, 8));
-  my $num = unpack("Q", reverse($bytes));
-  bless { num => $num }, $class;
+  my $self = $class->SUPER::new($bytes);
+  $self->{num} = unpack("Q", reverse($bytes));
+  $self;
 }
 
 sub pretty  { shift->{num} }
+
+sub new {
+  my ($class, $num) = @_;
+  $class->peek(scalar reverse(pack("Q", $num)));
+}
 
 package ZeebeDB::Key::Tok::ZeebeKey;
 
@@ -119,7 +134,22 @@ our @ZbColumnFamilies; BEGIN { @ZbColumnFamilies = qw(
   JOB_BACKOFF
 )};
 
+our %ZbColumnFamilies; BEGIN {
+  for(my $i = 0; $i <= $#ZbColumnFamilies; $i++) {
+    $ZbColumnFamilies{$ZbColumnFamilies[$i]} = $i;
+  }
+}
+
 sub name { my $self = shift; $ZbColumnFamilies[$self->{num}] || "(unknown)" }
+
+sub new {
+  my ($class, $value) = @_;
+  if ($ZbColumnFamilies{$value}) {
+    $value = $ZbColumnFamilies{$value};
+  }
+  my $self = new ZeebeDB::Key::Tok::Int64($value);
+  bless $self, $class;
+}
 
 sub pretty {
   my ($self) = @_;
@@ -143,6 +173,8 @@ sub peek {
 }
 
 sub bytes_length { 4 + length(shift->{str}) }
+
+sub new { die "UNIMPLEMENTED"; }
 
 sub pretty {
   my $self = shift;
@@ -183,10 +215,10 @@ our ($timestamp_min, $timestamp_max); BEGIN {
 
 sub peek {
   my $class = shift;
-  return unless my $self = $class->SUPER::peek(@_);
-  return ($self->{num} >= $timestamp_min && $self->{num} <= $timestamp_max) ?
-    bless { millis => new Math::BigInt($self->{num}) }, $class            :
-    undef;
+  return unless my $self = ZeebeDB::Key::Tok::Int64->peek(@_);
+  return unless $self->{num} >= $timestamp_min && $self->{num} <= $timestamp_max;
+  $self->{millis} = Math::BigInt->new($self->{num});
+  return bless $self, $class;
 }
 
 sub pretty {
