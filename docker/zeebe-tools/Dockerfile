@@ -1,22 +1,25 @@
 # Dockerfile for the “zeebe-tools” image, used by operators to look
 # around and fix things
 
-# As it turns out, upstream https://github.com/spiritloose/RocksDB is
-# quite tightly coupled to the year 2018:
-FROM ubuntu:bionic
+FROM ubuntu:focal
 
 RUN set -e -x; \
-    runtime_packages="curl librocksdb5.8 openjdk-17-jre-headless perl-modules-5.26 \
+    runtime_packages="curl openjdk-17-jre-headless perl-modules-5.30 \
                     libdata-messagepack-perl libjson-perl"; \
-    build_packages="build-essential librocksdb-dev libperl-dev git cpanminus"; \
+    build_packages="build-essential libperl-dev git cpanminus"; \
     apt -qy update; \
-    apt -qy install $runtime_packages $build_packages; \
+    DEBIAN_FRONTEND=noninteractive apt -qy install $runtime_packages $build_packages; \
     cpanm Date::Parse URI::Escape; \
     cpanm --installdeps RocksDB; \
-    cpanm --force RocksDB; \
+    git clone -b fix/build-on-modern-ubuntu https://github.com/epfl-si/RocksDB; \
+    ( cd RocksDB; \
+      perl Build.PL; \
+      ./Build; \
+      ./Build install; \
+    ); \
     apt -qy remove --auto-remove $build_packages; \
     apt -q clean; \
-    rm -rf /root/.cpanm
+    rm -rf /root/.cpanm /root/RocksDB
 
 RUN set -e -x; \
   for download in zdb zdb.jar; do \
