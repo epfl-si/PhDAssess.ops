@@ -2,12 +2,6 @@
 
 use strict;
 use warnings qw(all);
-use RocksDB;
-use Data::MessagePack;
-use JSON;
-use URI::Escape;
-
-binmode STDOUT, ':utf8';
 
 =head1 NAME
 
@@ -29,6 +23,15 @@ C<jq> or R's L<arrow|https://arrow.apache.org/docs/r/>.
 
 =cut
 
+use RocksDB;
+use Data::MessagePack;
+use JSON;
+use FindBin qw($Bin);
+use lib "$Bin/perllib";
+use ZeebeDB::Key;
+
+binmode STDOUT, ':utf8';
+
 my $db = RocksDB->new($ARGV[0]);
 our $targetdir = $ARGV[1];  # Optional
 
@@ -38,9 +41,9 @@ my $iter = $db->new_iterator->seek_to_first;
 while (my ($key, $value) = $iter->each) {
   $value = parse_value($value);
   if ($targetdir) {
-    emit_structured_json($targetdir, parse_key($key), $value);
+    emit_structured_json($targetdir, ZeebeDB::Key->parse($key), $value);
   } else {
-    $key = parse_key($key);
+    $key = ZeebeDB::Key->parse($key);
     if (my $json = eval { $jsonist->encode($value) }) {
       $value = $json;
     } else {
@@ -80,7 +83,7 @@ sub emit_structured_json {
   # name for them to put into the JSON:
   my %stem_seq;
   foreach my $k (@kv) {
-    my ($keystem) = ref($k) =~ m/Tok::(.*)$/;
+    my ($keystem) = ref($k) =~ m/^.*::(.*)$/;
     $keystem = lc($keystem);
     my $keyname = $keystem . ++$stem_seq{$keystem};
     $data->{$keyname} = $k;
@@ -100,199 +103,10 @@ sub summarize_strings {
     return $wat;
   }
 
-  local $_ = $wat;
-  if (length() > 500) {
-    $_ = sprintf("%s[...%d...]%s", substr($_, 0, 25), length() - 50,
-                   substr($_, length() - 25, 25));
-  }
-  if (m/[\N{U+00}-\N{U+1f}]/ || m/\N{U+FF}/) {
-    $_ = uri_escape_utf8($_);
-  }
-  return $_;
+  return ZeebeDB::Key::Tok::String->pretty($wat);
 }
 
 sub Data::MessagePack::Boolean::TO_JSON {
   my $self = shift;
   if ($$self) { return "true" } else { return "false" }
 }
-
-sub parse_key {
-  my ($key) = @_;
-  my $cf;
-  unless ($cf = Tok::ColumnFamily->take($key)) {
-    return sprintf("<No column family? %s>", parse_value($key));
-  }
-  my @toks = ($cf);
-
-  TOK: while(length $key) {
-    if (my $tok = Tok::ZeebeKey->take($key) ||
-        Tok::String->take($key) ||
-        Tok::Timestamp->take($key)) {
-      push @toks, $tok;
-    } else {
-      # Skip one byte, try again
-      push @toks, Tok::Garbage->new unless $toks[$#toks]->can("cram");
-      $toks[$#toks]->cram(substr($key, 0, 1, ""));
-    }
-  }
-
-  return wantarray ? @toks : join(" ", map { $_->pretty } @toks);
-}
-
-package Tok;
-
-use JSON;
-
-sub take {
-  my $class = shift;
-  return unless my $self = $class->peek(@_);
-  substr($_[0], 0, $self->bytes_length, "");
-  return $self;
-}
-
-sub TO_JSON { shift->pretty }
-
-package Tok::Int64;
-
-use base qw(Tok);
-
-sub bytes_length { 8 }
-
-sub peek {
-  my $class = shift;
-  return undef unless 8 == length(my $bytes = substr($_[0], 0, 8));
-  my $num = unpack("Q", reverse($bytes));
-  bless \$num, $class;
-}
-
-sub pretty  { ${$_[0]} }
-
-package Tok::ZeebeKey;
-
-use base qw(Tok::Int64);
-
-sub peek {
-  my $class = shift;
-  return unless my $self = $class->SUPER::peek(@_);
-  return ($$self % (2**48) < 2**32) ? $self : undef;
-}
-
-package Tok::ColumnFamily;
-
-use base qw(Tok::Int64);
-
-# as per `public enum ZbColumnFamilies`, from the Book of
-# zeebe/engine/src/main/java/io/camunda/zeebe/engine/state/ZbColumnFamilies.java:
-
-our @ZbColumnFamilies; BEGIN { @ZbColumnFamilies = qw(
-  DEFAULT
-  KEY
-  PROCESS_VERSION
-
-  PROCESS_CACHE PROCESS_CACHE_BY_ID_AND_VERSION PROCESS_CACHE_DIGEST_BY_ID
-
-  ELEMENT_INSTANCE_PARENT_CHILD ELEMENT_INSTANCE_KEY
-  NUMBER_OF_TAKEN_SEQUENCE_FLOWS
-
-  ELEMENT_INSTANCE_CHILD_PARENT  VARIABLES
-  TEMPORARY_VARIABLE_STORE
-
-  TIMERS  TIMER_DUE_DATES  PENDING_DEPLOYMENT  DEPLOYMENT_RAW
-
-  JOBS JOB_STATES JOB_DEADLINES JOB_ACTIVATABLE
-
-  MESSAGE_KEY MESSAGES MESSAGE_DEADLINES MESSAGE_IDS
-  MESSAGE_CORRELATED MESSAGE_PROCESSES_ACTIVE_BY_CORRELATION_KEY
-  MESSAGE_PROCESS_INSTANCE_CORRELATION_KEYS
-
-  MESSAGE_SUBSCRIPTION_BY_KEY MESSAGE_SUBSCRIPTION_BY_SENT_TIME
-  MESSAGE_SUBSCRIPTION_BY_NAME_AND_CORRELATION_KEY
-
-  MESSAGE_START_EVENT_SUBSCRIPTION_BY_NAME_AND_KEY
-  MESSAGE_START_EVENT_SUBSCRIPTION_BY_KEY_AND_NAME
-
-  PROCESS_SUBSCRIPTION_BY_KEY
-  PROCESS_SUBSCRIPTION_BY_SENT_TIME
-
-  INCIDENTS
-  INCIDENT_PROCESS_INSTANCES
-  INCIDENT_JOBS
-
-  EVENT_SCOPE
-  EVENT_TRIGGER
-
-  BLACKLIST
-
-  EXPORTER
-
-  AWAIT_WORKLOW_RESULT
-
-  JOB_BACKOFF
-)};
-
-sub name { my $self = shift; $ZbColumnFamilies[$$self] || "(unknown)" }
-
-sub pretty {
-  my ($self) = @_;
-  my $cf_name = $self->name;
-  "<$cf_name>";
-}
-
-package Tok::String;
-
-use base qw(Tok);
-
-sub peek {
-  my ($class, $bytes) = @_;
-  return unless my $len = unpack("N", $bytes);  # Not zero
-  return unless $len == length(my $str = substr($bytes, 4, $len));
-  return if $str =~ m/[\N{U+00}-\N{U+1f}]/;
-  bless {
-    str => $str
-  }, $class;
-}
-
-sub bytes_length { 4 + length(shift->{str}) }
-
-sub pretty { shift->{str} }
-
-package Tok::Garbage;
-
-use base qw(Tok);
-
-sub new { bless { bin => "" }, shift }
-
-sub cram {
-  my ($self, $moar) = @_;
-  $self->{bin} .= $moar;
-}
-
-sub pretty {
-  main::parse_value(shift->{bin})
-}
-
-package Tok::Timestamp;
-
-use base qw(Tok::Int64);
-use Date::Parse;
-use Math::BigInt;
-
-our ($timestamp_min, $timestamp_max); BEGIN {
-  ($timestamp_min, $timestamp_max) =
-    map { 1000 * Math::BigInt->new(str2time($_)) }
-    ("Jan  1 00:00:00 2020",
-     "Jan  1 00:00:00 2030");
-}
-
-sub peek {
-  my $class = shift;
-  return unless my $self = $class->SUPER::peek(@_);
-  return ($$self >= $timestamp_min && $$self <= $timestamp_max) ?
-    bless { millis => new Math::BigInt($$self) }, $class        :
-    undef;
-}
-
-sub pretty {
-  scalar localtime(shift->{millis}->bdiv(1000));
-}
-sub TO_JSON { shift->{millis}->to_base(10) }
