@@ -27,7 +27,7 @@ use RocksDB;
 use Data::MessagePack;
 use JSON;
 use FindBin qw($Bin);
-use lib "$Bin/perllib";
+use lib "$Bin/../docker/zeebe-observability/lib";
 use ZeebeDB::Key;
 
 binmode STDOUT, ':utf8';

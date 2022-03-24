@@ -15,7 +15,7 @@ use warnings qw(all);
 use strict;
 
 use FindBin qw($Bin $Script);
-use lib "$FindBin::Bin/perllib";
+use lib "$FindBin::Bin/../docker/zeebe-observability/lib";
 use ZeebeDB;
 
 use v5.21;
