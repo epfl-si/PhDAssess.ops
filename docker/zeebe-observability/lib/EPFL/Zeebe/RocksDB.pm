@@ -8,6 +8,7 @@ instances that can be found in a Zeebe C<data> volume.
 package EPFL::Zeebe::RocksDB;
 
 use RocksDB;
+use Data::MessageUnpack;
 use ZeebeDB::Key;
 
 our $datadir = $ENV{ZEEBE_OBSERVABILITY_DATA_DIR} || "/usr/local/zeebe/data";
