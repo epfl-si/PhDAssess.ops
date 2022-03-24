@@ -19,18 +19,23 @@ use File::Basename;
 use Fcntl qw(:flock);
 
 sub open {
-  my ($class, $path) = @_;
+  my ($class, $path, $open_options) = @_;
   my $self = bless {
     path => $path,
     # Lazy-open (no db =>) - Mostly for the ability to no-op test the
     # checksum business
+    open_options => $open_options,
   }, $class;
   return $self;
 }
 
+sub readonly {
+  shift->{open_options}->{read_only} = 1;
+}
+
 sub db {
   my ($self) = @_;
-  $self->{db} ||= RocksDB->new($ARGV[0]);
+  $self->{db} ||= RocksDB->new($self->{path}, $self->{open_options});
   return $self->{db};
 }
 
