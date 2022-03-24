@@ -8,5 +8,4 @@
         <% END %>
         </ul>
       </div>
-<% settings.environment %> environment
 </div>
