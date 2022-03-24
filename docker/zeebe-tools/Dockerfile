@@ -40,7 +40,7 @@ RUN set -e -x; \
     ); \
     apt -qy remove --auto-remove $build_packages; \
     apt -q clean; \
-    rm -rf /root/.cpanm /root/RocksDB
+    rm -rf /root/.cpanm RocksDB /var/lib/apt/lists
 
 RUN set -e -x; \
   for download in zdb zdb.jar; do \

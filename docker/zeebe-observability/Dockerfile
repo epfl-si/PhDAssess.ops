@@ -16,7 +16,7 @@ RUN set -e -x; \
     cpanm --installdeps --notest . ; \
     apt -qy remove --auto-remove $build_packages; \
     apt -q clean; \
-    rm -rf /root/.cpanm
+    rm -rf /root/.cpanm /var/lib/apt/lists
 
 COPY . /dancer
 
