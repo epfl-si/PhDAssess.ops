@@ -79,7 +79,6 @@ sub all {
   find({
     no_chdir => 1,
     wanted => sub {
-      warn $_;
       return unless -d && m[(?:^|/)(\d+-\d+-\d+-\d+)$];
       push @all, $class->open($1);
     }
