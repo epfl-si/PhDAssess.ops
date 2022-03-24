@@ -1,0 +1,13 @@
+requires "Dancer2" => "0.300000";
+requires "Plack::Builder" => "0";
+
+requires "File::Find" => "0";
+requires "File::Basename" => "0";
+requires "RocksDB" => "0";
+requires "Template" => "0";
+
+on "test" => sub {
+    requires "Test::More"            => "0";
+    requires "HTTP::Request::Common" => "0";
+};
+

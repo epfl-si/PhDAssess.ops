@@ -1,0 +1,12 @@
+<div id="page">
+      <div id="content">
+        <h1><% title %></h1>
+        <% snapshots.size %> snapshots found
+        <ul>
+        <% FOREACH snapshot IN snapshots %>
+        <li><a href="<% snapshot.uri %>"><% snapshot.name %></a></li>
+        <% END %>
+        </ul>
+      </div>
+<% settings.environment %> environment
+</div>
