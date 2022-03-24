@@ -6,6 +6,7 @@ requires "File::Basename" => "0";
 requires "RocksDB" => "0";
 requires "Template" => "0";
 requires "Template::Plugin::JSON::Escape" => "0";
+requires "Data::MessagePack" => "0";
 
 on "test" => sub {
     requires "Test::More"            => "0";
