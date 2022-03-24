@@ -83,6 +83,17 @@ sub close {
   $checksum->overwrite();
 }
 
+sub walk_column_family {
+  my ($self, $cf_name, $walker) = @_;
+  my $iter = $self->db->new_iterator->seek_to_first;
+  while (my ($key, $value) = $iter->each) {
+    eval { $value = Data::MessagePack->unpack($value) };
+    my ($cf, @key_toks) = ZeebeDB::Key->parse($key);
+    next unless $cf->name eq $cf_name;
+    $walker->($key, $value, $cf, @key_toks);
+  }
+}
+
 package ZeebeDB::_Checksum;
 
 use File::Basename;

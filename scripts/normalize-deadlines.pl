@@ -47,20 +47,18 @@ my $db = ZeebeDB->open($ARGV[0]);
 
 my %job_deadlines;
 
-sub walk_column_family ($&);
-
 warn "Scanning JOB_STATES...\n";
-walk_column_family JOB_STATES => sub {
+$db->walk_column_family(JOB_STATES => sub {
   my (undef, $state, undef, $jobKey) = @_;
   $jobKey = $jobKey->pretty;
   if ($state->{jobState} =~ m/ACTIVATED|ACTIVATABLE/) {
     $job_deadlines{$jobKey} = 1;
   }
-};
+});
 warn ("... " . keys(%job_deadlines) . " activated jobs found.\n");
 
 warn "Scanning JOBS...\n";
-walk_column_family JOBS => sub {
+$db->walk_column_family(JOBS => sub {
   my (undef, $job, $cf, $jobKey) = @_;
   $jobKey = $jobKey->pretty;
   next unless $job_deadlines{$jobKey} and (my $deadline = $job->{jobRecord}->{deadline});
@@ -71,7 +69,7 @@ walk_column_family JOBS => sub {
       ZeebeDB::Key::Tok::ZeebeKey->new($jobKey)
     ]
   };
-};
+});
 
 my $orphan_count = 0;
 foreach my $j (keys %job_deadlines) {
@@ -84,11 +82,11 @@ warn ("... found $orphan_count jobs without a deadline.\n");
 
 warn "Deleting all JOB_DEADLINES...\n";
 my $deleted_count = 0;
-walk_column_family JOB_DEADLINES => sub {
+$db->walk_column_family(JOB_DEADLINES => sub {
   my ($key) = @_;
   $db->delete($key);
   $deleted_count++;
-};
+});
 warn "... $deleted_count entries deleted.\n";
 
 warn "Populating JOB_DEADLINES...\n";
@@ -100,14 +98,3 @@ foreach my $deadline (sort { $a->{timestamp} <=> $b->{timestamp}} (values %job_d
 warn "... " . values(%job_deadlines) . " entries added.\n";
 
 $db->close();
-
-sub walk_column_family ($&) {
-  my ($cf_name, $walker) = @_;
-  my $iter = $db->new_iterator->seek_to_first;
-  while (my ($key, $value) = $iter->each) {
-    eval { $value = Data::MessagePack->unpack($value) };
-    my ($cf, @key_toks) = ZeebeDB::Key->parse($key);
-    next unless $cf->name eq $cf_name;
-    $walker->($key, $value, $cf, @key_toks);
-  }
-}
