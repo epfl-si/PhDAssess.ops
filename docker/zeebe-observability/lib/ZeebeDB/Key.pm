@@ -154,7 +154,7 @@ sub new {
 sub pretty {
   my ($self) = @_;
   my $cf_name = $self->name;
-  "<$cf_name>";
+  "[$cf_name]";
 }
 
 package ZeebeDB::Key::Tok::String;

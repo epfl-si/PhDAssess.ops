@@ -29,11 +29,11 @@ get '/rocksdb/' => sub {
 
 get '/rocksdb/snapshots/:snapshotid[StrMatch[qr{\d+-\d+-\d+}]]' => sub {
     my $id = route_parameters->get('snapshotid');
-    my $rocksdb = EPFL::Zeebe::RocksDB::Snapshot->load($id)
+    my $rocksdb = EPFL::Zeebe::RocksDB::Snapshot->open($id)
       or return a_404;
     template "rocksdb-mainmenu", {
       moniker => "Snapshot $id",
-      rocksdb => $rocksdb,
+      dump => $rocksdb->dump
     };
 };
 
