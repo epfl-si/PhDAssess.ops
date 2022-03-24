@@ -1,6 +1,5 @@
 package EPFL::Zeebe::Observability;
 use Dancer2;
-use Dancer::Exception qw(:all);
 
 use EPFL::Zeebe::RocksDB;
 
