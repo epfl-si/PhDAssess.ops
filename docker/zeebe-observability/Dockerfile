@@ -7,9 +7,9 @@ WORKDIR /dancer
 COPY cpanfile /dancer
 
 RUN set -e -x; \
-    runtime_packages="libdancer2-perl libtemplate-perl"; \
+    runtime_packages="libdancer2-perl libtemplate-perl libcrypt-cbc-perl"; \
     not_really_a_runtime_package_but_we_keep_it_anyway="make"; \
-    build_packages="cpanminus"; \
+    build_packages="build-essential cpanminus libssl-dev"; \
     apt -qy update; \
     DEBIAN_FRONTEND=noninteractive apt -qy install $runtime_packages \
       $build_packages $not_really_a_runtime_package_but_we_keep_it_anyway; \

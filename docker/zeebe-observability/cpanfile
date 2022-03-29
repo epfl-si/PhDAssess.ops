@@ -12,6 +12,9 @@ requires "Java" => 0;
 requires "Error" => 0;
 requires "IPC::Open2" => 0;
 requires "MIME::Base64" => 0;
+requires "IO::Socket::INET" => 0;
+requires "Crypt::CBC" => 0;
+requires "Crypt::OpenSSL::AES" => 0;
 
 on "test" => sub {
     requires "Test::More"            => "0";
