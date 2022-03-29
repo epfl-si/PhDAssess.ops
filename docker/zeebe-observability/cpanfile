@@ -2,11 +2,16 @@ requires "Dancer2" => "0.300000";
 requires "Plack::Builder" => "0";
 
 requires "File::Find" => "0";
+requires "File::Temp" => "0";
 requires "File::Basename" => "0";
 requires "RocksDB" => "0";
 requires "Template" => "0";
 requires "Template::Plugin::JSON::Escape" => "0";
 requires "Data::MessagePack" => "0";
+requires "Java" => 0;
+requires "Error" => 0;
+requires "IPC::Open2" => 0;
+requires "MIME::Base64" => 0;
 
 on "test" => sub {
     requires "Test::More"            => "0";
