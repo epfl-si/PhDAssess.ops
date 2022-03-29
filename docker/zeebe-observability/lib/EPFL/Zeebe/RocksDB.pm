@@ -67,6 +67,14 @@ sub summarize_strings {
   return ZeebeDB::Key::Tok::String->pretty($wat);
 }
 
+=head2 EPFL::Zeebe::RocksDB::Snapshot
+
+An instance of this class models a RocksDB database found under
+C<raft-partition/partitions/1/snapshots>, which is used as part of
+Zeebe's Raft consensus algorithm.
+
+=cut
+
 package EPFL::Zeebe::RocksDB::Snapshot;
 use base qw(EPFL::Zeebe::RocksDB);
 use File::Find;
