@@ -64,6 +64,9 @@ sub decrypt {
   local $_ = $struct;
   if (m/^(\d{13})$/) {
     return scalar localtime($_ / 1000);
+  } elsif (m/^"(.*)"$/) {
+    my $decrypt_inside = decrypt($1);
+    return qq'"$decrypt_inside"';
   } elsif (m/^U2Fsd/) {
     my $decrypted;
     if (! eval {
