@@ -35,7 +35,11 @@ sub readonly {
 
 sub db {
   my ($self) = @_;
-  $self->{db} ||= RocksDB->new($self->{path}, $self->{open_options});
+  if (! $self->{db}) {
+    my @new_opts = $self->{path};
+    push @new_opts, $self->{open_options} if $self->{open_options};
+    $self->{db} = RocksDB->new(@new_opts);
+  }
   return $self->{db};
 }
 
