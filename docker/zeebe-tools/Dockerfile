@@ -5,9 +5,9 @@ FROM ubuntu:focal
 
 # We want librocksdb 6. Not 5 (won't open our databases), not 7
 # (prevents RocksDB's XS code from compiling).
-# And can't just use ubuntu:impish, because its glibc won't work with
-# our OpenShift's dockerd, for the reason that someone has been
-# misinformed about the difference between EPERM and ENOSYS
+# And we can't just use FROM ubuntu:impish, because its glibc won't
+# work with our OpenShift's dockerd, for the reason that someone has
+# been misinformed about the difference between EPERM and ENOSYS
 # (https://bugs.launchpad.net/ubuntu/+source/libseccomp/+bug/1916485)
 RUN sed 's/focal/impish/g' < /etc/apt/sources.list > /etc/apt/sources.list.d/impish.list
 COPY dpkg-pref /etc/apt/preferences.d/rocksdb-of-impish.pref
@@ -47,3 +47,5 @@ RUN set -e -x; \
     curl -L -o /usr/local/bin/$download https://github.com/Zelldon/zdb/releases/latest/download/$download; \
   done; \
   chmod 755 /usr/local/bin/zdb
+
+COPY perllib/ZeebeDB.pm perllib/ZeebeDB /usr/local/lib/site_perl/

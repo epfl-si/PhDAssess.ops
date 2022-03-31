@@ -17,7 +17,7 @@ through the Docker image built from C<../docker/zeebe-tools>.
 use FindBin qw($Bin $Script);
 use File::Spec;
 # For ZeebeDB::* libs while outside the container - Doesn't harm inside it:
-use lib "$Bin/../docker/zeebe-observability/lib";
+use lib "$Bin/../docker/zeebe-tools/perllib";
 
 # If we can't have RocksDB, run the same script inside Docker:
 BEGIN {

@@ -9,6 +9,12 @@ package EPFL::Zeebe::RocksDB;
 
 use RocksDB;
 use Data::MessagePack;
+
+# In development mode, find Perl libs “belonging to” the other Docker
+# image (harmless in production):
+use FindBin qw($Bin);
+use lib "$Bin/../../zeebe-tools/perllib";
+
 use ZeebeDB::Key;
 
 our $datadir = $ENV{ZEEBE_OBSERVABILITY_DATA_DIR} || "/usr/local/zeebe/data";
