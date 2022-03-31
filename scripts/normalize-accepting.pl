@@ -57,6 +57,7 @@ use v5.21;
 use Data::MessagePack;
 use ZeebeDB;
 use ZeebeDB::Key;
+use List::Util qw(max);
 
 my $db = ZeebeDB->open($ARGV[0]);
 
@@ -75,8 +76,11 @@ warn sprintf("... %d distinct element instance keys found from %d jobs\n",
 
 warn "Scanning existing EVENT_SCOPE entries...\n";
 my $eventScopeCount = 0;
-$db->walk_column_family(EVENT_SCOPE => sub {
-  my (undef, $eventScope, undef, $eventScopeKey) = @_;
+my %eventScopeRaws;
+$db->walk_column_family_raw(EVENT_SCOPE => sub {
+  my (undef, $eventScopeRaw, undef, $eventScopeKey) = @_;
+  $eventScopeRaws{$eventScopeRaw}++;
+  my $eventScope = Data::MessagePack->unpack($eventScopeRaw);
   $eventScopeKey = $eventScopeKey->pretty;
   if (! $elementInstanceKeys{$eventScopeKey}) {
     warn "Event scope key $eventScopeKey doesn't belong to a job.";
@@ -87,12 +91,13 @@ $db->walk_column_family(EVENT_SCOPE => sub {
 warn sprintf("... %d entries found, %d missing (will be recreated)\n",
              $eventScopeCount, scalar(keys(%elementInstanceKeys)));
 
+
+%eventScopeRaws = reverse %eventScopeRaws;
+my $mostFrequentEventScopeRaw = $eventScopeRaws{max(keys %eventScopeRaws)};
 my $event_scope_cf = ZeebeDB::Key::Tok::ColumnFamily->new("EVENT_SCOPE");
-my $mp = Data::MessagePack->new();
 foreach my $k (keys %elementInstanceKeys) {
   $db->put(ZeebeDB::Key->serialize($event_scope_cf, ZeebeDB::Key::Tok::ZeebeKey->new($k)),
-           $mp->pack({ accepting => $Data::MessagePack::Boolean::true,
-                       interrupting => [] }));
+           $mostFrequentEventScopeRaw);
 }
 
 $db->close();
