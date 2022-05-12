@@ -38,8 +38,8 @@ our $targetdir = $ARGV[1];  # Optional
 our $jsonist; BEGIN { $jsonist = JSON->new->canonical->convert_blessed; }
 
 my $iter = $db->new_iterator->seek_to_first;
-while (my ($key, $value) = $iter->each) {
-  $value = parse_value($value);
+while (my ($key, $msgpacked) = $iter->each) {
+  my $value = parse_value($msgpacked);
   if ($targetdir) {
     emit_structured_json($targetdir, ZeebeDB::Key->parse($key), $value);
   } else {
@@ -48,6 +48,10 @@ while (my ($key, $value) = $iter->each) {
       $value = $json;
     } else {
       $value = "<???>";
+    }
+
+    if ($key =~ m/EVENT_SCOPE/) {
+      $value .= sprintf(" /* %s */", summarize_strings($msgpacked));
     }
 
     printf "%s: %s\n", $key, $value;
