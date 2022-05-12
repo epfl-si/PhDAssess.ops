@@ -16,4 +16,5 @@ tasks_journal <-
 
 tasks_journal %>%
     ggplot(aes(x = lastSeen, y = seenCount)) +
-    geom_point()
+    geom_point() +
+    scale_y_log10()
