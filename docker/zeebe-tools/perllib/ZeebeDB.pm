@@ -92,6 +92,35 @@ sub close {
   $checksum->overwrite();
 }
 
+=head2 walk_column_family ($cf_name, $walker)
+
+Call C<$walker> once per line in the column family C<$cf_name>.
+
+C<$walker> will be called as
+
+  $walker->($keyRaw, $value, @keyParts)
+
+
+where
+
+=over
+
+=item C<$keyRaw>
+
+is the raw (binary) key as seen by the RocksDB cursor
+
+=item C<$value>
+
+is the MessagePack-decoded value as a L<Data::MessagePack> object if the decoding was successful; or the raw value otherwise
+
+=item C<@keyParts>
+
+is whatever C<< ZeebeDB::Key->parse($keyRaw) >> returns
+
+=back
+
+=cut
+
 sub walk_column_family {
   my ($self, $cf_name, $walker) = @_;
   $self->walk_column_family_raw($cf_name, sub {
@@ -99,6 +128,13 @@ sub walk_column_family {
                                   $walker->(@_);
                                 });
 }
+
+=head2 walk_column_family_raw ($cf_name, $walker)
+
+Like L</walk_column_family>, except the value is not decoded and is
+still in binary form.
+
+=cut
 
 sub walk_column_family_raw {
   my ($self, $cf_name, $walker) = @_;
