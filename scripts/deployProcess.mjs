@@ -1,7 +1,9 @@
-const ZB = require('zeebe-node')
-const findUp = require('find-up')
+//const findUp = require('find-up')
+import {findUpSync} from 'find-up'
+import ZB from 'zeebe-node'
+import dotenv from 'dotenv'
 
-require("dotenv").config({path: findUp.sync(".env")})
+dotenv.config({path: findUpSync(".env")})
 
 void (async () => {
   const zbc = new ZB.ZBClient() // localhost:26500 || ZEEBE_GATEWAY_ADDRESS
