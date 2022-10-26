@@ -5,12 +5,12 @@ FROM ubuntu:focal
 
 # We want librocksdb 6. Not 5 (won't open our databases), not 7
 # (prevents RocksDB's XS code from compiling).
-# And we can't just use FROM ubuntu:impish, because its glibc won't
+# And we can't just use FROM ubuntu:jammy, because its glibc won't
 # work with our OpenShift's dockerd, for the reason that someone has
 # been misinformed about the difference between EPERM and ENOSYS
 # (https://bugs.launchpad.net/ubuntu/+source/libseccomp/+bug/1916485)
-RUN sed 's/focal/impish/g' < /etc/apt/sources.list > /etc/apt/sources.list.d/impish.list
-COPY dpkg-pref /etc/apt/preferences.d/rocksdb-of-impish.pref
+RUN sed 's/focal/jammy/g' < /etc/apt/sources.list > /etc/apt/sources.list.d/jammy.list
+COPY dpkg-pref /etc/apt/preferences.d/rocksdb-of-jammy.pref
 
 # Arguably even messier stuff is afoot below. Some explanations:
 #
@@ -25,7 +25,7 @@ COPY dpkg-pref /etc/apt/preferences.d/rocksdb-of-impish.pref
 #   any useful troubleshooting info from our OpenShift build logs.
 #
 RUN set -e -x; \
-    runtime_packages="curl openjdk-17-jre-headless perl-modules-5.30 \
+    runtime_packages="curl openjdk-17-jre-headless perl-modules-5.34 \
                     libdata-messagepack-perl libjson-perl librocksdb6.11"; \
     build_packages="build-essential librocksdb-dev libperl-dev git cpanminus"; \
     apt -qy update; \
