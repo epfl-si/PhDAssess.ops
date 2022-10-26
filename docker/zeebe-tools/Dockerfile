@@ -26,11 +26,12 @@ COPY dpkg-pref /etc/apt/preferences.d/rocksdb-of-jammy.pref
 #
 RUN set -e -x; \
     runtime_packages="curl openjdk-17-jre-headless perl-modules-5.34 \
-                    libdata-messagepack-perl libjson-perl librocksdb6.11"; \
+                    libdata-messagepack-perl libjson-perl librocksdb6.11 \
+                    libtimedate-perl liburi-perl"; \
     build_packages="build-essential librocksdb-dev libperl-dev git cpanminus"; \
     apt -qy update; \
     DEBIAN_FRONTEND=noninteractive apt -qy install $runtime_packages $build_packages; \
-    cpanm Date::Parse URI::Escape Crypt::Rhash File::Find File::Slurp; \
+    cpanm URI::Escape Crypt::Rhash File::Find File::Slurp; \
     cpanm --installdeps RocksDB; \
     git clone -b fix/build-on-modern-ubuntu https://github.com/epfl-si/RocksDB; \
     ( cd RocksDB; \
