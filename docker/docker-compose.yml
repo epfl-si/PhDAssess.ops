@@ -7,23 +7,42 @@ networks:
     driver: bridge
 
 services:
-  zeebe:
-    container_name: zeebe_broker
-    # See `make pull` in ../Makefile:
-    image: os-docker-registry.epfl.ch/phd-assess-test/zeebe-broker-with-exporters
+  zeebe_node_0:
+    extends:
+      file: template-zeebe-compose.yml
+      service: zeebe_node_0
+    container_name: zeebe_node_0
     environment:
-      - ZEEBE_LOG_LEVEL=info
-      - ZEEBE_BROKER_EXPORTERS_HAZELCAST_CLASSNAME=io.zeebe.hazelcast.exporter.HazelcastExporter
-      - ZEEBE_BROKER_EXPORTERS_HAZELCAST_JARPATH=lib/zeebe-hazelcast-exporter.jar
-      - ZEEBE_BROKER_DATA_DISKUSAGEMONITORINGENABLED=false
-    ports:
-      - "26501:26500"
-      - "9600:9600"
-      - "5701:5701"
+      - ZEEBE_BROKER_CLUSTER_NODEID=0
     volumes:
-      - ./volumes/zeebe_data:/usr/local/zeebe/data
-    networks:
-      - zeebe_network
+      - ./volumes/zeebe_data_node_0:/usr/local/zeebe/data
+    ports:
+      - "26501-26503:26500-26502"
+
+  zeebe_node_1:
+    extends:
+      file: template-zeebe-compose.yml
+      service: zeebe_node_1
+    container_name: zeebe_node_1
+    environment:
+      - ZEEBE_BROKER_CLUSTER_NODEID=1
+    volumes:
+      - ./volumes/zeebe_data_node_1:/usr/local/zeebe/data
+    ports:
+      - "26504-26506:26500-26502"
+
+  zeebe_node_2:
+    extends:
+      file: template-zeebe-compose.yml
+      service: zeebe_node_2
+    container_name: zeebe_node_2
+    environment:
+      - ZEEBE_BROKER_CLUSTER_NODEID=2
+    volumes:
+      - ./volumes/zeebe_data_node_2:/usr/local/zeebe/data
+    ports:
+      - "26507-26509:26500-26502"
+
   monitor:
     container_name: zeebe_monitor
     build: simple-monitor
@@ -39,13 +58,13 @@ services:
       - spring.jpa.hibernate.ddl-auto=update
     ports:
       - "8082:8082"
-    depends_on:
-      - zeebe
     networks:
       - zeebe_network
+
   mongo:
     image: mongo
     restart: always
+
   mongo-express:
     image: mongo-express
     restart: always
