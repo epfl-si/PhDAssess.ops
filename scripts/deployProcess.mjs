@@ -10,7 +10,10 @@ export default async function() {
   if (!zeebePort) zeebePort = '26501'
 
   const areYouReady = await question(`The bpmn from ${ bpmnURL } will be deployed with 'zbctl deploy'. Continue ? [Y/n] `)
-  if (areYouReady && ( areYouReady === 'n' || areYouReady === 'N' )) return
+  if (areYouReady && ( areYouReady === 'n' || areYouReady === 'N' )) {
+      console.log(`You can manually upload a bpmn with : zbctl deploy --port ${ zeebePort } --insecure path_to_your_bpmn_file; `)
+      return
+  }
 
   console.log(`Downloading the BPMN from ${bpmnURL}..`)
   await fetch(bpmnURL).then(
