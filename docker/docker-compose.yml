@@ -43,60 +43,60 @@ services:
     ports:
       - "26507-26509:26500-26502"
 
-  monitor:
-    container_name: zeebe_monitor
-    build: simple-monitor
-    image: phd-assess/simple-monitor
-    volumes:
-      - ./volumes/simple_monitor_h2_db:/h2-db
-    environment:
-      - white-label.custom.title=PhD Assess Monitor
-      - zeebe.client.broker.contactPoint=zeebe:26501
-      - zeebe.client.worker.hazelcast.connection=zeebe:5701
-      - spring.datasource.url=jdbc:h2:file:/h2-db/simple-monitor;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;
-      - spring.datasource.initialization-mode=never
-      - spring.jpa.hibernate.ddl-auto=update
-    ports:
-      - "8082:8082"
+#  monitor:
+#    container_name: zeebe_monitor
+#    build: simple-monitor
+#    image: phd-assess/simple-monitor
+#    volumes:
+#      - ./volumes/simple_monitor_h2_db:/h2-db
+#    environment:
+#      - white-label.custom.title=PhD Assess Monitor
+#      - zeebe.client.broker.contactPoint=zeebe:26501
+#      - zeebe.client.worker.hazelcast.connection=zeebe:5701
+#      - spring.datasource.url=jdbc:h2:file:/h2-db/simple-monitor;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;
+#      - spring.datasource.initialization-mode=never
+#      - spring.jpa.hibernate.ddl-auto=update
+#    ports:
+#      - "8082:8082"
+#    networks:
+#      - zeebe_network
+
+#  mongo:
+#    image: mongo
+#    restart: always
+
+#  mongo-express:
+#    image: mongo-express
+#    restart: always
+#    ports:
+#      - "127.0.0.1:8081:8081"
+#    environment:
+#      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+#      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+#      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
+#    depends_on:
+#      - mongo
+
+  notifier:
+    build:
+      context: ../../PhDAssess-Notifier
     networks:
       - zeebe_network
-
-  mongo:
-    image: mongo
-    restart: always
-
-  mongo-express:
-    image: mongo-express
-    restart: always
-    ports:
-      - "127.0.0.1:8081:8081"
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
     depends_on:
-      - mongo
+      - zeebe_node_0
+    env_file:
+      - ../../PhDAssess-Notifier/.env
 
-#  notifier:
-#    build:
-#      context: ../../PhDAssess-Notifier
-#    networks:
-#      - zeebe_network
-#    depends_on:
-#      - zeebe
-#    env_file:
-#      - ../../PhDAssess-Notifier/.env
+  pdf:
+    build:
+      context: ../../PhDAssess-PDF
+    networks:
+      - zeebe_network
+    depends_on:
+      - zeebe_node_0
+    env_file:
+      - ../../PhDAssess-PDF/.env
 
-#  pdf:
-#    build:
-#      context: ../../PhDAssess-PDF
-#    networks:
-#      - zeebe_network
-#    depends_on:
-#      - zeebe
-#    env_file:
-#      - ../../PhDAssess-PDF/.env
-#
 #  phd-assess:
 #    build:
 #      context: ..
