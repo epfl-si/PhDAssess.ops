@@ -15,16 +15,20 @@ export default async function() {
       return
   }
 
-  console.log(`Downloading the BPMN from ${bpmnURL}..`)
-  await fetch(bpmnURL).then(
-    async res => {
+  try {
+    await spinner(`Downloading the BPMN`, async () => {
+      const res = await fetch(bpmnURL)
       const dest = fs.createWriteStream(bpmnFullPath)
       await res.body.pipe(dest)
       console.log('File downloaded successfully')
+    })
 
-      console.log('Deploying the BPMN on Zeebe..')
+    await spinner(`Deploying the BPMN on Zeebe`, async () => {
       await $`zbctl deploy --port ${ zeebePort } --insecure ${ bpmnFullPath };`
-      console.log('BPMN deployed successfully')
-    }
-  ).catch(err => console.error(err))
+    })
+
+    console.log('BPMN deployed successfully')
+  } catch (err) {
+    console.error(err)
+  }
 }
