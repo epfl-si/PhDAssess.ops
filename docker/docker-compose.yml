@@ -43,23 +43,23 @@ services:
     ports:
       - "26507-26509:26500-26502"
 
-#  monitor:
-#    container_name: zeebe_monitor
-#    build: simple-monitor
-#    image: phd-assess/simple-monitor
-#    volumes:
-#      - ./volumes/simple_monitor_h2_db:/h2-db
-#    environment:
-#      - white-label.custom.title=PhD Assess Monitor
-#      - zeebe.client.broker.contactPoint=zeebe:26501
-#      - zeebe.client.worker.hazelcast.connection=zeebe:5701
-#      - spring.datasource.url=jdbc:h2:file:/h2-db/simple-monitor;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;
-#      - spring.datasource.initialization-mode=never
-#      - spring.jpa.hibernate.ddl-auto=update
-#    ports:
-#      - "8082:8082"
-#    networks:
-#      - zeebe_network
+  simple-monitor:
+    container_name: zeebe_simple_monitor
+    build: simple-monitor
+    image: phd-assess/simple-monitor
+    volumes:
+      - ./volumes/simple_monitor_h2_db:/h2-db
+    environment:
+      - white-label.custom.title=PhD Assess Monitor
+      - zeebe.client.broker.contactPoint=zeebe_node_0:26501
+      - zeebe.client.worker.hazelcast.connection=zeebe_node_0:5701
+      - spring.datasource.url=jdbc:h2:file:/h2-db/simple-monitor;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;
+      - spring.datasource.initialization-mode=never
+      - spring.jpa.hibernate.ddl-auto=update
+    ports:
+      - "8082:8082"
+    networks:
+      - zeebe_network
 
 #  mongo:
 #    image: mongo

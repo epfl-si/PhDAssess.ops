@@ -1,1 +1,1 @@
-FROM ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.3.0
+FROM ghcr.io/camunda-community-hub/zeebe-simple-monitor:2.4.1
