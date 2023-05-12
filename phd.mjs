@@ -30,6 +30,31 @@ async function run(args) {
 }
 
 async function clean(args) {
+
+  if (await question('Move Zeebe partitions to *.bak ? [y/N] ') === 'y') {
+    const pathZeebeVolume = path.join(__dirname, `docker/volumes`);
+
+    ['zeebe_data_node_0', 'zeebe_data_node_1', 'zeebe_data_node_2'].forEach((pathVolume) => {
+      const partitionInstanceVolumePath = path.join(pathZeebeVolume, pathVolume);
+      const bakPartitionInstanceVolumePath = path.join(pathZeebeVolume, `${pathVolume}.bak`);
+      fs.pathExistsSync(partitionInstanceVolumePath) &&
+        fs.moveSync(partitionInstanceVolumePath, bakPartitionInstanceVolumePath);
+      console.log(`Successfully moved ${partitionInstanceVolumePath} to ${bakPartitionInstanceVolumePath}`)
+    });
+  }
+
+  if (await question('Clean meteor db ? [y/N] ') === 'y') {
+    const fillFormPath = path.join(__dirname, `apps/fillForm`);
+    cd(fillFormPath);
+    await $`meteor reset`;
+    console.log(`Successfully reset the meteor db`)
+  }
+
+  if (await question('Clean simple monitor data ? [y/N] ') === 'y') {
+    const simpleMonitorVolumePath = path.join(__dirname, `docker/volumes/simple_monitor_h2_db`);
+    await fs.remove(path.join(simpleMonitorVolumePath, 'simple-monitor.mv.db'));
+    console.log(`Successfully removed ${path.join(simpleMonitorVolumePath, 'simple-monitor.mv.db')}`)
+  }
 }
 
 async function test(args) {
