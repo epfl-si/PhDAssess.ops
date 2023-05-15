@@ -17,6 +17,8 @@ if (argv.help || argv._[0] === 'help') {
   await deployProcess();
 } else if (argv._[0] === 'read-snapshot') {
   await readSnapshot(...argv._.slice(1));
+} else if (argv._[0] === 'git-pull-all') {
+  await gitPullAll(...argv._.slice(1));
 } else {
   await help(...argv._);
 }
@@ -89,3 +91,24 @@ async function readSnapshot(args) {
     console.log('Done.')
   }
 }
+
+async function gitPullAll(args) {
+  const projectsPathes = [
+    path.join(__dirname, 'apps/fillForm'),
+    path.join(__dirname, '..', 'PhDAssess-meta'),
+    path.join(__dirname, '..', 'PhDAssess-PDF'),
+    path.join(__dirname, '..', 'PhDAssess-Notifier'),
+    path.join(__dirname, '..', 'PhDAssess-GED'),
+  ];
+  for (const projectPath of projectsPathes) {
+    if (fs.pathExistsSync(projectPath)) {
+      console.log(`Doing ${projectPath}..`)
+      cd(projectPath)
+      await $`git pull`
+      console.log(`${projectPath} done`)
+    } else {
+      console.log(`skipping inexisting ${projectPath}`)
+    }
+  }
+}
+
