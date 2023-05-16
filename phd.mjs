@@ -8,7 +8,9 @@ if (argv.help || argv._[0] === 'help') {
   argv._[0] === 'help' && !argv._[1] && await help()  // called with help only
   argv._[0] !== 'help' && !argv._[1] && await help(...argv._)  // called with --help
 } else if (argv._[0] === 'run') {
-  await run(...argv._.slice(1));
+  await dockerRun(...argv._.slice(1));
+} else if (argv._[0] === 'stop') {
+  await dockerStop(...argv._.slice(1));
 } else if (argv._[0] === 'test') {
   await test(...argv._.slice(1));
 } else if (argv._[0] === 'clean') {
@@ -27,9 +29,34 @@ async function help(args) {
   await echo`${chalk.yellow('Helping soon ?')}`;
 }
 
-async function run(args) {
-  await echo`${__filename}`
+async function dockerRun(args) {
+  cd(path.join(__dirname, `docker`));
+
+  console.log('Starting the zeebe stack..')
+  await $`docker compose up -d zeebe_node_0 zeebe_node_1 zeebe_node_2`;
+
+  console.log('Starting the pdf and notifier..')
+  await $`docker compose up -d pdf notifier`;
+
+  console.log('Starting the simple-monitor (localhost:8082)..')
+  await $`docker compose up -d simple-monitor`;
+
+  console.log(`Stack started.`);
+  console.log(`To see the logs, use "cd ${path.join(__dirname, `docker`)}; docker compose logs -f"`);
+  console.log(`To stop, use the ./phd.mjs stop command`);
 }
+
+
+async function dockerStop(args) {
+  cd(path.join(__dirname, `docker`));
+
+  await spinner(`Stopping the containers`, async () => {
+    await $`docker compose stop`;
+  });
+
+  console.log('Containers stopped.')
+}
+
 
 async function clean(args) {
 
