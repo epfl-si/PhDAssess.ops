@@ -60,7 +60,7 @@ async function dockerStop(args) {
 
 async function clean(args) {
 
-  if (await question('Move Zeebe partitions to *.bak ? [y/N] ') === 'y') {
+  if (await question(`Move Zeebe partitions to ${path.join(__dirname, `docker/volumes/`)}*.bak ? [y/N] `) === 'y') {
     const pathZeebeVolume = path.join(__dirname, `docker/volumes`);
 
     ['zeebe_data_node_0', 'zeebe_data_node_1', 'zeebe_data_node_2'].forEach((pathVolume) => {
