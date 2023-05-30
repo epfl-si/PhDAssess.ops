@@ -8,7 +8,7 @@ export async function stringifySnapshot(args) {
   }
 
   const snapshotPath = await question('Path to snapshot ? (should have the CURRENT file inside) ')
-  const defaultOutputFilePath = `${ path.join(__dirname, `snapshot-${ new Date().toJSON().slice(0,19) }`) }.json`
+  const defaultOutputFilePath = `${ path.join(__dirname, `snapshot-${ new Date().toJSON().slice(0,19) }`) }.txt`
   let outputFile = await question(`Full path of the destination file: [${defaultOutputFilePath}] `)
   if (outputFile === '') outputFile = defaultOutputFilePath;
 
