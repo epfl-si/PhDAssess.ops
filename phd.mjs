@@ -27,7 +27,17 @@ if (argv.help || argv._[0] === 'help') {
 }
 
 async function help(args) {
-  await echo`${chalk.yellow('Helping soon ?')}`;
+  await echo`
+Usage:
+  phd help                 Show this message
+  phd run                  Start the docker stack
+  phd stop                 Stop the docker stack
+  phd clean                Wipe all data. All steps have to be confirmed
+  phd test                 Launch tests
+  phd git-pull-all           Git refresh all the known modules / submodules 
+  phd deploy-bpmn          Interactively deploy a BPMN 
+  phd stringify-snapshot   Use the PERL-tools to export a DB to a *.txt
+  `
 }
 
 async function dockerRun(args) {
