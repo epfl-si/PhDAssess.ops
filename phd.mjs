@@ -1,6 +1,6 @@
 #!/usr/bin/env -S npm exec --yes --package=zx@latest zx --
-import deployProcess from './scripts/deployProcess.mjs'
-import { stringifySnapshot } from './scripts/snapshots.mjs'
+import deployProcess from './cli/deployProcess.mjs'
+import { stringifySnapshot } from './cli/snapshots.mjs'
 
 $.verbose = false
 
