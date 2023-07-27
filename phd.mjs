@@ -34,7 +34,8 @@ Usage:
   phd stop                 Stop the docker stack
   phd clean                Wipe all data. All steps have to be confirmed
   phd test                 Launch tests
-  phd git-pull-all           Git refresh all the known modules / submodules 
+  phd test load-fixtures   Load locally task fixtures
+  phd git-pull-all         Git refresh all the known modules / submodules 
   phd deploy-bpmn          Interactively deploy a BPMN 
   phd stringify-snapshot   Use the PERL-tools to export a DB to a *.txt
   `
@@ -98,13 +99,24 @@ async function clean(args) {
 }
 
 async function test(args) {
-  $.verbose = true
+  if (args === 'load-fixtures') {
+    $.verbose = true
+    await cd('./apps/fillForm');
+    //await $`echo "Meteor.isServer && Meteor.isDevelopment" | meteor shell`
+    const p = await $`echo "Meteor.call('loadFixtures')" | meteor shell`.pipe(process.stdout)
+    for await (const chunk of p.stdout) {
+      echo(chunk)
+    }
+  } else {
+    $.verbose = true
 
-  const testServer = process.env.TEST_SERVER ?? '1'
-  const testClient = process.env.TEST_CLIENT ?? '0'
+    const testServer = process.env.TEST_SERVER ?? '1'
+    const testClient = process.env.TEST_CLIENT ?? '0'
 
-  await cd('./apps/fillForm');
-  await $`TEST_SERVER=${testServer} TEST_CLIENT=${testClient} meteor test --driver-package meteortesting:mocha --port 3100`;
+    await cd('./apps/fillForm');
+    await $`TEST_SERVER=${testServer} TEST_CLIENT=${testClient} meteor test --driver-package meteortesting:mocha --port 3100`;
+
+  }
 }
 
 async function gitPullAll(args) {
