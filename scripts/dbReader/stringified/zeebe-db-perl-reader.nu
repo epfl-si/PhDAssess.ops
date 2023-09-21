@@ -20,13 +20,23 @@ def main [
   snapshotTxtPath: path,  # The path to the snapshot stringified file. Should be the result of a ./phd.mjs stringify-snapshot
   processInstanceKey?: string  # Optional: if you want to filter for a specific instance
 ] {
-  if $processInstanceKey != null {
-    open $snapshotTxtPath 
+  let zeebeData = open $snapshotTxtPath 
     | all_from_zeebe_db_perl_importer
+
+  if $processInstanceKey != null {
+    $zeebeData
     | ( 
       where JSON.incidentRecord?.processInstanceKey? == $processInstanceKey or JSON.jobRecord?.processInstanceKey? == $processInstanceKey
     )
   } else {
-    open $snapshotTxtPath | all_from_zeebe_db_perl_importer
+    $zeebeData
+    | insert processInstanceKey {
+      if ($in.JSON?.incidentRecord? != null) {
+        $in.JSON.incidentRecord.processInstanceKey?
+      } else if ($in.JSON?.jobRecord? != null) {
+        $in.JSON.jobRecord.processInstanceKey?
+      }
+    }
+    | group-by processInstanceKey
   }
 }
