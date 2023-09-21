@@ -2,7 +2,10 @@ Here you can find some nushell scripts in this directory, mainly to better read 
 
 Prerequistes:
 - have the command nu installed
-- For ./zeebe-db-incidents-by-message.nu
+
+Then:
+- For scripts inside the `./zdb` folder:
   - have the command zdb installed
-- For ./zeebe-db-incidents.nu
-  - a stringified zeebe db from `./phd.mjs stringify-snapshot path_to_snapshot`
+- For scripts inside the `./stringified` folder:
+- For ./zeebe-db-incidents-by-message.nu
+  - have a stringified zeebe db from `./phd.mjs stringify-snapshot path_to_snapshot`
