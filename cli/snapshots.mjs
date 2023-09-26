@@ -11,8 +11,8 @@ export async function stringifySnapshot(argv) {
       return
     }
 
-    const defaultOutputFilePath = `${ path.join(__dirname, `${ path.basename(snapshotPath) }.txt`)}`
-    let outputFile = await question(`Full path of the destination file: [${defaultOutputFilePath}] `)
+    const defaultOutputFilePath = `${ path.join(path.dirname(snapshotPath), `${ path.basename(snapshotPath) }.txt`)}`
+    let outputFile = await question(`Full path of the destination file: [ ${defaultOutputFilePath} ] `)
     if (outputFile === '') outputFile = defaultOutputFilePath;
 
     let uncompressedColumnFamilies = ''
