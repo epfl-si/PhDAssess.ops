@@ -19,7 +19,7 @@ if (argv.help || argv._[0] === 'help') {
 } else if (argv._[0] === 'deploy-bpmn') {
   await deployProcess();
 } else if (argv._[0] === 'stringify-snapshot') {
-  await stringifySnapshot(...argv._.slice(1));
+  await stringifySnapshot(argv);
 } else if (argv._[0] === 'git-pull-all') {
   await gitPullAll(...argv._.slice(1));
 } else {
@@ -35,9 +35,9 @@ Usage:
   phd clean                Wipe all data. All steps have to be confirmed
   phd test                 Launch tests
   phd test load-fixtures   Load locally task fixtures
-  phd git-pull-all         Git refresh all the known modules / submodules 
-  phd deploy-bpmn          Interactively deploy a BPMN 
-  phd stringify-snapshot   Use the PERL-tools to export a DB to a *.txt
+  phd git-pull-all         Git refresh all the known modules / submodules
+  phd deploy-bpmn          Interactively deploy a BPMN
+  phd stringify-snapshot   Use the PERL-tools to export a DB to a *.txt. Use --path=PATH_TO_CURRENT
   `
 }
 
