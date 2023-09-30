@@ -111,9 +111,9 @@ async function test(args) {
     $.verbose = true
 
     const testServer = process.env.TEST_SERVER ?? '1'
-    const testClient = process.env.TEST_CLIENT ?? '0'
+    const testClient = process.env.TEST_CLIENT ?? '1'
 
-    await cd('./apps/fillForm');
+    await cd(path.join(__dirname, './apps/fillForm'));
     await $`TEST_SERVER=${testServer} TEST_CLIENT=${testClient} meteor test --driver-package meteortesting:mocha --port 3100`;
 
   }

@@ -61,22 +61,6 @@ services:
     networks:
       - zeebe_network
 
-#  mongo:
-#    image: mongo
-#    restart: always
-
-#  mongo-express:
-#    image: mongo-express
-#    restart: always
-#    ports:
-#      - "127.0.0.1:8081:8081"
-#    environment:
-#      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-#      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-#      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
-#    depends_on:
-#      - mongo
-
   notifier:
     build:
       context: ../../PhDAssess-Notifier
@@ -93,23 +77,40 @@ services:
     env_file:
       - ../../PhDAssess-PDF/.env
 
-#  phd-assess:
+#  mongo:
+#    image: mongo
+#    restart: always
+#
+#  mongo-express:
+#    image: mongo-express
+#    restart: always
+#    ports:
+#      - "127.0.0.1:8081:8081"
+#    environment:
+#      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+#      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+#      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
+#    depends_on:
+#      - mongo
+#
+#  meteor:
 #    build:
-#      context: ..
+#      context: ../apps/fillForm
 #    networks:
 #      - default
 #      - zeebe_network
 #    depends_on:
-#      - zeebe
 #      - mongo
+#      - zeebe_node_0
+#      - zeebe_node_1
+#      - zeebe_node_2
 #    env_file:
-#      - ../.env
+#      - ../apps/fillForm/.env
 #    environment:
 #      ROOT_URL: https://127.0.0.1
 #      PORT: 3000
 #      MONGO_URL: mongodb://mongo:27017/meteor
 #      MONGO_PERSISTENT_URL: mongodb://mongo:27017/meteor
-#      PHDASSESS_ENCRYPTION_KEY: ${PHDASSESS_ENCRYPTION_KEY}
 #      ISA_LOCAL_DATA: 'true'
 #    ports:
 #      - "3000:3000"
