@@ -34,6 +34,7 @@ Usage:
   phd stop                 Stop the docker stack
   phd clean                Wipe all data. All steps have to be confirmed
   phd test                 Launch tests
+  phd test e2e             Launch e2e tests with a headless browser
   phd test load-fixtures   Load locally task fixtures
   phd git-pull-all         Git refresh all the known modules / submodules
   phd deploy-bpmn          Interactively deploy a BPMN
@@ -99,16 +100,22 @@ async function clean(args) {
 }
 
 async function test(args) {
+  $.verbose = true
+
   if (args === 'load-fixtures') {
-    $.verbose = true
     await cd('./apps/fillForm');
     //await $`echo "Meteor.isServer && Meteor.isDevelopment" | meteor shell`
     const p = await $`echo "Meteor.call('loadFixtures')" | meteor shell`.pipe(process.stdout)
     for await (const chunk of p.stdout) {
       echo(chunk)
     }
+  } else if (args === 'e2e') {
+
+    await cd(path.join(__dirname, './apps/fillForm/tests/E2E'));
+
+    await $`npx playwright test --ui`;
+
   } else {
-    $.verbose = true
 
     const testServer = process.env.TEST_SERVER ?? '1'
     const testClient = process.env.TEST_CLIENT ?? '1'
