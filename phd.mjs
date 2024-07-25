@@ -56,7 +56,7 @@ async function dockerRun(args) {
 
   console.log(`Stack started.`);
   console.log(`To see the logs, use "cd ${path.join(__dirname, `docker`)}; docker compose logs -f"`);
-  console.log(`To stop, use the ./phd.mjs stop command`);
+  console.log(`To stop, use the './phd.mjs stop' command`);
 }
 
 
@@ -72,17 +72,25 @@ async function dockerStop(args) {
 
 
 async function clean(args) {
+  if (await question(`Clean Zeebe partitions ? [y/N] `) === 'y') {
+    if (await question(`Backup Zeebe partitions before deleting ? (${ path.join(__dirname, `docker/volumes/`) }*.bak) [y/N] `) === 'y') {
+      const pathZeebeVolume = path.join(__dirname, `docker/volumes`);
 
-  if (await question(`Move Zeebe partitions to ${path.join(__dirname, `docker/volumes/`)}*.bak ? [y/N] `) === 'y') {
-    const pathZeebeVolume = path.join(__dirname, `docker/volumes`);
-
-    ['zeebe_data_node_0', 'zeebe_data_node_1', 'zeebe_data_node_2'].forEach((pathVolume) => {
-      const partitionInstanceVolumePath = path.join(pathZeebeVolume, pathVolume);
-      const bakPartitionInstanceVolumePath = path.join(pathZeebeVolume, `${pathVolume}.bak`);
-      fs.pathExistsSync(partitionInstanceVolumePath) &&
-        fs.moveSync(partitionInstanceVolumePath, bakPartitionInstanceVolumePath);
-      console.log(`Successfully moved ${partitionInstanceVolumePath} to ${bakPartitionInstanceVolumePath}`)
-    });
+      ['zeebe_data_node_0', 'zeebe_data_node_1', 'zeebe_data_node_2'].forEach((pathVolume) => {
+        const partitionInstanceVolumePath = path.join(pathZeebeVolume, pathVolume);
+        const bakPartitionInstanceVolumePath = path.join(pathZeebeVolume, `${ pathVolume }.bak`);
+        fs.pathExistsSync(partitionInstanceVolumePath) &&
+          fs.moveSync(partitionInstanceVolumePath, bakPartitionInstanceVolumePath);
+        console.log(`Successfully moved ${ partitionInstanceVolumePath } to ${ bakPartitionInstanceVolumePath }`)
+      });
+    } else {
+      ['zeebe_data_node_0', 'zeebe_data_node_1', 'zeebe_data_node_2'].forEach((pathVolume) => {
+        const partitionInstanceVolumePath = path.join(pathZeebeVolume, pathVolume);
+        fs.pathExistsSync(partitionInstanceVolumePath) &&
+          fs.deleteSync(partitionInstanceVolumePath);
+        console.log(`Successfully deleted ${ partitionInstanceVolumePath }`)
+      });
+    }
   }
 
   if (await question('Clean meteor db ? [y/N] ') === 'y') {
