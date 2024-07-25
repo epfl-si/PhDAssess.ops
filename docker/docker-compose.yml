@@ -1,7 +1,5 @@
 # inspired from https://github.com/camunda-community-hub/zeebe-docker-compose.git
 
-version: "3.9"
-
 networks:
   zeebe_network:
     driver: bridge
