@@ -8,7 +8,7 @@ if (argv.help || argv._[0] === 'help') {
   argv._[0] === 'help' && argv._[1] && await help(...argv._.slice(1))  // called with help + something
   argv._[0] === 'help' && !argv._[1] && await help()  // called with help only
   argv._[0] !== 'help' && !argv._[1] && await help(...argv._)  // called with --help
-} else if (argv._[0] === 'run') {
+} else if (argv._[0] === 'run' || argv._[0] === 'start') {
   await dockerRun(...argv._.slice(1));
 } else if (argv._[0] === 'stop') {
   await dockerStop(...argv._.slice(1));
@@ -31,6 +31,7 @@ async function help(args) {
 Usage:
   phd help                 Show this message
   phd run                  Start the docker stack
+  phd start                Start the docker stack
   phd stop                 Stop the docker stack
   phd clean                Wipe all data. All steps have to be confirmed
   phd test                 Launch tests
