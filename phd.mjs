@@ -49,8 +49,8 @@ async function dockerRun(args) {
   console.log('Starting the zeebe stack..')
   await $`docker compose up -d zeebe_node_0 zeebe_node_1 zeebe_node_2`;
 
-  console.log('Starting the pdf and notifier..')
-  await $`docker compose up -d pdf notifier`;
+  console.log('Starting the pdf, notifier, ged, isa..')
+  await $`docker compose up -d pdf notifier ged isa`;
 
   console.log('Starting the simple-monitor (localhost:8082)..')
   await $`docker compose up -d simple-monitor`;
@@ -74,9 +74,9 @@ async function dockerStop(args) {
 
 async function clean(args) {
   if (await question(`Clean Zeebe partitions ? [y/N] `) === 'y') {
-    if (await question(`Backup Zeebe partitions before deleting ? (${ path.join(__dirname, `docker/volumes/`) }*.bak) [y/N] `) === 'y') {
-      const pathZeebeVolume = path.join(__dirname, `docker/volumes`);
+    const pathZeebeVolume = path.join(__dirname, `docker/volumes`);
 
+    if (await question(`Backup Zeebe partitions before deleting ? (${ path.join(__dirname, `docker/volumes/`) }*.bak) [y/N] `) === 'y') {
       ['zeebe_data_node_0', 'zeebe_data_node_1', 'zeebe_data_node_2'].forEach((pathVolume) => {
         const partitionInstanceVolumePath = path.join(pathZeebeVolume, pathVolume);
         const bakPartitionInstanceVolumePath = path.join(pathZeebeVolume, `${ pathVolume }.bak`);
@@ -88,7 +88,7 @@ async function clean(args) {
       ['zeebe_data_node_0', 'zeebe_data_node_1', 'zeebe_data_node_2'].forEach((pathVolume) => {
         const partitionInstanceVolumePath = path.join(pathZeebeVolume, pathVolume);
         fs.pathExistsSync(partitionInstanceVolumePath) &&
-          fs.deleteSync(partitionInstanceVolumePath);
+          fs.removeSync(partitionInstanceVolumePath);
         console.log(`Successfully deleted ${ partitionInstanceVolumePath }`)
       });
     }
