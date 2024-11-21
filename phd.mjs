@@ -98,6 +98,7 @@ async function clean(args) {
     const fillFormPath = path.join(__dirname, `apps/fillForm`);
     cd(fillFormPath);
     await $`meteor reset`;
+    await $`meteor npm i`;
     console.log(`Successfully reset the meteor db`)
   }
 
