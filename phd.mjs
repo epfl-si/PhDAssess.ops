@@ -1,6 +1,7 @@
 #!/usr/bin/env -S npm exec --yes --package=zx@latest zx --
 import deployProcess from './cli/deployProcess.mjs'
 import { stringifySnapshot } from './cli/snapshots.mjs'
+import generateActivityLogs from './cli/generateActivityLogs.mjs'
 
 $.verbose = false
 
@@ -22,6 +23,8 @@ if (argv.help || argv._[0] === 'help') {
   await stringifySnapshot(argv);
 } else if (argv._[0] === 'git-pull-all') {
   await gitPullAll(...argv._.slice(1));
+} else if (argv._[0] === 'generate-activity-logs') {
+  await generateActivityLogs(argv);
 } else {
   await help(...argv._);
 }
@@ -29,17 +32,18 @@ if (argv.help || argv._[0] === 'help') {
 async function help(args) {
   await echo`
 Usage:
-  phd help                 Show this message
-  phd run                  Start the docker stack
-  phd start                Start the docker stack
-  phd stop                 Stop the docker stack
-  phd clean                Wipe all data. All steps have to be confirmed
-  phd test                 Launch tests
-  phd test e2e             Launch e2e tests with a headless browser
-  phd test load-fixtures   Load locally task fixtures
-  phd git-pull-all         Git refresh all the known modules / submodules
-  phd deploy-bpmn          Interactively deploy a BPMN
-  phd stringify-snapshot   Use the PERL-tools to export a DB to a *.txt. Use --path=PATH_TO_CURRENT
+  phd help                    Show this message
+  phd run                     Start the docker stack
+  phd start                   Start the docker stack
+  phd stop                    Stop the docker stack
+  phd clean                   Wipe all data. All steps have to be confirmed
+  phd test                    Launch tests
+  phd test e2e                Launch e2e tests with a headless browser
+  phd test load-fixtures      Load locally task fixtures
+  phd git-pull-all            Git refresh all the known modules / submodules
+  phd deploy-bpmn             Interactively deploy a BPMN
+  phd stringify-snapshot      Use the PERL-tools to export a DB to a *.txt. Use --path=PATH_TO_CURRENT
+  phd generate-activity-logs  Initiate the activityLogs table for the new dashboard milestone (temp)
   `
 }
 
