@@ -33,8 +33,8 @@ async function help(args) {
   await echo`
 Usage:
   phd help                    Show this message
-  phd run                     Start the docker stack
-  phd start                   Start the docker stack
+  phd start                   Start the docker stack. You can use 'phd run' too
+  phd start zeebe             Start the docker stack, but only the zeebe stack
   phd stop                    Stop the docker stack
   phd clean                   Wipe all data. All steps have to be confirmed
   phd test                    Launch tests
@@ -53,14 +53,16 @@ async function dockerRun(args) {
   console.log('Starting the zeebe stack..')
   await $`docker compose up -d zeebe_node_0 zeebe_node_1 zeebe_node_2`;
 
-  console.log('Starting the pdf, notifier, ged, isa..')
-  await $`docker compose up -d pdf notifier ged isa`;
+  if (args !== 'zeebe') {
+    console.log('Starting the pdf, notifier, ged, isa..')
+    await $`docker compose up -d pdf notifier ged isa`;
 
-  console.log('Starting the simple-monitor (localhost:8082)..')
-  await $`docker compose up -d simple-monitor`;
+    console.log('Starting the simple-monitor (localhost:8082)..')
+    await $`docker compose up -d simple-monitor`;
+  }
 
   console.log(`Stack started.`);
-  console.log(`To see the logs, use "cd ${path.join(__dirname, `docker`)}; docker compose logs -f"`);
+  console.log(`To see the logs, use "cd ${path.join(__dirname, `docker`)}; docker compose logs -f --since 5m"`);
   console.log(`To stop, use the './phd.mjs stop' command`);
 }
 
