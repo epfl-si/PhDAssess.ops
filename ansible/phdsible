@@ -1,0 +1,147 @@
+#!/bin/bash
+#
+# This is a wrapper around ansible-playbook.
+
+# Easy to use with ansible (default is --dev)
+#   ./ansible/phdsible --dev
+#   ./ansible/phdsible --test
+#   ./ansible/phdsible --prod
+#
+# If you are unfamiliar with Ansible, read up on it at
+# - https://www.ansible.com/overview/how-ansible-works
+# - https://github.com/jdauphant/awesome-ansible
+
+set -e
+cd "$(cd "$(dirname "$0")"; pwd)"
+
+help () {
+    fatal <<HELP_MSG
+Usage:
+
+  $0 [ -t sometag ] [OPTION]
+
+Options:
+  --dev        Deploy to dev environment (default)
+  --test        Deploy to test environment
+  --prod        Deploy to production environment
+  --help        Display this help
+
+HELP_MSG
+}
+
+oc_check () {
+  case "$(oc version | grep Client)" in
+    "Client Version: 3"*) fatal "Please update your oc to >4.7";;
+    "Client Version: 4"*) :;;
+    "Client Version: v4"*) :;;
+    *) fatal "Please install oc >4.7";;
+  esac
+
+  if ! oc projects >/dev/null 2>&1; then
+    echo "Please login to openshift:"
+    oc login
+  fi
+}
+
+zbctl_check () {
+  which zbctl >/dev/null || fatal "Please install zbctl (maybe 'npm install -g zbctl' ?)"
+}
+
+keybase_check () {
+  ls /keybase >/dev/null || fatal "Please install keybase"
+  ls /keybase/team/epfl_phdassess/ >/dev/null || fatal "Please get your rights to access the /keybase/team/epfl_phdassess/ folder"
+}
+
+docker_check () {
+  which docker >/dev/null || fatal "Please install docker"
+}
+
+ensure_suitcase () {
+    if ! test -f ansible-deps-cache/.versions 2>/dev/null; then
+        curl https://raw.githubusercontent.com/epfl-si/ansible.suitcase/master/install.sh | \
+            SUITCASE_DIR=$PWD/ansible-deps-cache \
+            SUITCASE_PIP_EXTRA="kubernetes" \
+            SUITCASE_ANSIBLE_VERSION=10.3.0 \
+            SUITCASE_WITH_KEYBASE=1 \
+            bash -x
+    fi
+    . ansible-deps-cache/lib.sh
+    ensure_ansible_runtime
+}
+
+platform_check () {
+    oc_check
+    ensure_suitcase
+    keybase_check
+    docker_check
+    zbctl_check
+}
+
+do_login_oc () {
+    local cluster_url=$1
+
+    if ! oc whoami > /dev/null 2>&1 || ! oc whoami --show-server | grep -q "$cluster_url"; then
+        echo "Logging into OpenShift cluster at $cluster_url..."
+        if ! oc login "$cluster_url" --web; then
+            echo "Login failed. Exiting."
+            exit 1
+        fi
+    else
+        echo "Already logged into $cluster_url."
+    fi
+}
+
+platform_check
+
+[ "$1" == "--help" ] && help
+
+declare -a ansible_args
+ansible_args=(-e "phdisble_suitcase_dir=$PWD/ansible-deps-cache")
+inventory_mode="dev"
+cluster_url="https://api.ocpitsd0001.xaas.epfl.ch:6443"
+namespace="svc1394d-phd-assess"
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --help)
+            help ;;
+        --dev)
+            inventory_mode="dev"
+            cluster_url="https://api.ocpitsd0001.xaas.epfl.ch:6443"
+            namespace="svc1394d-phd-assess"
+            shift ;;
+        --test)
+            inventory_mode="test"
+            cluster_url="https://api.ocpitst0001.xaas.epfl.ch:6443"
+            namespace="svc1394t-phd-assess"
+            shift ;;
+        --prod)
+            inventory_mode="prod"
+            cluster_url="https://api.ocpitsp0001.xaas.epfl.ch:6443"
+            namespace="svc1394p-phd-assess"
+            shift ;;
+        *)
+            ansible_args+=("$1")
+            shift ;;
+    esac
+done
+
+do_login_oc "$cluster_url"
+
+# Attempt to switch to the target namespace
+if ! oc project "$namespace" >/dev/null 2>&1; then
+    echo "Failed to switch to namespace '$namespace'."
+    exit 1
+else
+    echo "Successfully switched to namespace '$namespace'."
+fi
+
+inventories () {
+    case "$inventory_mode" in
+        dev) echo "-i inventory/dev.yml" ;;
+        test) echo "-i inventory/test.yml" ;;
+        prod) echo "-i inventory/prod.yml" ;;
+        *) fatal "Invalid inventory_mode" ;;
+    esac
+}
+
+ansible-playbook $(inventories) "${ansible_args[@]}" playbook.yml
