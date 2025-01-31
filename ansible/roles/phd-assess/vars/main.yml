@@ -1,4 +1,4 @@
 
 # Secrets
 general_secrets_name: "phd-assess.secrets"
-meteor_secrets_name: "phd-assess.secrets"
+meteor_secrets_name: "phd-assess.secrets.meteor"
