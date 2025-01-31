@@ -1,9 +1,7 @@
-# To push this playbook to OpenShift, say
-#
-#   ansible-playbook playbook.yml -i inventory/dev.yml
+---
 
 - name: Phd Assess on OpenShift
   hosts: all
-  gather_facts: no   # Not yet
+  gather_facts: false
   roles:
-    - role: roles/phd-assess
+    - phd-assess
