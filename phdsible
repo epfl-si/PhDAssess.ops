@@ -3,9 +3,9 @@
 # This is a wrapper around ansible-playbook.
 
 # Easy to use with ansible (default is --dev)
-#   ./ansible/phdsible --dev
-#   ./ansible/phdsible --test
-#   ./ansible/phdsible --prod
+#   ./phdsible --dev
+#   ./phdsible --test
+#   ./phdsible --prod
 #
 # If you are unfamiliar with Ansible, read up on it at
 # - https://www.ansible.com/overview/how-ansible-works
@@ -36,11 +36,6 @@ oc_check () {
     "Client Version: v4"*) :;;
     *) fatal "Please install oc >4.7";;
   esac
-
-  if ! oc projects >/dev/null 2>&1; then
-    echo "Please login to openshift:"
-    oc login
-  fi
 }
 
 zbctl_check () {
@@ -57,7 +52,7 @@ docker_check () {
 }
 
 ensure_suitcase () {
-    if ! test -f ansible-deps-cache/.versions 2>/dev/null; then
+    if ! test -f ansible/ansible-deps-cache/.versions 2>/dev/null; then
         curl https://raw.githubusercontent.com/epfl-si/ansible.suitcase/master/install.sh | \
             SUITCASE_DIR=$PWD/ansible-deps-cache \
             SUITCASE_PIP_EXTRA="kubernetes" \
@@ -65,7 +60,7 @@ ensure_suitcase () {
             SUITCASE_WITH_KEYBASE=1 \
             bash -x
     fi
-    . ansible-deps-cache/lib.sh
+    . ansible/ansible-deps-cache/lib.sh
     ensure_ansible_runtime
 }
 
@@ -96,7 +91,7 @@ platform_check
 [ "$1" == "--help" ] && help
 
 declare -a ansible_args
-ansible_args=(-e "phdisble_suitcase_dir=$PWD/ansible-deps-cache")
+ansible_args=(-e "phdisble_suitcase_dir=$PWD/ansible/ansible-deps-cache")
 inventory_mode="dev"
 cluster_url="https://api.ocpitsd0001.xaas.epfl.ch:6443"
 namespace="svc1394d-phd-assess"
@@ -137,11 +132,11 @@ fi
 
 inventories () {
     case "$inventory_mode" in
-        dev) echo "-i inventory/dev.yml" ;;
-        test) echo "-i inventory/test.yml" ;;
-        prod) echo "-i inventory/prod.yml" ;;
+        dev) echo "-i ansible/inventory/dev.yml" ;;
+        test) echo "-i ansible/inventory/test.yml" ;;
+        prod) echo "-i ansible/inventory/prod.yml" ;;
         *) fatal "Invalid inventory_mode" ;;
     esac
 }
 
-ansible-playbook $(inventories) "${ansible_args[@]}" playbook.yml
+ansible-playbook $(inventories) "${ansible_args[@]}" ansible/playbook.yml

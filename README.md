@@ -2,7 +2,7 @@
 
 This repository regroups the configuration-as-code to provision, configure,
 deploy and manage the EPFL's PhDAssess stack. It uses Ansible wrapped in a
-convenient [suitcase](https://github.com/epfl-si/ansible.suitcase), called [phdsible](./ansible/phdsible).
+convenient [suitcase](https://github.com/epfl-si/ansible.suitcase), called [phdsible](phdsible).
 
 ## Prerequisites
 
@@ -15,7 +15,7 @@ convenient [suitcase](https://github.com/epfl-si/ansible.suitcase), called [phds
 
 ## Usage
 
-`./ansible/phdsible`
+`./phdsible`
 
 Setup the dev. environment on Openshift and run the stack.
 
