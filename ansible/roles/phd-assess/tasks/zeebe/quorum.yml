@@ -1,0 +1,57 @@
+- name: Setting the Zeebe instances
+  ansible.builtin.include_tasks: _instance.yml
+  loop: "{{ zeebe_instance_config }}"
+  vars:
+    zeebe_instance_config:
+      - node_id: 0
+        name: "zeebe-0"
+        quorum_name: "zeebe-quorum-0"
+        data_volume:
+          emptyDir: {}
+        peers:
+          - "zeebe-quorum-1:{{ zeebe_ports_quorum }}"
+          - "zeebe-quorum-2:{{ zeebe_ports_quorum }}"
+      - node_id: 1
+        name: "zeebe-1"
+        quorum_name: "zeebe-quorum-1"
+        data_volume:
+          emptyDir: {}
+        peers:
+          - "zeebe-quorum-0:{{ zeebe_ports_quorum }}"
+          - "zeebe-quorum-2:{{ zeebe_ports_quorum }}"
+      - node_id: 2
+        name: "zeebe-2"
+        quorum_name: "zeebe-quorum-2"
+        data_volume:
+          emptyDir: {}
+        peers:
+          - "zeebe-quorum-0:{{ zeebe_ports_quorum }}"
+          - "zeebe-quorum-1:{{ zeebe_ports_quorum }}"
+
+- name: Quorum Services
+  kubernetes.core.k8s:
+    definition:
+      state: latest
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: "{{ item }}"
+        namespace: "{{ openshift_namespace }}"
+      spec:
+        type: ClusterIP
+        ports:
+          - name: "zeebe-raft"
+            port: "{{ zeebe_ports_quorum }}"
+            protocol: TCP
+            targetPort: "{{ zeebe_ports_quorum }}"
+          - name: "zeebe-command"
+            port: "{{ zeebe_ports_command }}"
+            protocol: TCP
+            targetPort: "{{ zeebe_ports_command }}"
+        selector:
+          zeebe-quorum-member: "{{ item }}"
+  loop:
+    - "zeebe-quorum-0"
+    - "zeebe-quorum-1"
+    - "zeebe-quorum-2"
+  tags: zeebe.service

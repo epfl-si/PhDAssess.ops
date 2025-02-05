@@ -11,3 +11,9 @@ all:
 
     ### Secrets
     keybase_secrets_folder: "/keybase/team/epfl_phdassess/dev/"
+
+    ### Zeebe
+    zeebe_version: '8.3.3'
+    zeebe_camunda_image_path: "camunda/zeebe"
+    zeebe_camunda_image_full_path_on_quay:
+      "{{ quay_host }}/{{ quay_organisation_name }}/{{ zeebe_camunda_image_path }}"

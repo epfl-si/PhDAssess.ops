@@ -1,6 +1,53 @@
+- name: Doing Quay images setup...
+  ansible.builtin.include_tasks:
+    file: quay/images.yml
+    apply:
+      tags:
+        - quay
+        - never
+  tags:
+    - quay
+    - never
+
+- name: Setup service account for Quay...
+  ansible.builtin.include_tasks:
+    file: quay/serviceAccounts.yml
+    apply:
+      tags:
+        - zeebe
+  tags:
+    - zeebe
+
 - name: Applying secrets(s)...
   ansible.builtin.include_tasks:
     file: secrets.yml
     apply:
       tags: secrets
   tags: secrets
+
+- name: Setting the Zeebe quorum...
+  ansible.builtin.include_tasks:
+    file: zeebe/quorum.yml
+    apply:
+      tags: zeebe
+  tags:
+    - zeebe
+    - zeebe.service
+
+- name: Applying route(s)...
+  ansible.builtin.include_tasks:
+    file: routes.yml
+    apply:
+      tags: routes
+  tags: routes
+
+- name: Post process suggestions
+  vars:
+    post_process_message: |
+      Now you can:
+        - Check the Zeebe stack status with zbctl
+          - oc port-forward pod/zeebe-0-0 26501:26500
+          - watch zbctl status --insecure --port 26501
+  debug: msg={{ post_process_message.split('\n') }}
+  tags:
+    - zeebe

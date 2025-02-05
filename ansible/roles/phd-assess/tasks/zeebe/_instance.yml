@@ -1,0 +1,58 @@
+- name: "Applying one Zeebe StatefulSet"   # noqa name[template]
+  vars:
+    _instance_env:
+      ZEEBE_BROKER_CLUSTER_NODEID: "{{ item.node_id }}"
+      ZEEBE_BROKER_CLUSTER_INITIALCONTACTPOINTS: >-
+        {{ ",".join(item.peers | default([])) }}
+      # yamllint disable-line rule:line-length
+      # https://github.com/camunda-cloud/zeebe/issues/5410 and
+      # https://github.com/camunda-cloud/zeebe/blob/develop/qa/integration-tests/src/test/java/io/camunda/zeebe/it/network/AdvertisedAddressTest.java#L150
+      ZEEBE_BROKER_NETWORK_INTERNALAPI_ADVERTISEDHOST: >-
+        {{ item.quorum_name }}
+      ZEEBE_BROKER_NETWORK_COMMANDAPI_ADVERTISEDHOST: >-
+        {{ item.quorum_name }}
+  kubernetes.core.k8s:
+    definition:
+      state: latest
+      apiVersion: apps/v1
+      kind: StatefulSet
+      metadata:
+        name: "{{ item.name }}"
+        namespace: "{{ openshift_namespace }}"
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            zeebe-quorum-member: "{{ item.quorum_name }}"
+        template:
+          metadata:
+            labels:
+              for-service: "{{ zeebe_gateway_service_name }}"
+              for-prometheus-job: zeebe
+              zeebe-quorum-member: "{{ item.quorum_name }}"
+          spec:
+            serviceAccountName: "{{ quay_service_account_name }}"
+            containers:
+              - name: zeebe
+                image:
+                  "{{ zeebe_camunda_image_full_path_on_quay }}:{{ zeebe_version }}"
+                env: >-
+                  {{ zeebe_env
+                  | combine(_instance_env)
+                  | combine(env | default({}))
+                  | to_k8s_env }}
+                resources:
+                  requests:
+                    cpu: '50m'
+                    memory: '1500Mi'
+                  limits:
+                    cpu: '200m'
+                    memory: '2500Mi'
+                ports:
+                  - name: metrics
+                    containerPort: 9600
+                volumeMounts:
+                  - name: zeebe-data
+                    mountPath: /usr/local/zeebe/data
+            volumes:
+              - name: zeebe-data
