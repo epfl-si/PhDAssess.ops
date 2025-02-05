@@ -1,7 +1,7 @@
-## Validate the YAML's
+## Linting
 
-`yamllint ./ansible/playbook.yml`
+`yamllint ./ansible`
 
-`ansible-lint ./ansible/playbook.yml`
+`ansible-lint ./ansible`
 
 `ansible-playbook --syntax-check ./ansible/playbook.yml`

@@ -1,2 +1,4 @@
 skip_list:
   - "yaml[empty-lines]"
+exclude_paths:
+  - ansible/ansible-deps-cache
