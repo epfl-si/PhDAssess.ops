@@ -1,0 +1,10 @@
+all:
+  hosts:
+    openshift-4-dev:
+      ansible_connection: local
+      ansible_host: localhost
+      ansible_python_interpreter: "{{ phdisble_suitcase_dir }}/bin/python3"
+      openshift_namespace: svc1394d-phd-assess
+  vars:
+    phd-assess:
+      is_test: 'true'
