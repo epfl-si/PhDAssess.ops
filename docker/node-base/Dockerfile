@@ -1,4 +1,6 @@
-FROM docker-registry.default.svc:5000/phd-assess-test/ubuntu:focal
+ARG BASE_IMAGE=docker-registry.default.svc:5000/phd-assess-test/ubuntu:focal
+
+FROM $BASE_IMAGE
 
 RUN set -e -x; export DEBIAN_FRONTEND=noninteractive; \
     apt -qy update; \
