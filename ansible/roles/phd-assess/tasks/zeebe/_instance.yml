@@ -51,11 +51,11 @@
                   | to_k8s_env }}
                 resources:
                   requests:
-                    cpu: '50m'
-                    memory: '1500Mi'
+                    cpu: '20m'
+                    memory: '2000Mi'
                   limits:
-                    cpu: '200m'
-                    memory: '2500Mi'
+                    cpu: '150m'
+                    memory: '4000Mi'
                 ports:
                   - name: metrics
                     containerPort: 9600
