@@ -9,24 +9,24 @@
         data_volume:
           emptyDir: {}
         peers:
-          - "zeebe-quorum-1:{{ zeebe_ports_quorum }}"
-          - "zeebe-quorum-2:{{ zeebe_ports_quorum }}"
+          - "zeebe-quorum-1:{{ zeebe_broker_network_internalApi_port }}"
+          - "zeebe-quorum-2:{{ zeebe_broker_network_internalApi_port }}"
       - node_id: 1
         name: "zeebe-1"
         quorum_name: "zeebe-quorum-1"
         data_volume:
           emptyDir: {}
         peers:
-          - "zeebe-quorum-0:{{ zeebe_ports_quorum }}"
-          - "zeebe-quorum-2:{{ zeebe_ports_quorum }}"
+          - "zeebe-quorum-0:{{ zeebe_broker_network_internalApi_port }}"
+          - "zeebe-quorum-2:{{ zeebe_broker_network_internalApi_port }}"
       - node_id: 2
         name: "zeebe-2"
         quorum_name: "zeebe-quorum-2"
         data_volume:
           emptyDir: {}
         peers:
-          - "zeebe-quorum-0:{{ zeebe_ports_quorum }}"
-          - "zeebe-quorum-1:{{ zeebe_ports_quorum }}"
+          - "zeebe-quorum-0:{{ zeebe_broker_network_internalApi_port }}"
+          - "zeebe-quorum-1:{{ zeebe_broker_network_internalApi_port }}"
 
 - name: Quorum Services
   kubernetes.core.k8s:
@@ -40,16 +40,20 @@
       spec:
         type: ClusterIP
         ports:
-          - name: "zeebe-raft"
-            port: "{{ zeebe_ports_quorum }}"
+          - name: "zeebe-gateway"
+            port: "{{ zeebe_gateway_network_port }}"
             protocol: TCP
-            targetPort: "{{ zeebe_ports_quorum }}"
-          - name: "zeebe-command"
-            port: "{{ zeebe_ports_command }}"
+            targetPort: "{{ zeebe_gateway_network_port }}"
+          - name: "zeebe-broker-command-api"
+            port: "{{ zeebe_broker_network_commandApi_port }}"
             protocol: TCP
-            targetPort: "{{ zeebe_ports_command }}"
+            targetPort: "{{ zeebe_broker_network_commandApi_port }}"
+          - name: "zeebe-broker-internal-api"
+            port: "{{ zeebe_broker_network_internalApi_port }}"
+            protocol: TCP
+            targetPort: "{{ zeebe_broker_network_internalApi_port }}"
         selector:
-          zeebe-quorum-member: "{{ item }}"
+          app.kubernetes.io/instance: "{{ item }}"
   loop:
     - "zeebe-quorum-0"
     - "zeebe-quorum-1"

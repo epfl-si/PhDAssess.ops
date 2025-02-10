@@ -19,10 +19,16 @@
       metadata:
         name: "{{ item.name }}"
         namespace: "{{ openshift_namespace }}"
+        labels:
+          app.kubernetes.io/name: "zeebe"
+          app.kubernetes.io/component: "workflow-engine"
+          app.kubernetes.io/part-of: "zeebe-quorum"
+          app.kubernetes.io/managed-by: "ansible"
       spec:
         replicas: 1
         selector:
           matchLabels:
+            app.kubernetes.io/instance: "{{ item.quorum_name }}"
             zeebe-quorum-member: "{{ item.quorum_name }}"
         template:
           metadata:
@@ -30,6 +36,8 @@
               for-service: "{{ zeebe_gateway_service_name }}"
               for-prometheus-job: zeebe
               zeebe-quorum-member: "{{ item.quorum_name }}"
+              app.kubernetes.io/instance: "{{ item.quorum_name }}"
+              app.kubernetes.io/version: "{{ zeebe_version }}"
           spec:
             serviceAccountName: "{{ quay_service_account_name }}"
             containers:
@@ -37,7 +45,7 @@
                 image:
                   "{{ zeebe_camunda_image_full_path_on_quay }}:{{ zeebe_version }}"
                 env: >-
-                  {{ zeebe_env
+                  {{ zeebe_instance_env
                   | combine(_instance_env)
                   | combine(env | default({}))
                   | to_k8s_env }}

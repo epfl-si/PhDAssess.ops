@@ -4,7 +4,7 @@ app_name: "phd-assess"
 default_secrets_name: "all"
 meteor_secrets_name: "meteor-app"
 
-# Images
+# Images repository
 quay_service_account_name: "rw-for-quay"
 quay_host: "quay-its.epfl.ch"
 quay_organisation_name: svc1394
@@ -21,21 +21,23 @@ zeebe_gateway_service_name: "zeebe-gateway"
 _zeebe_log_level: >-
   {{ "info" if is_test | default(false) else "info" }}
 
-# The port of the “Zeebe gateways,” where clients connect:
-zeebe_ports_api: 26500
+# The port of the “Zeebe gateways,” where clients connect with gRPC:
+zeebe_gateway_network_port: 26500
+zeebe_gateway_cluster_port: 26502
 # The port through which gateways reach brokers. Note that despite
 # every gateway having a broker next to it in the same pod, it will
 # not necessarily talk to that one. (Rather, the network coordinates
 # of all brokers are broadcast through the “gossip” mechanism when
 # gateways start up)
-zeebe_ports_command: 26501
+zeebe_broker_network_commandApi_port: 26501
 # The port that brokers use to connect to each other to make the Raft network:
-zeebe_ports_quorum: 26502
+zeebe_broker_network_internalApi_port: 26502
+zeebe_broker_network_monitoringApi_port: 9600
 
 zeebe_route_name: "zeebe"
 
-zeebe_env:
-  PORT: '{{ zeebe_ports_api }}'
+zeebe_instance_env:
+  PORT: '{{ zeebe_gateway_network_port }}'
   JAVA_OPTS: "{{ '-Xmx2024m' }}"
   ZEEBE_BROKER_NETWORK_MONITORINGAPI_HOST: '0.0.0.0'
   # https://docs.camunda.io/docs/self-managed/zeebe-deployment/operations/setting-up-a-cluster/
