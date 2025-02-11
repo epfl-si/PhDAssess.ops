@@ -73,10 +73,6 @@
         selector:
           matchLabels:
             app.kubernetes.io/instance: "{{ item.name }}"
-          resources:
-            requests:
-              cpu: "{{ microservice_cpu_request }}"
-              memory: "{{ microservice_memory_request }}"
         template:
           metadata:
             labels:
@@ -96,16 +92,9 @@
                     )
                   }}"
                 resources:
+                  requests:
+                    cpu: "5m"
+                    memory: "300Mi"
                   limits:
-                    cpu: "{{ microservice_cpu_limit }}"
-                    memory: "{{ microservice_memory_limit }}"
-#        triggers:
-#          - type: ImageChange
-#            imageChangeParams:
-#              automatic: true
-#              containerNames:
-#                - phd-assess-notifier
-#              from:
-#                kind: ImageStreamTag
-#                name: 'phd-assess-notifier:latest'
-#                namespace: "{{openshift_namespace}}"
+                    cpu: "20m"
+                    memory: "800Mi"

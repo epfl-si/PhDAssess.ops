@@ -59,10 +59,5 @@ microservice_node_18_base_image: "node:{{ microservice_node_18_base_tag }}"
 microservice_node_22_base_tag: "22-alpine"
 microservice_node_22_base_image: "node:{{ microservice_node_22_base_tag }}"
 
-microservice_cpu_request: "10m"
-microservice_memory_request: "300Mi"
-microservice_cpu_limit: "20m"
-microservice_memory_limit: "600Mi"
-
 notifier_service_name: "notifier"
 pdf_service_name: "pdf"
