@@ -8,3 +8,20 @@ all:
   vars:
     phd-assess:
       is_test: 'false'
+
+    # Secrets
+    keybase_secrets_folder: "/keybase/team/epfl_phdassess/prod/"
+
+    # Microservices
+    ## Notifier
+    notifier_port: "25"
+    notifier_host: "mail.epfl.ch"
+    notifier_from_address: "Annual report <noreply@epfl.ch>"
+
+    ## GED
+    alfresco_url: "https://ged-etu.epfl.ch"
+    alfresco_username: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_USERNAME') }}"
+    alfresco_password: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_PASSWORD') }}"
+
+    ## ISA
+    isa_url: "{{ lookup('file', keybase_secrets_folder + 'ISA_POST_STUDENT_RESULT_URL') }}"

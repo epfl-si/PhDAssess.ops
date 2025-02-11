@@ -44,7 +44,7 @@
             containers:
               - name: zeebe
                 image:
-                  "{{ zeebe_camunda_image_full_path_on_quay }}:{{ zeebe_version }}"
+                  "{{ zeebe_full_image_path_on_quay }}:{{ zeebe_version }}"
                 env: >-
                   {{ zeebe_instance_env
                   | combine(_instance_env)
@@ -59,7 +59,7 @@
                     memory: '4000Mi'
                 ports:
                   - name: metrics
-                    containerPort: 9600
+                    containerPort: "{{ zeebe_broker_network_monitoringApi_port }}"
                 volumeMounts:
                   - name: zeebe-data
                     mountPath: /usr/local/zeebe/data

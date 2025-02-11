@@ -1,0 +1,92 @@
+- name: BuildConfig for the custom Zeebe image
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: build.openshift.io/v1
+      kind: BuildConfig
+      metadata:
+        name:  zeebe-custom-image
+        namespace: "{{ openshift_namespace }}"
+      spec:
+        serviceAccount: "{{ quay_service_account_name }}"
+        source:
+          type: Git
+          git:
+            ref: "master"
+            uri: "https://github.com/epfl-si/PhDAssess"
+        strategy:
+          type: Docker
+          dockerStrategy:
+            buildArgs:
+              - name: "BASE_IMAGE"
+                value: "{{ zeebe_camunda_image_full_path_on_quay }}:{{ zeebe_version }}"
+            dockerfilePath: "docker/zeebe/Dockerfile"
+        output:
+          to:
+            kind: DockerImage
+            name: "{{ zeebe_custom_image_full_path_on_quay }}:{{ zeebe_custom_version }}"
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "2Gi"
+
+- name: BuildConfig for the node image
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: build.openshift.io/v1
+      kind: BuildConfig
+      metadata:
+        name: "{{ node_for_meteor_image_name }}"
+        namespace: "{{ openshift_namespace }}"
+      spec:
+        serviceAccount: "{{ quay_service_account_name }}"
+        source:
+          type: Git
+          git:
+            ref: "master"
+            uri: "https://github.com/epfl-si/PhDAssess"
+        strategy:
+          type: Docker
+          dockerStrategy:
+            buildArgs:
+              - name: "BASE_IMAGE"
+                value:  "{{ quay_repo }}/ubuntu:focal"
+            dockerfilePath: "docker/node-base/Dockerfile"
+        output:
+          to:
+            kind: DockerImage
+            name: "{{ quay_repo }}/{{ node_for_meteor_image_name }}"
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "2Gi"
+
+- name: BuildConfig for the Meteor App
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: build.openshift.io/v1
+      kind: BuildConfig
+      metadata:
+        name: "{{ web_app_image_name }}"
+        namespace: "{{ openshift_namespace }}"
+      spec:
+        serviceAccount: "{{ quay_service_account_name }}"
+        source:
+          type: Git
+          git:
+            ref: "master"
+            uri: "https://github.com/epfl-si/PhDAssess"
+          contextDir: "apps/fillForm"
+        strategy:
+          type: Docker
+          dockerStrategy:
+            buildArgs:
+              - name: "BASE_IMAGE"
+                value:  "{{ quay_repo }}/{{ node_for_meteor_image_name}}"
+        output:
+          to:
+            kind: DockerImage
+            name: "{{ quay_repo }}/{{ web_app_image_name }}:{{ web_app_image_tag }}"
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "2Gi"

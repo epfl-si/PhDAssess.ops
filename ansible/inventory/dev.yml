@@ -9,11 +9,45 @@ all:
     phd-assess:
       is_test: 'true'
 
-    ### Secrets
+    # Secrets
     keybase_secrets_folder: "/keybase/team/epfl_phdassess/dev/"
 
-    ### Zeebe
+    # Zeebe
+    ## Which are we using
     zeebe_version: '8.3.3'
+    zeebe_image_path: "camunda/zeebe"
+    zeebe_full_image_path_on_quay:
+      "{{ quay_repo }}/{{ zeebe_image_path }}"
+
+    ## Which are we based on for custom build
     zeebe_camunda_image_path: "camunda/zeebe"
     zeebe_camunda_image_full_path_on_quay:
-      "{{ quay_host }}/{{ quay_organisation_name }}/{{ zeebe_camunda_image_path }}"
+      "{{ quay_repo }}/{{ zeebe_camunda_image_path }}"
+
+    ## Which we have customized
+    zeebe_custom_version: "8.3.3"
+    zeebe_custom_image_path: "zeebe-hazelcast"
+    zeebe_custom_image_full_path_on_quay:
+      "{{ quay_repo }}/{{ zeebe_custom_image_path }}"
+
+    # Meteor
+    node_for_meteor_image_name: 'ubuntu-node-14'
+    web_app_image_name: 'meteor-web-app'
+    web_app_image_tag: 'latest'
+
+    # Microservices
+    microservice_node_base_tag: "18-alpine"
+
+    ## Notifier
+    notifier_port: "587"
+    notifier_host: "smtp.ethereal.email"
+    notifier_from_address: "Annual report test <noreply@epfl.ch>"
+
+    ## GED
+    alfresco_url: "https://integration-gedetu.epfl.ch"
+    alfresco_ignore_TLS_error: true
+    alfresco_username: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_USERNAME') }}"
+    alfresco_password: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_PASSWORD') }}"
+
+    ## ISA
+    isa_url: "{{ lookup('file', keybase_secrets_folder + 'ISA_POST_STUDENT_RESULT_URL') }}"

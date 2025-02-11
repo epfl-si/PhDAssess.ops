@@ -8,6 +8,7 @@ meteor_secrets_name: "meteor-app"
 quay_service_account_name: "rw-for-quay"
 quay_host: "quay-its.epfl.ch"
 quay_organisation_name: svc1394
+quay_repo: "{{ quay_host }}/{{ quay_organisation_name }}"
 _quay_push_pull_credential: "{{ lookup('file', '/keybase/team/epfl_phdassess/QUAY_BOT_ACCOUNT') }}"
 
 quay_push_pull_config:
@@ -51,3 +52,17 @@ zeebe_instance_env:
   ZEEBE_BROKER_CLUSTER_REPLICATIONFACTOR: "3"
   ZEEBE_LOG_LEVEL: "{{ _zeebe_log_level }}"
   ATOMIX_LOG_LEVEL: "{{ _zeebe_log_level }}"
+
+# Microservices
+microservice_node_18_base_tag: "18-alpine"
+microservice_node_18_base_image: "node:{{ microservice_node_18_base_tag }}"
+microservice_node_22_base_tag: "22-alpine"
+microservice_node_22_base_image: "node:{{ microservice_node_22_base_tag }}"
+
+microservice_cpu_request: "10m"
+microservice_memory_request: "300Mi"
+microservice_cpu_limit: "20m"
+microservice_memory_limit: "600Mi"
+
+notifier_service_name: "notifier"
+pdf_service_name: "pdf"

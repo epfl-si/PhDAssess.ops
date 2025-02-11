@@ -1,0 +1,111 @@
+- name: Applying Microservice...
+  vars:
+    current_microservice:
+      "Applying {{ item.name }}..."
+  ansible.builtin.debug:
+    msg: "{{ current_microservice }}"
+
+- name: Microservice Secret(s)
+  when: item.additional_secrets is defined
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Secret
+      type: Opaque
+      metadata:
+        name: "microservice.{{ item.name }}"
+        namespace: "{{ openshift_namespace }}"
+      stringData: "{{ item.additional_secrets }}"
+
+- name: Microservice BuildConfig
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: build.openshift.io/v1
+      kind: BuildConfig
+      metadata:
+        name: "{{ item.name }}-image"
+        namespace: "{{ openshift_namespace }}"
+      spec:
+        serviceAccount: "{{ quay_service_account_name }}"
+        source:
+          type: Git
+          git:
+            ref: "{{ item.git_branch | default('main') }}"
+            uri: "{{ item.git_url }}"
+        strategy:
+          type: Docker
+          dockerStrategy:
+            buildArgs:
+              - name: "BASE_IMAGE"
+                value:
+                  "{{ quay_repo }}/node:{{ item.node_version | default('18-alpine') }}"
+        output:
+          to:
+            kind: DockerImage
+            name:
+              "{{ quay_repo }}/microservice-{{ item.name }}:latest"
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "1Gi"
+
+- name: Microservice Deployment
+  vars:
+    _instance_env:
+      ZEEBE_ADDRESS: "zeebe-gateway:{{ zeebe_gateway_network_port }}"
+      CONSOLE_LOG_JSON_NO_STACK_FOR_NON_ERROR: "true"
+      CONSOLE_LOG_JSON_NO_FILE_NAME: "true"
+    _secrets_ref:
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: "{{ item.name }}"
+        namespace: "{{ openshift_namespace }}"
+        labels:
+          app.kubernetes.io/name: "{{ item.name }}"
+          app.kubernetes.io/component: "microservice"
+          app.kubernetes.io/part-of: "zeebe-clients"
+          app.kubernetes.io/managed-by: "ansible"
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app.kubernetes.io/instance: "{{ item.name }}"
+          resources:
+            requests:
+              cpu: "{{ microservice_cpu_request }}"
+              memory: "{{ microservice_memory_request }}"
+        template:
+          metadata:
+            labels:
+              app.kubernetes.io/instance: "{{ item.name }}"
+          spec:
+            serviceAccountName: "{{ quay_service_account_name }}"
+            containers:
+              - name: "{{ item.name }}"
+                image: "{{ quay_repo }}/microservice-{{ item.name }}:latest"
+                env: >-
+                  {{ _instance_env
+                  | combine(item.additional_env)
+                  | to_k8s_env }}
+                envFrom: "{{
+                    [{ 'secretRef': {'name': 'all'} }] + (
+                      [{ 'secretRef': {'name': 'microservice.'+item.name} }] if item.additional_secrets is defined else []
+                    )
+                  }}"
+                resources:
+                  limits:
+                    cpu: "{{ microservice_cpu_limit }}"
+                    memory: "{{ microservice_memory_limit }}"
+#        triggers:
+#          - type: ImageChange
+#            imageChangeParams:
+#              automatic: true
+#              containerNames:
+#                - phd-assess-notifier
+#              from:
+#                kind: ImageStreamTag
+#                name: 'phd-assess-notifier:latest'
+#                namespace: "{{openshift_namespace}}"

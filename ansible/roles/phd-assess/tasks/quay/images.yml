@@ -12,3 +12,45 @@
     tag: "{{ zeebe_version }}"
     push: true
     source: local
+
+- name: Images - Pull Ubuntu Focal image
+  community.docker.docker_image:
+    name: "ubuntu"
+    tag: "focal"
+    source: pull
+
+- name: Images - Tag and push Ubuntu Focal to Quay
+  community.docker.docker_image:
+    name: "ubuntu"
+    repository: "{{ quay_repo }}/ubuntu"
+    tag: "focal"
+    push: true
+    source: local
+
+- name: Images - Pull the Node 18 for microservices as base image
+  community.docker.docker_image:
+    name: "node"
+    tag: "{{ microservice_node_18_base_tag }}"
+    source: pull
+
+- name: Images - Tag and push Node 18
+  community.docker.docker_image:
+    name: "node"
+    repository: "{{ quay_repo }}/node"
+    tag: "{{ microservice_node_18_base_tag }}"
+    push: true
+    source: local
+
+- name: Images - Pull the Node 22 for microservices as base image
+  community.docker.docker_image:
+    name: "node"
+    tag: "{{ microservice_node_22_base_tag }}"
+    source: pull
+
+- name: Images - Tag and push Node 22
+  community.docker.docker_image:
+    name: "node"
+    repository: "{{ quay_repo }}/node"
+    tag: "{{ microservice_node_22_base_tag }}"
+    push: true
+    source: local
