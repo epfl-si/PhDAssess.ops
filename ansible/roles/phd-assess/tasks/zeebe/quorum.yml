@@ -71,7 +71,7 @@
       spec:
         type: ClusterIP
         ports:
-          - name: "zeebe_gateway_network"
+          - name: "zeebe-gateway-network"
             port: "{{ zeebe_gateway_network_port }}"
             protocol: TCP
             targetPort: "{{ zeebe_gateway_network_port }}"
