@@ -1,0 +1,94 @@
+- name: Web app Deployment
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: "web-app"
+        namespace: "{{ openshift_namespace }}"
+        labels:
+          app.kubernetes.io/name: "web-app"
+          app.kubernetes.io/component: "web"
+          app.kubernetes.io/part-of: "zeebe-clients"
+          app.kubernetes.io/managed-by: "ansible"
+          deployment.name: "web-app"
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            deployment.name: "web-app"
+        template:
+          metadata:
+            creationTimestamp: null
+            labels:
+              deployment.name: "web-app"
+          spec:
+            serviceAccountName: "{{ quay_service_account_name }}"
+            containers:
+              - name: "web-app"
+                image: "{{ quay_repo }}/{{ web_app_image_name }}:{{ web_app_image_tag }}"
+                command:
+                  - /usr/bin/node
+                  - main.js
+                ports:
+                  - name: metrics
+                    containerPort: 3000
+                resources:
+                  requests:
+                    cpu: "50m"
+                    memory: "800Mi"
+                  limits:
+                    cpu: "100m"
+                    memory: "4Gi"
+                envFrom:
+                  - secretRef:
+                      name: "all"
+                  - secretRef:
+                      name: "{{ meteor_secrets_name }}"
+                env:
+                - name: "PORT"
+                  value: "3000"
+                - name: "ROOT_URL"
+                  value: "{{ web_app_full_url }}"
+                - name: "MONGO_URL"
+                  value: "{{ web_app_mongo_url }}"
+                - name: "ZEEBE_ADDRESS"
+                  value: "{{ zeebe_gateway_service_name }}:{{ zeebe_gateway_network_port }}"
+                - name: "ZEEBE_NODE_LOG_LEVEL"
+                  value: "{{ web_app_zeebe_log_level }}"
+                - name: "DEBUG"
+                  value: "{{ web_app_debug_env }}"
+                - name: "METEOR_SETTINGS"
+                  value: "{{ web_app_meteor_settings | to_json }}"
+                - name: "ISA_IMPORT_API_URL"
+                  value: "http://isa.epfl.ch/services/v1/doctorants/current/programme"
+                - name: "ZEEBE_WORKER_TIMEOUT"
+                  value: "300000"
+                - name: "ZEEBE_WORKER_MAX_JOBS_TO_ACTIVATE"
+                  # tried:
+                  #   - 100: too much, 10 were gone as error
+                  #   - 66: too much, 3 were gone as error
+                  value: "50"
+                - name: "TZ"
+                  value: "Europe/Zurich"
+                - name: "NODE_OPTIONS"
+                  value: "--max_old_space_size={{ '1536' if openshift_namespace == 'phd-assess' else '615' }}"
+
+
+- name: Web app Service
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: "web-app-service"
+        namespace: "{{ openshift_namespace }}"
+      spec:
+        type: ClusterIP
+        ports:
+          - name: "web"
+            port: 80
+            protocol: TCP
+            targetPort: 3000
+        selector:
+          deployment.name: "web-app"

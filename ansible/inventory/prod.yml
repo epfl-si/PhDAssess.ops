@@ -1,18 +1,43 @@
 all:
   hosts:
-    openshift-4-dev:
+    openshift-4-prod:
       ansible_connection: local
       ansible_host: localhost
       ansible_python_interpreter: "{{ phdisble_suitcase_dir }}/bin/python3"
-      openshift_namespace: svc1394d-phd-assess
+      openshift_namespace: svc1394p-phd-assess
   vars:
-    phd-assess:
-      is_test: 'false'
-
-    # Secrets
     keybase_secrets_folder: "/keybase/team/epfl_phdassess/prod/"
 
+    # Meteor
+    node_for_meteor_image_name: 'ubuntu-node-14'
+    web_app_image_name: 'meteor-web-app'
+    web_app_image_tag: 'latest'
+
+    web_app_url: "phd-assess-prod.128.178.211.3.nip.io"
+    #web_app_url: "phd-annual-report.epfl.ch"
+    web_app_full_url: "https://{{ web_app_url }}"
+
+    web_app_mongo_url: "mongodb://mongo:27017/meteor"
+
+    web_app_zeebe_log_level: "ERROR"
+    web_app_debug_env: "phd-assess:*"
+    web_app_node_options: "--max_old_space_size=1536"
+
+    web_app_meteor_settings:
+      public:
+        isTest:
+          "true"
+        phdAssessRoleAdmin:
+          "PhD-annual-report-admin"
+        phdAssessRoleProgramAssistant:
+          "PhD-annual-report-administrative-assistant"
+
+    # Route
+    avi_route_access_level: public
+
     # Microservices
+    microservice_node_base_tag: "18-alpine"
+
     ## Notifier
     notifier_port: "25"
     notifier_host: "mail.epfl.ch"

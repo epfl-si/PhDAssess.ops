@@ -38,6 +38,15 @@
   tags:
     - buildConfigs
 
+- name: Setting the Zeebe quorum...
+  ansible.builtin.include_tasks:
+    file: zeebe/quorum.yml
+    apply:
+      tags: zeebe
+  tags:
+    - zeebe
+    - zeebe.service
+
 - name: Applying Notifier microservice...
   ansible.builtin.include_tasks:
     file: microservices/main.yml
@@ -47,14 +56,14 @@
   tags:
     - microservices
 
-- name: Setting the Zeebe quorum...
+- name: Applying the Meteor web app...
   ansible.builtin.include_tasks:
-    file: zeebe/quorum.yml
+    file: web-app.yml
     apply:
-      tags: zeebe
+      tags:
+        - web-app
   tags:
-    - zeebe
-    - zeebe.service
+    - web-app
 
 - name: Applying route(s)...
   ansible.builtin.include_tasks:

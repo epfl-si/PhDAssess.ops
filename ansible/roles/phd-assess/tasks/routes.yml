@@ -1,0 +1,23 @@
+- name: Web Route
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: route.openshift.io/v1
+      kind: Route
+      metadata:
+        name: "phd-assess"
+        namespace: "{{ openshift_namespace }}"
+        labels:
+          app: "web-app"
+          route: "{{ avi_route_access_level }}"
+      spec:
+        host: "{{ web_app_url }}"
+        port:
+          targetPort: "http"
+        tls:
+          termination: edge
+          insecureEdgeTerminationPolicy: Redirect
+        to:
+          kind: Service
+          name: "web-app-service"
+          weight: 100
+        wildcardPolicy: None
