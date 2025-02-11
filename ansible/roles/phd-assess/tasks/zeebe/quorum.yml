@@ -59,3 +59,21 @@
     - "zeebe-quorum-1"
     - "zeebe-quorum-2"
   tags: zeebe.service
+
+- name: "Zeebe Gateway Service"
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: "{{ zeebe_gateway_service_name }}"
+        namespace: "{{ openshift_namespace }}"
+      spec:
+        type: ClusterIP
+        ports:
+          - name: "zeebe_gateway_network"
+            port: "{{ zeebe_gateway_network_port }}"
+            protocol: TCP
+            targetPort: "{{ zeebe_gateway_network_port }}"
+        selector:
+          for-service: "{{ zeebe_gateway_service_name }}"
