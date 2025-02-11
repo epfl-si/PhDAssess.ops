@@ -10,6 +10,7 @@
           NOTIFIER_FROM_ADDRESS: "{{ notifier_from_address }}"
     - name: "pdf"
       git_url: "https://github.com/epfl-si/PhDAssess-PDF"
+      git_branch: "master"
       additional_env:
         - ZEEBE_TASK_TYPE: "phdBuildPDF"
     - name: "ged"
