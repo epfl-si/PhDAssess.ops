@@ -100,7 +100,7 @@ services:
       - ../../PhDAssess-ISA/.env
 
 #  mongo:
-#    image: mongo
+#    image: mongo:6
 #    restart: always
 #
 #  mongo-express:
