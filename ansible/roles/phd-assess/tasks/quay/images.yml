@@ -54,3 +54,17 @@
     tag: "{{ microservice_node_22_base_tag }}"
     push: true
     source: local
+
+- name: Images - Pull the MongoDB for web-app
+  community.docker.docker_image:
+    name: "{{ db_image_name }}"
+    tag: "{{ db_image_tag }}"
+    source: pull
+
+- name: Images - Tag and push the MongoDB
+  community.docker.docker_image:
+    name: "{{ db_image_name }}"
+    repository: "{{ quay_repo }}/{{ db_image_name }}"
+    tag: "{{ db_image_tag }}"
+    push: true
+    source: local

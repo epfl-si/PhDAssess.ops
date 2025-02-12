@@ -1,0 +1,7 @@
+- name: Applying MongoDB...
+  ansible.builtin.include_tasks:
+    file: db.yml
+
+- name: Applying Meteor App...
+  ansible.builtin.include_tasks:
+    file: app.yml

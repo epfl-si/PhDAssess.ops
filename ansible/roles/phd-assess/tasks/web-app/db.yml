@@ -1,0 +1,58 @@
+- name: Mongo Deployment
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: "web-app-db"
+        namespace: "{{ openshift_namespace }}"
+        labels:
+          app.kubernetes.io/name: "web-app-db"
+          app.kubernetes.io/component: "db"
+          app.kubernetes.io/part-of: "frontend"
+          app.kubernetes.io/managed-by: "ansible"
+          deployment.name: "web-app-db"
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            deployment.name: "web-app-db"
+        template:
+          metadata:
+            labels:
+              deployment.name: "web-app-db"
+          spec:
+            serviceAccountName: "{{ quay_service_account_name }}"
+            containers:
+              - name: "web-app-db"
+                image: "{{ web_app_db_image }}"
+                resources:
+                  requests:
+                    cpu: "10m"
+                    memory: "400Mi"
+                  limits:
+                    cpu: "100m"
+                    memory: "1Gi"
+                volumeMounts:
+                  - name: data-db
+                    mountPath: /data/db
+            volumes:
+              - name: data-db
+                emptyDir: {}
+
+- name: MongoDB Service
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: "mongo"
+        namespace: "{{openshift_namespace}}"
+      spec:
+        type: ClusterIP
+        ports:
+          - name: "mongo"
+            port: 27017
+            targetPort: 27017
+        selector:
+          deployment.name: "web-app-db"

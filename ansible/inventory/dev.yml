@@ -36,10 +36,14 @@ all:
     web_app_full_url: "https://{{ web_app_url }}"
 
     web_app_mongo_url: "mongodb://mongo:27017/meteor"
-
     web_app_zeebe_log_level: "ERROR"
     web_app_debug_env: "phd-assess:*"
+    web_app_node_env: "development"
     web_app_node_options: "--max_old_space_size=1536"
+
+    web_app_secret_mongo_persistent_db: false
+
+    web_app_db_image: "{{ quay_repo }}/{{ db_image_name }}:{{ db_image_tag }}"
 
     web_app_meteor_settings:
       public:
@@ -49,6 +53,9 @@ all:
           "PhD-annual-report-admin"
         phdAssessRoleProgramAssistant:
           "PhD-annual-report-administrative-assistant"
+
+    db_image_name: "mongo"
+    db_image_tag: "6"
 
     # Route
     avi_route_access_level: private

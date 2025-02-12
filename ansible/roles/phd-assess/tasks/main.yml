@@ -58,7 +58,7 @@
 
 - name: Applying the Meteor web app...
   ansible.builtin.include_tasks:
-    file: web-app.yml
+    file: web-app/main.yml
     apply:
       tags:
         - web-app
