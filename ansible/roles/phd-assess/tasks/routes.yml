@@ -9,6 +9,8 @@
         labels:
           app: "web-app"
           route: "{{ avi_route_access_level }}"
+        annotations:
+          console.alpha.openshift.io/overview-app-route: "true"
       spec:
         host: "{{ web_app_url }}"
         port:

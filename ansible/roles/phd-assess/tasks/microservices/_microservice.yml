@@ -66,8 +66,12 @@
         labels:
           app.kubernetes.io/name: "{{ item.name }}"
           app.kubernetes.io/component: "microservice"
-          app.kubernetes.io/part-of: "zeebe-clients"
+          app.kubernetes.io/part-of: "microservice-zeebe-clients"
           app.kubernetes.io/managed-by: "ansible"
+        annotations:
+          app.openshift.io/vcs-uri: "{{ item.git_url }}"
+          app.openshift.io/vcs-ref: "{{ item.git_branch | default('main') }}"
+          app.openshift.io/connects-to: "zeebe-0"
       spec:
         replicas: 1
         selector:

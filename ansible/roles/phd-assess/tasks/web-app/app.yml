@@ -8,10 +8,13 @@
         namespace: "{{ openshift_namespace }}"
         labels:
           app.kubernetes.io/name: "web-app"
-          app.kubernetes.io/component: "web"
-          app.kubernetes.io/part-of: "frontend"
+          app.kubernetes.io/component: "frontend"
+          app.kubernetes.io/part-of: "web"
           app.kubernetes.io/managed-by: "ansible"
           deployment.name: "web-app"
+        annotations:
+          app.openshift.io/vcs-uri: "https://github.com/epfl-si/PhDAssess"
+          app.openshift.io/connects-to: '["web-app-db", "zeebe-0"]'
       spec:
         replicas: 1
         selector:
@@ -21,6 +24,7 @@
           metadata:
             labels:
               deployment.name: "web-app"
+              app.kubernetes.io/instance: "web-app"
           spec:
             serviceAccountName: "{{ quay_service_account_name }}"
             containers:

@@ -21,7 +21,7 @@
         namespace: "{{ openshift_namespace }}"
         labels:
           app.kubernetes.io/name: "zeebe"
-          app.kubernetes.io/component: "workflow-engine"
+          app.kubernetes.io/component: "backend"
           app.kubernetes.io/part-of: "zeebe-quorum"
           app.kubernetes.io/managed-by: "ansible"
       spec:

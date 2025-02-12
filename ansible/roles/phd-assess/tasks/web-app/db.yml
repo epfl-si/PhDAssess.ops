@@ -8,8 +8,8 @@
         namespace: "{{ openshift_namespace }}"
         labels:
           app.kubernetes.io/name: "web-app-db"
-          app.kubernetes.io/component: "db"
-          app.kubernetes.io/part-of: "frontend"
+          app.kubernetes.io/component: "database"
+          app.kubernetes.io/part-of: "web"
           app.kubernetes.io/managed-by: "ansible"
           deployment.name: "web-app-db"
       spec:
@@ -20,6 +20,8 @@
         template:
           metadata:
             labels:
+              app.kubernetes.io/instance: "{{ db_image_name }}"
+              app.kubernetes.io/version: "{{ db_image_tag }}"
               deployment.name: "web-app-db"
           spec:
             serviceAccountName: "{{ quay_service_account_name }}"
