@@ -96,6 +96,8 @@ async function clean(args) {
         fs.pathExistsSync(partitionInstanceVolumePath) &&
           fs.removeSync(partitionInstanceVolumePath);
         console.log(`Successfully deleted ${ partitionInstanceVolumePath }`)
+        console.log(`Be warned.'`)
+        console.log(`you may need to recreate the folder and the permissions on them after restarting the Zeebe stack`)
       });
     }
   }
