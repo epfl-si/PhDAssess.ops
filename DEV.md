@@ -2,4 +2,4 @@
 
 `ansible-lint ./ansible`
 
-`ansible-playbook --syntax-check ./ansible/playbook.yml`
+`ansible-playbook -i ansible/inventory/dev.yml --syntax-check ./ansible/playbook.yml`

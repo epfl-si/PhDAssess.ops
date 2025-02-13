@@ -16,17 +16,17 @@
             protocol: TCP
             targetPort: "{{ zeebe_gateway_network_port }}"
           - name: "zeebe-broker-command-api"
-            port: "{{ zeebe_broker_network_commandApi_port }}"
+            port: "{{ zeebe_broker_network_command_api_port }}"
             protocol: TCP
-            targetPort: "{{ zeebe_broker_network_commandApi_port }}"
+            targetPort: "{{ zeebe_broker_network_command_api_port }}"
           - name: "zeebe-broker-internal-api"
-            port: "{{ zeebe_broker_network_internalApi_port }}"
+            port: "{{ zeebe_broker_network_internal_api_port }}"
             protocol: TCP
-            targetPort: "{{ zeebe_broker_network_internalApi_port }}"
+            targetPort: "{{ zeebe_broker_network_internal_api_port }}"
           - name: "zeebe-broker-monitoring-api"
-            port: "{{ zeebe_broker_network_monitoringApi_port }}"
+            port: "{{ zeebe_broker_network_monitoring_api_port }}"
             protocol: TCP
-            targetPort: "{{ zeebe_broker_network_monitoringApi_port }}"
+            targetPort: "{{ zeebe_broker_network_monitoring_api_port }}"
         selector:
           app.kubernetes.io/instance: "{{ item }}"
   loop:

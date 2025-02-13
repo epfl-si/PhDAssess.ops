@@ -49,7 +49,7 @@
       kind: Service
       metadata:
         name: "web-app-db"
-        namespace: "{{openshift_namespace}}"
+        namespace: "{{ openshift_namespace }}"
       spec:
         type: ClusterIP
         ports:

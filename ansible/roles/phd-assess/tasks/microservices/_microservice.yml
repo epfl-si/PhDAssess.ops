@@ -91,9 +91,8 @@
                   | combine(item.additional_env)
                   | to_k8s_env }}
                 envFrom: "{{
-                    [{ 'secretRef': {'name': 'all'} }] + (
-                      [{ 'secretRef': {'name': 'microservice.'+item.name} }] if item.additional_secrets is defined else []
-                    )
+                    [{'secretRef': {'name': 'all'}}] +
+                    ([{'secretRef': {'name': 'microservice.' + item.name}}] if item.additional_secrets is defined else [])
                   }}"
                 resources:
                   requests:

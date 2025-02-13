@@ -9,21 +9,21 @@
         data_volume:
           emptyDir: {}
         peers:
-          - "zeebe-quorum-1:{{ zeebe_broker_network_internalApi_port }}"
-          - "zeebe-quorum-2:{{ zeebe_broker_network_internalApi_port }}"
+          - "zeebe-quorum-1:{{ zeebe_broker_network_internal_api_port }}"
+          - "zeebe-quorum-2:{{ zeebe_broker_network_internal_api_port }}"
       - node_id: 1
         name: "zeebe-1"
         quorum_name: "zeebe-quorum-1"
         data_volume:
           emptyDir: {}
         peers:
-          - "zeebe-quorum-0:{{ zeebe_broker_network_internalApi_port }}"
-          - "zeebe-quorum-2:{{ zeebe_broker_network_internalApi_port }}"
+          - "zeebe-quorum-0:{{ zeebe_broker_network_internal_api_port }}"
+          - "zeebe-quorum-2:{{ zeebe_broker_network_internal_api_port }}"
       - node_id: 2
         name: "zeebe-2"
         quorum_name: "zeebe-quorum-2"
         data_volume:
           emptyDir: {}
         peers:
-          - "zeebe-quorum-0:{{ zeebe_broker_network_internalApi_port }}"
-          - "zeebe-quorum-1:{{ zeebe_broker_network_internalApi_port }}"
+          - "zeebe-quorum-0:{{ zeebe_broker_network_internal_api_port }}"
+          - "zeebe-quorum-1:{{ zeebe_broker_network_internal_api_port }}"

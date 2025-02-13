@@ -4,7 +4,7 @@
       apiVersion: build.openshift.io/v1
       kind: BuildConfig
       metadata:
-        name:  zeebe-custom-image
+        name: zeebe-custom-image
         namespace: "{{ openshift_namespace }}"
       spec:
         serviceAccount: "{{ quay_service_account_name }}"
@@ -49,7 +49,7 @@
           dockerStrategy:
             buildArgs:
               - name: "BASE_IMAGE"
-                value:  "{{ quay_repo }}/ubuntu:focal"
+                value: "{{ quay_repo }}/ubuntu:focal"
             dockerfilePath: "docker/node-base/Dockerfile"
         output:
           to:
@@ -81,7 +81,7 @@
           dockerStrategy:
             buildArgs:
               - name: "BASE_IMAGE"
-                value:  "{{ quay_repo }}/{{ node_for_meteor_image_name}}"
+                value: "{{ quay_repo }}/{{ node_for_meteor_image_name }}"
         output:
           to:
             kind: DockerImage
