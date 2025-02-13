@@ -1,7 +1,43 @@
-- name: Applying MongoDB...
+- name: Applying Meteor App secrets...
   ansible.builtin.include_tasks:
-    file: db.yml
+    file: web-app/app.yml
+    apply:
+      tags:
+        - web-app
+        - web-app.secrets
+  tags:
+    - web-app
+    - web-app.secrets
+
+- name: Applying Mongo for the Meteor App...
+  ansible.builtin.include_tasks:
+    file: web-app/db.yml
+    apply:
+      tags:
+        - web-app
+        - web-app.db
+  tags:
+    - web-app
+    - web-app.db
 
 - name: Applying Meteor App...
   ansible.builtin.include_tasks:
-    file: app.yml
+    file: web-app/app.yml
+    apply:
+      tags:
+        - web-app
+        - web-app.meteor
+  tags:
+    - web-app
+    - web-app.meteor
+
+- name: Applying App services...
+  ansible.builtin.include_tasks:
+    file: web-app/services.yml
+    apply:
+      tags:
+        - web-app
+        - web-app.services
+  tags:
+    - web-app
+    - web-app.services

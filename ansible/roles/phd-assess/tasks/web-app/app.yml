@@ -34,7 +34,7 @@
                   - /usr/bin/node
                   - main.js
                 ports:
-                  - name: metrics
+                  - name: meteor
                     containerPort: 3000
                 resources:
                   requests:
@@ -78,21 +78,3 @@
                     value: "{{ web_app_node_env }}"
                   - name: "NODE_OPTIONS"
                     value: "{{ web_app_node_options }}"
-
-- name: Web app Service
-  kubernetes.core.k8s:
-    definition:
-      apiVersion: v1
-      kind: Service
-      metadata:
-        name: "web-app-service"
-        namespace: "{{ openshift_namespace }}"
-      spec:
-        type: ClusterIP
-        ports:
-          - name: "http"
-            port: 80
-            protocol: TCP
-            targetPort: 3000
-        selector:
-          deployment.name: "web-app"

@@ -1,0 +1,23 @@
+- name: Zeebe Broker configMap
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: "zeebe-broker"
+        namespace: "{{ openshift_namespace }}"
+      data:
+        PORT: '{{ zeebe_gateway_network_port | string }}'
+        JAVA_OPTS: "{{ '-Xmx2024m' }}"
+        ZEEBE_BROKER_NETWORK_MONITORINGAPI_HOST: "0.0.0.0"
+        # https://docs.camunda.io/docs/self-managed/zeebe-deployment/operations/setting-up-a-cluster/
+        ZEEBE_LOG_APPENDER: "Stackdriver"
+        ZEEBE_BROKER_BACKPRESSURE_ALGORITHM: "fixed"
+        ZEEBE_BROKER_BACKPRESSURE_FIXEDLIMIT_LIMIT: "300"
+        ZEEBE_BROKER_THREADS_CPUTHREADCOUNT: "1"
+        ZEEBE_BROKER_THREADS_IOTHREADCOUNT: "1"
+        ZEEBE_BROKER_CLUSTER_CLUSTERNAME: "epfl"
+        ZEEBE_BROKER_CLUSTER_CLUSTERSIZE: "3"
+        ZEEBE_BROKER_CLUSTER_REPLICATIONFACTOR: "3"
+        ZEEBE_LOG_LEVEL: "{{ _zeebe_log_level }}"
+        ATOMIX_LOG_LEVEL: "{{ _zeebe_log_level }}"

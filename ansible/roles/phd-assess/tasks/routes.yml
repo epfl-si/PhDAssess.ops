@@ -14,7 +14,7 @@
       spec:
         host: "{{ web_app_url }}"
         port:
-          targetPort: "http"
+          targetPort: "http-web"
         tls:
           termination: edge
           insecureEdgeTerminationPolicy: Redirect

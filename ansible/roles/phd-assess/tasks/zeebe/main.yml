@@ -1,0 +1,43 @@
+- name: Setting the Zeebe configs...
+  ansible.builtin.include_tasks:
+    file: zeebe/configMaps.yml
+    apply:
+      tags:
+        - zeebe
+        - zeebe.configMaps
+  tags:
+    - zeebe
+    - zeebe.configMaps
+
+- name: Setting the Zeebe secrets...
+  ansible.builtin.include_tasks:
+    file: zeebe/secrets.yml
+    apply:
+      tags:
+        - zeebe
+        - zeebe.secrets
+  tags:
+    - zeebe
+    - zeebe.secrets
+
+- name: Setting the Zeebe quorum...
+  ansible.builtin.include_tasks:
+    file: zeebe/quorum.yml
+    apply:
+      tags:
+        - zeebe
+        - zeebe.quorum
+  tags:
+    - zeebe
+    - zeebe.quorum
+
+- name: Setting the Zeebe services...
+  ansible.builtin.include_tasks:
+    file: zeebe/services.yml
+    apply:
+      tags:
+        - zeebe
+        - zeebe.service
+  tags:
+    - zeebe
+    - zeebe.service

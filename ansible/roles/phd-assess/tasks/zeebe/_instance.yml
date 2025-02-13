@@ -42,14 +42,16 @@
           spec:
             serviceAccountName: "{{ quay_service_account_name }}"
             containers:
-              - name: zeebe
+              - name: "zeebe"
                 image:
                   "{{ zeebe_full_image_path_on_quay }}:{{ zeebe_version }}"
                 env: >-
-                  {{ zeebe_instance_env
-                  | combine(_instance_env)
-                  | combine(env | default({}))
-                  | to_k8s_env }}
+                  {{ _instance_env | to_k8s_env }}
+                envFrom:
+                  - configMapRef:
+                      name: "zeebe-broker"
+                  - secretRef:
+                      name: "{{ zeebe_secrets_name }}-s3"
                 resources:
                   requests:
                     cpu: '15m'
