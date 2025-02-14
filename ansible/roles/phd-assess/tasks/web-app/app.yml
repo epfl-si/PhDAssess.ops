@@ -43,6 +43,13 @@
                   limits:
                     cpu: "100m"
                     memory: "4Gi"
+                readinessProbe:
+                  httpGet:
+                    path: /
+                    port: 3000
+                  initialDelaySeconds: 15
+                  periodSeconds: 3
+                  failureThreshold: 120
                 envFrom:
                   - secretRef:
                       name: "all"
