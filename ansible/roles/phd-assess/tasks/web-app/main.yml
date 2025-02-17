@@ -1,6 +1,6 @@
 - name: Applying Meteor App secrets...
   ansible.builtin.include_tasks:
-    file: web-app/app.yml
+    file: web-app/secrets.yml
     apply:
       tags:
         - web-app
