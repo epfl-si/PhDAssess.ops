@@ -1,0 +1,67 @@
+- name: Applying zeebe-db-monitor Deployment...
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: "zeebe-db-monitor"
+        namespace: "{{ openshift_namespace }}"
+        labels:
+          app.kubernetes.io/name: "zeebe-db-monitor"
+          app.kubernetes.io/component: "monitoring"
+          app.kubernetes.io/part-of: "monitoring"
+          app.kubernetes.io/managed-by: "ansible"
+        annotations:
+          app.openshift.io/vcs-uri: "https://github.com/epfl-si/zeebe-db-monitor"
+          app.openshift.io/connects-to: "zeebe-0"
+      spec:
+        replicas: 1
+        strategy:
+          resources:
+            limits:
+              cpu: "50m"
+              memory: "100Mi"
+        selector:
+          matchLabels:
+            app.kubernetes.io/instance: "zeebe-db-monitor"
+        template:
+          metadata:
+            labels:
+              app.kubernetes.io/instance: "zeebe-db-monitor"
+              for-prometheus-job: "zeebe"
+          spec:
+            serviceAccountName: "{{ quay_service_account_name }}"
+            containers:
+              - name: "zeebe-db-monitor"
+                image: "{{ zeebe_db_monitor_image }}:latest"
+                env:
+                  - name: 'ZEEBE_DATA_RO_PATH'
+                    value: '/zeebe-data-ro/raft-partition/partitions/1/runtime/'
+                resources:
+                  requests:
+                    cpu: "5m"
+                    memory: "50Mi"
+                  limits:
+                    cpu: "50m"
+                    memory: "300Mi"
+                ports:
+                  - name: metrics
+                    containerPort: 8080
+
+- name: Applying zeebe-db-monitor Service...
+  tags: monitoring.zeebe-db-monitor
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: "zeebe-db-monitor"
+        namespace: "{{ openshift_namespace }}"
+        labels:
+          app.kubernetes.io/name: "zeebe-db-monitor"
+      spec:
+        ports:
+          - name: metrics
+            port: 8080
+        selector:
+          app.kubernetes.io/name: "zeebe-db-monitor"

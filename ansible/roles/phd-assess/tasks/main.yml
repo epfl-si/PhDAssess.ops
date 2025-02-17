@@ -67,6 +67,16 @@
     - web-app.meteor
     - web-app.services
 
+- name: Doing the monitoring setups...
+  ansible.builtin.include_tasks:
+    file: monitoring/main.yml
+  tags:
+    - monitoring
+    - monitoring.prometheus
+    - monitoring.prometheus.restart
+    - monitoring.disk-usage
+    - monitoring.zeebe-db-monitor
+
 - name: Applying route(s)...
   ansible.builtin.include_tasks:
     file: routes.yml

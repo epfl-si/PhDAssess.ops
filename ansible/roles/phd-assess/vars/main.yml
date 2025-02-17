@@ -49,3 +49,7 @@ microservice_node_22_base_image: "node:{{ microservice_node_22_base_tag }}"
 
 notifier_service_name: "notifier"
 pdf_service_name: "pdf"
+
+# Monitoring
+monitoring_node_disk_usage_exporter_image: "{{ quay_repo }}/disk-usage-exporter"
+zeebe_db_monitor_image: "{{ quay_repo }}/zeebe-db-monitor"

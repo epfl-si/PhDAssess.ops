@@ -1,0 +1,101 @@
+- name: Prometheus ConfigMap (configuration and sync scripts)
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: prometheus
+        namespace: "{{ openshift_namespace }}"
+      data:
+        prometheus.yml: >
+          {{ lookup("template", "prometheus-config.yml") }}
+  register: _prometheus_configmap
+
+- name: Prometheus StatefulSet
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: apps/v1
+      kind: StatefulSet
+      metadata:
+        name: "prometheus"
+        namespace: "{{ openshift_namespace }}"
+        labels:
+          app.kubernetes.io/name: "prometheus"
+          app.kubernetes.io/component: "monitoring"
+          app.kubernetes.io/part-of: "monitoring"
+          app.kubernetes.io/managed-by: "ansible"
+        annotations:
+          app.openshift.io/vcs-uri: "https://github.com/epfl-si/PhDAssess/tree/master/docker/monitoring"
+          app.openshift.io/connects-to: "zeebe-0"
+      spec:
+        serviceName: "prometheus"  # Refs the service above, so that the
+        # pods get
+        # a predictable KubeDNS name
+        selector:
+          matchLabels:
+            app: prometheus
+        template:
+          metadata:
+            labels:
+              app: prometheus
+          spec:
+            terminationGracePeriodSeconds: 10
+            containers:
+              - name: prometheus
+                image: quay.io/prometheus/prometheus
+                volumeMounts:
+                  - name: storage
+                    mountPath: /prometheus
+                  - name: dynamic-config
+                    mountPath: /prometheus-config/dynamic
+                  - name: static-config
+                    mountPath: /prometheus-config/static
+                command:
+                  - /bin/prometheus
+                  - --config.file=/prometheus-config/static/prometheus.yml
+                  - --storage.tsdb.path=/prometheus
+                resources:
+                  requests:
+                    cpu: "5m"
+                    memory: "200Mi"
+                  limits:
+                    cpu: '50m'
+                    memory: "200Mi"
+            volumes:
+              - name: storage
+                emptyDir: {}
+              - name: dynamic-config
+                emptyDir: {}
+              - name: static-config
+                configMap:
+                  name: prometheus
+  register: _prometheus_stateful_set
+
+- name: Restart Prometheus
+  when: >-
+    ( (_prometheus_stateful_set | default({})) is changed )
+    or
+    ( (_prometheus_configmap | default({})) is changed )
+    or
+    ( "monitoring.prometheus.restart" in ansible_run_tags )
+  shell:
+    cmd: |
+      oc -n {{ openshift_namespace }} delete pod prometheus-0
+  tags: monitoring.prometheus.restart
+
+- name: Prometheus service
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: prometheus
+        namespace: "{{ openshift_namespace }}"
+        labels:
+          app: prometheus
+      spec:
+        ports:
+          - name: prometheus
+            port: 9090
+        selector:
+          app: prometheus

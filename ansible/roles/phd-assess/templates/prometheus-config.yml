@@ -1,0 +1,81 @@
+# Prometheus configuration
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+{% macro _discover_k8s_pods(ns, label_selector) %}
+      - role: pod
+        namespaces:
+          names:
+            - "{{ ns }}"
+        selectors:
+        - role: pod
+          label: "{{ label_selector }}"
+{% endmacro %}
+
+{% macro _common_relabel_configs() %}
+      # Only keep targets whose port name contains "metrics"
+      - action: keep
+        source_labels:
+          - __meta_kubernetes_pod_container_port_name
+        regex: .*metrics.*
+      # Convert all labels as time series labels
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      # Give a special meaning to some of them
+      - action: replace
+        source_labels:
+          - __meta_kubernetes_pod_name
+        target_label: instance
+      - action: replace
+        source_labels:
+          - __meta_kubernetes_namespace
+        target_label: kubernetes_namespace
+      - action: replace
+        source_labels:
+          - for_prometheus_job
+        target_label: job
+      - action: labeldrop
+        regex: for_prometheus_job
+      # Set up “persistence” label
+      - action: replace
+        target_label: persistence
+        replacement: nfs
+        source_labels:
+          - instance
+        regex: .*1.*
+      - action: replace
+        target_label: persistence
+        replacement: local
+        source_labels:
+          - instance
+        regex: .*2.*
+{% endmacro %}
+
+scrape_configs:
+  # Prometheus scraping itself.
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: '0-prometheus'
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+    - targets: ['localhost:9090']
+
+    # Discover Zeebe targets in the same namespace
+  - job_name: "1-{{ openshift_namespace }}-zeebe-pods"
+    metrics_path: /actuator/prometheus
+    kubernetes_sd_configs:
+{{ _discover_k8s_pods(ns=openshift_namespace, label_selector="for-service==zeebe-gateway") }}
+    relabel_configs:
+{{ _common_relabel_configs() }}
+
+    # Discover other scrapable targets in the same namespace
+  - job_name: "2-{{ openshift_namespace }}-other-pods"
+    # Assume default `metrics_path` (i.e. /metrics)
+    kubernetes_sd_configs:
+{{ _discover_k8s_pods(ns=openshift_namespace, label_selector="for-service!=zeebe-gateway") }}
+    relabel_configs:
+{{ _common_relabel_configs() }}

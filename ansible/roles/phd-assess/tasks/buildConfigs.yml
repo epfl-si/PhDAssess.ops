@@ -90,3 +90,63 @@
           requests:
             cpu: "10m"
             memory: "2Gi"
+
+- name: BuildConfig for the disk usage monitor
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: build.openshift.io/v1
+      kind: BuildConfig
+      metadata:
+        name: "disk-usage-exporter"
+        namespace: "{{ openshift_namespace }}"
+      spec:
+        serviceAccount: "{{ quay_service_account_name }}"
+        source:
+          type: Git
+          git:
+            ref: "master"
+            uri: "https://github.com/epfl-si/PhDAssess"
+          contextDir: "docker/monitoring"
+        strategy:
+          type: Docker
+          dockerStrategy:
+            buildArgs:
+              - name: "BASE_IMAGE"
+                value: "{{ quay_repo }}/node:22-alpine"
+        output:
+          to:
+            kind: DockerImage
+            name: "{{ monitoring_node_disk_usage_exporter_image }}:latest"
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "2Gi"
+
+- name: BuildConfig for the zeebe db monitor
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: build.openshift.io/v1
+      kind: BuildConfig
+      metadata:
+        name: "zeebe-db-monitor"
+        namespace: "{{ openshift_namespace }}"
+      spec:
+        serviceAccount: "{{ quay_service_account_name }}"
+        source:
+          type: Git
+          git:
+            uri: "https://github.com/epfl-si/zeebe-db-monitor"
+        strategy:
+          type: Docker
+          dockerStrategy:
+            buildArgs:
+              - name: "BASE_IMAGE"
+                value: "{{ quay_repo }}/node:18-alpine"
+        output:
+          to:
+            kind: DockerImage
+            name: "{{ zeebe_db_monitor_image }}:latest"
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "2Gi"
