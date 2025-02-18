@@ -10,7 +10,6 @@
           app.kubernetes.io/name: "web-app-db"
           app.kubernetes.io/component: "database"
           app.kubernetes.io/part-of: "web"
-          app.kubernetes.io/managed-by: "ansible"
           deployment.name: "web-app-db"
       spec:
         replicas: 1

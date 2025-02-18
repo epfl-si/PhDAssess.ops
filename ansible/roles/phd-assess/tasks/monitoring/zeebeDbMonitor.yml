@@ -10,7 +10,6 @@
           app.kubernetes.io/name: "zeebe-db-monitor"
           app.kubernetes.io/component: "monitoring"
           app.kubernetes.io/part-of: "monitoring"
-          app.kubernetes.io/managed-by: "ansible"
         annotations:
           app.openshift.io/vcs-uri: "https://github.com/epfl-si/zeebe-db-monitor"
           app.openshift.io/connects-to: "zeebe-0"

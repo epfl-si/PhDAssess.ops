@@ -10,7 +10,6 @@
           app.kubernetes.io/name: "disk-usage-exporter"
           app.kubernetes.io/component: "monitoring"
           app.kubernetes.io/part-of: "monitoring"
-          app.kubernetes.io/managed-by: "ansible"
         annotations:
           app.openshift.io/vcs-uri: "https://github.com/epfl-si/PhDAssess/tree/master/docker/monitoring"
           app.openshift.io/connects-to: "zeebe-0"

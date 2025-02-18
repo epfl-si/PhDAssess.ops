@@ -23,7 +23,6 @@
           app.kubernetes.io/name: "zeebe"
           app.kubernetes.io/component: "backend"
           app.kubernetes.io/part-of: "zeebe-quorum"
-          app.kubernetes.io/managed-by: "ansible"
       spec:
         replicas: 1
         selector:

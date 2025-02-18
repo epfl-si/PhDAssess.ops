@@ -67,7 +67,6 @@
           app.kubernetes.io/name: "{{ item.name }}"
           app.kubernetes.io/component: "microservice"
           app.kubernetes.io/part-of: "microservice"
-          app.kubernetes.io/managed-by: "ansible"
         annotations:
           app.openshift.io/vcs-uri: "{{ item.git_url }}"
           app.openshift.io/vcs-ref: "{{ item.git_branch | default('main') }}"
