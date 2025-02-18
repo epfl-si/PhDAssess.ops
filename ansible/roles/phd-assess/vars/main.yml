@@ -23,8 +23,7 @@ quay_push_pull_config:
 # Zeebe
 zeebe_gateway_service_name: "zeebe-gateway"
 
-_zeebe_log_level: >-
-  {{ "info" if is_test | default(false) else "info" }}
+_zeebe_log_level: "info"
 
 # The port of the “Zeebe gateways,” where clients connect with gRPC:
 zeebe_gateway_network_port: 26500
