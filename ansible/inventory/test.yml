@@ -10,22 +10,23 @@ all:
     keybase_secrets_folder: "/keybase/team/epfl_phdassess/test/"
 
     # Zeebe
-    ## Which are we using
-    zeebe_version: '8.3.3'
-    zeebe_image_path: "camunda/zeebe"
-    zeebe_full_image_path_on_quay:
-      "{{ quay_repo }}/{{ zeebe_image_path }}"
+    ## Camunda Image config
+    zeebe_version:
+      '8.3.3'
+    zeebe_repository:
+      "ghcr.io/camunda-community-hub"
+    zeebe_camunda_image_path:
+      "{{ zeebe_repository }}/zeebe-with-redis-exporter"
+    zeebe_camunda_image_full_path:
+      "{{ zeebe_camunda_image_path }}:{{ zeebe_version }}"
 
-    ## Which are we based on for custom build
-    zeebe_camunda_image_path: "camunda/zeebe"
-    zeebe_camunda_image_full_path_on_quay:
-      "{{ quay_repo }}/{{ zeebe_camunda_image_path }}"
-
-    ## Which we have customized
-    zeebe_custom_version: "8.3.3"
-    zeebe_custom_image_path: "zeebe-hazelcast"
-    zeebe_custom_image_full_path_on_quay:
-      "{{ quay_repo }}/{{ zeebe_custom_image_path }}"
+    ## Quay Image destination config
+    zeebe_quay_image_name:
+      "zeebe-with-redis-exporter"
+    zeebe_quay_image__path:
+      "{{ quay_repo }}/{{ zeebe_quay_image_name }}"
+    zeebe_quay_image_full_path:
+      "{{ zeebe_quay_image__path }}:{{ zeebe_version }}"
 
     # Meteor
     node_for_meteor_image_name: 'ubuntu-node-14'

@@ -1,14 +1,15 @@
 # Setup quay to have the necessary base images
 - name: Images - Pull Zeebe image
   community.docker.docker_image:
+    repository: "{{ zeebe_repository }}"
     name: "{{ zeebe_camunda_image_path }}"
     tag: "{{ zeebe_version }}"
     source: pull
 
 - name: Images - Tag and push Zeebe to Quay
   community.docker.docker_image:
-    name: "{{ zeebe_camunda_image_path }}"
-    repository: "{{ zeebe_camunda_image_full_path_on_quay }}"
+    name: "{{ zeebe_camunda_image_full_path }}"
+    repository: "{{ zeebe_quay_image__path }}"
     tag: "{{ zeebe_version }}"
     push: true
     source: local

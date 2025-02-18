@@ -44,7 +44,7 @@
             containers:
               - name: "zeebe"
                 image:
-                  "{{ zeebe_full_image_path_on_quay }}:{{ zeebe_version }}"
+                  "{{ zeebe_quay_image_full_path }}"
                 env: >-
                   {{ _instance_env | to_k8s_env }}
                 envFrom:
