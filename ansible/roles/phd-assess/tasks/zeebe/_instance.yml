@@ -39,6 +39,8 @@
               app.kubernetes.io/instance: "{{ item.quorum_name }}"
               app.kubernetes.io/version: "{{ zeebe_version }}"
               app.kubernetes.io/name: "zeebe"
+            annotations:
+              app.openshift.io/connects-to: "{{ 'redis' if item.node_id == 0 else '' }}"
           spec:
             serviceAccountName: "{{ quay_service_account_name }}"
             containers:
@@ -87,6 +89,8 @@
                   timeoutSeconds: 1
             volumes:
               - name: zeebe-data
+                persistentVolumeClaim:
+                  claimName: "{{ item.data_claim_name }}"
             # Keep the pods spread into different physical nodes
             affinity:
               podAntiAffinity:
@@ -94,4 +98,4 @@
                   - labelSelector:
                       matchLabels:
                         app.kubernetes.io/name: "zeebe"
-                    topologyKey: "kubernetes.io/zone"
+                    topologyKey: "topology.kubernetes.io/zone"
