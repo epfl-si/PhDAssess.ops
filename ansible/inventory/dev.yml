@@ -20,6 +20,14 @@ all:
     zeebe_camunda_image_full_path:
       "{{ zeebe_camunda_image_path }}:{{ zeebe_version }}"
 
+    ## Zeebe Simple Monitor
+    zeebe_simple_monitor_version:
+      "2.9.0"
+    zeebe_simple_monitor_image_path:
+      "ghcr.io/camunda-community-hub/zeebe-simple-monitor"
+    zeebe_simple_monitor_image_full_path:
+      "{{ zeebe_simple_monitor_image_path }}:{{ zeebe_simple_monitor_version }}"
+
     ## Quay Image destination config
     zeebe_quay_image_name:
       "zeebe-with-redis-exporter"

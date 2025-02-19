@@ -1,0 +1,54 @@
+- name: Zeebe Simple Monitor Deployment...
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: "zeebe-simple-monitor"
+        namespace: "{{ openshift_namespace }}"
+        labels:
+          app.kubernetes.io/name: "zeebe-simple-monitor"
+          app.kubernetes.io/component: "monitoring"
+          app.kubernetes.io/part-of: "monitoring"
+          deployment.name: "zeebe-simple-monitor"
+        annotations:
+          app.openshift.io/connects-to: '["redis"]'
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            deployment.name: "zeebe-simple-monitor"
+        template:
+          metadata:
+            labels:
+              deployment.name: "zeebe-simple-monitor"
+              app.kubernetes.io/instance: "zeebe-simple-monitor"
+          spec:
+            serviceAccountName: "{{ quay_service_account_name }}"
+            containers:
+              - name: "zeebe-simple-monitor"
+                image: "{{ zeebe_simple_monitor_image_full_path }}"
+                ports:
+                  - name: web
+                    containerPort: 8082
+                resources:
+                  requests:
+                    cpu: "20m"
+                    memory: "800Mi"
+                  limits:
+                    cpu: "100m"
+                    memory: "4Gi"
+                readinessProbe:
+                  httpGet:
+                    path: /
+                    port: 8082
+                  initialDelaySeconds: 15
+                  periodSeconds: 3
+                  failureThreshold: 120
+                env:
+                  - name: "zeebe.client.broker.gateway-address"
+                    value: "{{ zeebe_gateway_service_name }}:{{ zeebe_gateway_network_port }}"
+                  - name: "zeebe-importer"
+                    value: "redis"
+                  - name: "zeebe.client.worker.redis.connection"
+                    value: "redis://redis:6379"
