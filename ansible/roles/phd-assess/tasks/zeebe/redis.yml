@@ -1,0 +1,64 @@
+- name: Apply Redis Instance
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: apps/v1
+      kind: StatefulSet
+      metadata:
+        name: "redis"
+        namespace: "{{ openshift_namespace }}"
+        labels:
+          app.kubernetes.io/name: "redis"
+          app.kubernetes.io/component: "database"
+          app.kubernetes.io/part-of: "zeebe-quorum"
+          deployment.name: "redis"
+        annotations:
+          app.openshift.io/connects-to: '["zeebe-0"]'
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            deployment.name: "redis"
+        template:
+          metadata:
+            labels:
+              deployment.name: "redis"
+              app.kubernetes.io/instance: "redis"
+          spec:
+            serviceAccountName: "{{ quay_service_account_name }}"
+            containers:
+              - name: "redis"
+                image: "{{ quay_repo }}/redis:7-alpine"
+                ports:
+                  - name: redis
+                    containerPort: 6379
+                resources:
+                  requests:
+                    cpu: "5m"
+                    memory: "600Mi"
+                  limits:
+                    cpu: "45m"
+                    memory: "1Gi"
+                  volumeMounts:
+                    - name: "redis-data"
+                      mountPath: "/data"
+            volumes:
+              - name: "redis-data"
+                emptyDir: {}
+
+- name: Apply Redis Service...
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: "redis"
+        namespace: "{{ openshift_namespace }}"
+      spec:
+        type: ClusterIP
+        ports:
+          - name: "redis"
+            port: 6379
+            protocol: TCP
+            targetPort: 6379
+        selector:
+          deployment.name: "redis"

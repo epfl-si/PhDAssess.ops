@@ -45,6 +45,7 @@
     - zeebe
     - zeebe.configMaps
     - zeebe.secrets
+    - zeebe.redis
     - zeebe.quorum
     - zeebe.service
 
