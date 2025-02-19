@@ -1,4 +1,13 @@
-- name: Setting the Zeebe instances
+- name: Applying the Persistent Volumes Claims...
+  ansible.builtin.include_tasks: _volume.yml
+  loop: "{{ zeebe_volume_config }}"
+  vars:
+    zeebe_volume_config:
+      - volume_claim_name: "zeebe-0-pvc"
+      - volume_claim_name: "zeebe-1-pvc"
+      - volume_claim_name: "zeebe-2-pvc"
+
+- name: Applying the Zeebe instances...
   ansible.builtin.include_tasks: _instance.yml
   loop: "{{ zeebe_instance_config }}"
   vars:
@@ -6,24 +15,21 @@
       - node_id: 0
         name: "zeebe-0"
         quorum_name: "zeebe-quorum-0"
-        data_volume:
-          emptyDir: {}
+        data_claim_name: "zeebe-0-pvc"
         peers:
           - "zeebe-quorum-1:{{ zeebe_broker_network_internal_api_port }}"
           - "zeebe-quorum-2:{{ zeebe_broker_network_internal_api_port }}"
       - node_id: 1
         name: "zeebe-1"
         quorum_name: "zeebe-quorum-1"
-        data_volume:
-          emptyDir: {}
+        data_claim_name: "zeebe-1-pvc"
         peers:
           - "zeebe-quorum-0:{{ zeebe_broker_network_internal_api_port }}"
           - "zeebe-quorum-2:{{ zeebe_broker_network_internal_api_port }}"
       - node_id: 2
         name: "zeebe-2"
         quorum_name: "zeebe-quorum-2"
-        data_volume:
-          emptyDir: {}
+        data_claim_name: "zeebe-2-pvc"
         peers:
           - "zeebe-quorum-0:{{ zeebe_broker_network_internal_api_port }}"
           - "zeebe-quorum-1:{{ zeebe_broker_network_internal_api_port }}"
