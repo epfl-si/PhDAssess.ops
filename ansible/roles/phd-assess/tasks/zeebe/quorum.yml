@@ -1,5 +1,5 @@
 - name: Applying the Persistent Volumes Claims...
-  ansible.builtin.include_tasks: _volume.yml
+  ansible.builtin.include_tasks: quorum_volume.yml
   loop: "{{ zeebe_volume_config }}"
   vars:
     zeebe_volume_config:
@@ -8,7 +8,7 @@
       - volume_claim_name: "zeebe-2-pvc"
 
 - name: Applying the Zeebe instances...
-  ansible.builtin.include_tasks: _instance.yml
+  ansible.builtin.include_tasks: quorum_instance.yml
   loop: "{{ zeebe_instance_config }}"
   vars:
     zeebe_instance_config:
