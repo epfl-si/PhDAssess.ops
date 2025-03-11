@@ -23,6 +23,8 @@
           app.kubernetes.io/name: "zeebe"
           app.kubernetes.io/component: "backend"
           app.kubernetes.io/part-of: "zeebe-quorum"
+        annotations:
+          app.openshift.io/connects-to: "{{ 'redis' if item.node_id == 0  }}"
       spec:
         replicas: 1
         selector:

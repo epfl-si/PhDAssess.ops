@@ -11,8 +11,6 @@
           app.kubernetes.io/component: "database"
           app.kubernetes.io/part-of: "zeebe-quorum"
           deployment.name: "redis"
-        annotations:
-          app.openshift.io/connects-to: '["zeebe-0"]'
       spec:
         replicas: 1
         selector:
