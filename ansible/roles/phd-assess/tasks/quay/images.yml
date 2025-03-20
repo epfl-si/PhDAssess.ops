@@ -14,34 +14,6 @@
     push: true
     source: local
 
-- name: Images - Pull Redis image
-  community.docker.docker_image:
-    name: "redis"
-    tag: "7-alpine"
-    source: pull
-
-- name: Images - Tag and push Redis to Quay
-  community.docker.docker_image:
-    name: "redis"
-    repository: "{{ quay_repo }}/redis"
-    tag: "7-alpine"
-    push: true
-    source: local
-
-- name: Images - Pull Zeebe Simple Monitor image
-  community.docker.docker_image:
-    name: "{{ zeebe_simple_monitor_image_path }}"
-    tag: "{{ zeebe_simple_monitor_version }}"
-    source: pull
-
-- name: Images - Tag and push Zeebe Simple Monitor to Quay
-  community.docker.docker_image:
-    name: "{{ zeebe_simple_monitor_image_path }}"
-    repository: "{{ quay_repo }}/zeebe-simple-monitor"
-    tag: "{{ zeebe_simple_monitor_version }}"
-    push: true
-    source: local
-
 - name: Images - Pull Ubuntu Focal image
   community.docker.docker_image:
     name: "ubuntu"

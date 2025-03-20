@@ -31,14 +31,3 @@
   tags:
     - monitoring
     - monitoring.zeebe-db-monitor
-
-- name: Applying the Zeebe Simple Monitor...
-  ansible.builtin.include_tasks:
-    file: monitoring/simpleMonitor.yml
-    apply:
-      tags:
-        - monitoring
-        - monitoring.simple-monitor
-  tags:
-    - monitoring
-    - monitoring.simple-monitor

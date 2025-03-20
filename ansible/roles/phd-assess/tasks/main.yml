@@ -45,7 +45,6 @@
     - zeebe
     - zeebe.configMaps
     - zeebe.secrets
-    - zeebe.redis
     - zeebe.quorum
     - zeebe.service
 
@@ -77,7 +76,6 @@
     - monitoring.prometheus.restart
     - monitoring.disk-usage
     - monitoring.zeebe-db-monitor
-    - monitoring.simple-monitor
 
 - name: Applying route(s)...
   ansible.builtin.include_tasks:

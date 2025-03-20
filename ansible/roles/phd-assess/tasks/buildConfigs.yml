@@ -4,7 +4,7 @@
       apiVersion: build.openshift.io/v1
       kind: BuildConfig
       metadata:
-        name: zeebe-custom-image
+        name: zeebe-image
         namespace: "{{ openshift_namespace }}"
       spec:
         serviceAccount: "{{ quay_service_account_name }}"
@@ -18,12 +18,12 @@
           dockerStrategy:
             buildArgs:
               - name: "BASE_IMAGE"
-                value: "{{ zeebe_camunda_image_full_path_on_quay }}:{{ zeebe_version }}"
+                value: "{{ zeebe_camunda_image_path }}:{{ zeebe_version }}"
             dockerfilePath: "docker/zeebe/Dockerfile"
         output:
           to:
             kind: DockerImage
-            name: "{{ zeebe_custom_image_full_path_on_quay }}:{{ zeebe_custom_version }}"
+            name: "{{ zeebe_quay_image_path }}:{{ zeebe_version }}"
         resources:
           requests:
             cpu: "10m"

@@ -23,8 +23,6 @@
           app.kubernetes.io/name: "zeebe"
           app.kubernetes.io/component: "backend"
           app.kubernetes.io/part-of: "zeebe-quorum"
-        annotations:
-          app.openshift.io/connects-to: "{{ 'redis' if item.node_id == 0  }}"
       spec:
         replicas: 1
         selector:
@@ -41,8 +39,6 @@
               app.kubernetes.io/instance: "{{ item.quorum_name }}"
               app.kubernetes.io/version: "{{ zeebe_version }}"
               app.kubernetes.io/name: "zeebe"
-            annotations:
-              app.openshift.io/connects-to: "{{ 'redis' if item.node_id == 0 else '' }}"
           spec:
             serviceAccountName: "{{ quay_service_account_name }}"
             containers:

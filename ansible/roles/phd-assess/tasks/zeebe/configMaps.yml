@@ -21,6 +21,5 @@
         ZEEBE_BROKER_CLUSTER_REPLICATIONFACTOR: "3"
         ZEEBE_LOG_LEVEL: "{{ _zeebe_log_level }}"
         ATOMIX_LOG_LEVEL: "{{ _zeebe_log_level }}"
-        ZEEBE_REDIS_REMOTE_ADDRESS: "redis://redis:6379"
         ZEEBE_REDIS_MAX_TIME_TO_LIVE_IN_SECONDS: "900"
         ZEEBE_REDIS_DELETE_AFTER_ACKNOWLEDGE: "true"

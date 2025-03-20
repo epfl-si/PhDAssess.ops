@@ -20,17 +20,6 @@
     - zeebe
     - zeebe.secrets
 
-- name: Setting the Redis Zeebe exporter receiver...
-  ansible.builtin.include_tasks:
-    file: zeebe/redis.yml
-    apply:
-      tags:
-        - zeebe
-        - zeebe.redis
-  tags:
-    - zeebe
-    - zeebe.redis
-
 - name: Setting the Zeebe quorum...
   ansible.builtin.include_tasks:
     file: zeebe/quorum.yml
