@@ -77,10 +77,24 @@
     ( (_prometheus_configmap | default({})) is changed )
     or
     ( "monitoring.prometheus.restart" in ansible_run_tags )
-  shell:
+  ansible.builtin.shell:
     cmd: |
       oc -n {{ openshift_namespace }} delete pod prometheus-0
+  register: output
+  changed_when: output.rc != 0
   tags: monitoring.prometheus.restart
+
+- name: Restart Prometheus
+  changed_when: >-
+    ( (_prometheus_stateful_set | default({})) is changed )
+    or
+    ( (_prometheus_configmap | default({})) is changed )
+    or
+    ( "monitoring.prometheus.restart" in ansible_run_tags )
+  ansible.builtin.shell:
+    cmd: |
+      oc -n {{ openshift_namespace }} delete pod prometheus-0
+  tags: monitoring.prometheus.restart```
 
 - name: Prometheus service
   kubernetes.core.k8s:
