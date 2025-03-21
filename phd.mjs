@@ -1,4 +1,6 @@
 #!/usr/bin/env -S npm exec --yes --package=zx@latest zx --
+import { userInfo } from 'os';
+
 import deployProcess from './cli/deployProcess.mjs'
 import { stringifySnapshot } from './cli/snapshots.mjs'
 import generateActivityLogs from './cli/generateActivityLogs.mjs'
@@ -107,9 +109,10 @@ async function clean(args) {
         fs.pathExistsSync(partitionInstanceVolumePath) &&
         fs.removeSync(partitionInstanceVolumePath);
         console.log(`Successfully deleted ${ partitionInstanceVolumePath }`)
-        console.log(`Be warned.'`)
-        console.log(`you may need to recreate the folder and the permissions on them after restarting the Zeebe stack`)
       });
+
+      console.log(`Warning. You may need to run a permission change on next start.`)
+      console.log(`To do so, maybe: sudo chown -R root:${ userInfo().username } ${ pathZeebeVolume }`)
     }
   }
 
