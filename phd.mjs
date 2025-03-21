@@ -13,6 +13,8 @@ if (argv.help || argv._[0] === 'help') {
   await dockerRun(...argv._.slice(1));
 } else if (argv._[0] === 'stop') {
   await dockerStop(...argv._.slice(1));
+} else if (argv._[0] === 'logs') {
+  await showLatestDockerLogs(...argv._.slice(1));
 } else if (argv._[0] === 'test') {
   await test(...argv._.slice(1));
 } else if (argv._[0] === 'clean') {
@@ -35,6 +37,7 @@ Usage:
   phd help                    Show this message
   phd start                   Start the docker stack. You can use 'phd run' too
   phd start zeebe             Start the docker stack, but only the zeebe stack
+  phd logs                    Show the latest docker logs, since 5min
   phd stop                    Stop the docker stack
   phd clean                   Wipe all data. All steps have to be confirmed
   phd test                    Launch tests
@@ -62,7 +65,7 @@ async function dockerRun(args) {
   }
 
   console.log(`Stack started.`);
-  console.log(`To see the logs, use "cd ${path.join(__dirname, `docker`)}; docker compose logs -f --since 5m"`);
+  console.log(`To see the logs, use './phd.mjs logs' command`);
   console.log(`To stop, use the './phd.mjs stop' command`);
 }
 
@@ -77,6 +80,14 @@ async function dockerStop(args) {
   console.log('Containers stopped.')
 }
 
+async function showLatestDockerLogs(args) {
+  cd(path.join(__dirname, `docker`));
+
+  const p = $`docker compose logs -f --since 5m`
+  for await (const chunk of p.stdout) {
+    echo(chunk)
+  }
+}
 
 async function clean(args) {
   if (await question(`Clean Zeebe partitions ? [y/N] `) === 'y') {
@@ -87,14 +98,14 @@ async function clean(args) {
         const partitionInstanceVolumePath = path.join(pathZeebeVolume, pathVolume);
         const bakPartitionInstanceVolumePath = path.join(pathZeebeVolume, `${ pathVolume }.bak`);
         fs.pathExistsSync(partitionInstanceVolumePath) &&
-          fs.moveSync(partitionInstanceVolumePath, bakPartitionInstanceVolumePath);
+        fs.moveSync(partitionInstanceVolumePath, bakPartitionInstanceVolumePath);
         console.log(`Successfully moved ${ partitionInstanceVolumePath } to ${ bakPartitionInstanceVolumePath }`)
       });
     } else {
       ['zeebe_data_node_0', 'zeebe_data_node_1', 'zeebe_data_node_2'].forEach((pathVolume) => {
         const partitionInstanceVolumePath = path.join(pathZeebeVolume, pathVolume);
         fs.pathExistsSync(partitionInstanceVolumePath) &&
-          fs.removeSync(partitionInstanceVolumePath);
+        fs.removeSync(partitionInstanceVolumePath);
         console.log(`Successfully deleted ${ partitionInstanceVolumePath }`)
         console.log(`Be warned.'`)
         console.log(`you may need to recreate the folder and the permissions on them after restarting the Zeebe stack`)
@@ -163,4 +174,3 @@ async function gitPullAll(args) {
     }
   }
 }
-
