@@ -19,6 +19,14 @@ all:
       "{{ zeebe_repository }}/camunda/zeebe"
     zeebe_camunda_image_full_path:
       "{{ zeebe_camunda_image_path }}:{{ zeebe_version }}"
+    ## Backup / Restore S3
+    zeebe_backup_s3_bucket_name_file:
+      "{{keybase_secrets_folder }}S3-zeebe-backup/BUCKETNAME"
+    zeebe_backup_s3_access_key_file:
+      "{{keybase_secrets_folder }}S3-zeebe-backup/ACCESSKEY"
+    zeebe_backup_s3_secret_key_file:
+      "{{keybase_secrets_folder }}S3-zeebe-backup/SECRETKEY"
+
 
     ## Quay Image destination config
     zeebe_quay_image_name:
