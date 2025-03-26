@@ -19,9 +19,30 @@
 
         oc port-forward service/zeebe-quorum-0 9600:9600
  
-- List backups
+- Test by listing the backups
 
         curl --request GET --url http://localhost:9600/actuator/backups
+
+#### Generate
+
+- Identify the 'Leader' number:
+
+        oc port-forward service/zeebe-gateway 26501:26500
+        watch zbctl status --insecure --port 26501
+
+- Open a port forward to the 'Leader':
+
+        oc -n phd-assess port-forward pod/zeebe-1-0 9600:9600
+
+- Set yourself a backup ID. You should take the bigger number of the list of all backups and add 1
+
+- Adapt the next command with your new backup ID and launch the backup process:
+
+        curl --request POST 'http://localhost:9600/actuator/backups' -H 'Content-Type: application/json' -d '{ "backupId": "<backupId>" }'
+
+- Adapt the next command with your new backup ID and follow the process:
+
+        curl --request GET --url http://localhost:9600/actuator/backups/<backupId>
 
 #### Restore
 
