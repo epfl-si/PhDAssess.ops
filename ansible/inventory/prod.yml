@@ -6,9 +6,19 @@ all:
       ansible_python_interpreter: "{{ phdisble_suitcase_dir }}/bin/python3"
       openshift_namespace: svc1394p-phd-assess
   vars:
+    # Secrets
     keybase_secrets_folder: "/keybase/team/epfl_phdassess/prod/"
 
     # Zeebe
+    ## Camunda Image config
+    zeebe_version:
+      '8.3.3'
+    zeebe_repository:
+      "ghcr.io/camunda-community-hub"
+    zeebe_camunda_image_path:
+      "{{ zeebe_repository }}/camunda/zeebe"
+    zeebe_camunda_image_full_path:
+      "{{ zeebe_camunda_image_path }}:{{ zeebe_version }}"
     ## Backup / Restore S3
     zeebe_backup_s3_bucket_name_file:
       "{{keybase_secrets_folder }}S3-zeebe-backup/BUCKETNAME"
@@ -38,7 +48,7 @@ all:
     web_app_meteor_settings:
       public:
         isTest:
-          "true"
+          "false"
         phdAssessRoleAdmin:
           "PhD-annual-report-admin"
         phdAssessRoleProgramAssistant:
