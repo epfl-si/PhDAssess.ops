@@ -41,3 +41,14 @@
   tags:
     - zeebe
     - zeebe.service
+
+- name: Setting the Zeebe monitoring...
+  ansible.builtin.include_tasks:
+    file: zeebe/monitoring.yml
+    apply:
+      tags:
+        - zeebe
+        - zeebe.monitoring
+  tags:
+    - zeebe
+    - zeebe.monitoring

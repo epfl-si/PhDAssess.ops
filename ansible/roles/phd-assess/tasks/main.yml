@@ -49,6 +49,7 @@
     - zeebe.secrets
     - zeebe.quorum
     - zeebe.service
+    - zeebe.monitoring
 
 - name: Applying Notifier microservice...
   ansible.builtin.include_tasks:
@@ -85,6 +86,13 @@
     apply:
       tags: routes
   tags: routes
+
+- name: Applying network policies..
+  ansible.builtin.include_tasks:
+    file: networkPolicies.yml
+    apply:
+      tags: network-policies
+  tags: network-policies
 
 - name: Post process suggestions
   vars:

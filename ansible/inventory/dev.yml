@@ -88,3 +88,6 @@ all:
 
     ### Security
     tequila_allowed_request_hosts: "10.180.21.0/24"
+
+    ## Monitoring
+    grafana_dashboard_instance: grafana-dev

@@ -1,0 +1,63 @@
+- name: Zeebe Prometheus PodMonitor
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: PodMonitor
+      metadata:
+        name: zeebe-monitoring
+        namespace: '{{ openshift_namespace }}'
+      spec:
+        selector:
+          matchLabels:
+            app.kubernetes.io/name: 'zeebe'
+        podMetricsEndpoints:
+          - port: "metrics"
+            path: '/actuator/prometheus'
+            interval: '15s'
+
+- name: Zeebe GrafanaFolder
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      kind: GrafanaFolder
+      apiVersion: grafana.integreatly.org/v1beta1
+      metadata:
+        name: zeebe
+        namespace: '{{ openshift_namespace }}'
+      spec:
+        allowCrossNamespaceImport: true
+        instanceSelector:
+          matchLabels:
+            dashboards: '{{ grafana_dashboard_instance }}'
+        title: "PhDAssess"
+
+- name: Zeebe Grafana dashboard config
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: 'zeebe-grafana-dashboard'
+        namespace: '{{ openshift_namespace }}'
+      data:
+        json: >
+          {{ lookup('file', 'templates/grafana-zeebe-dashboards.json') | string }}
+
+- name: Zeebe Grafana dashboard
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: grafana.integreatly.org/v1beta1
+      kind: GrafanaDashboard
+      metadata:
+        name: 'zeebe'
+        namespace: '{{ openshift_namespace }}'
+      spec:
+        resyncPeriod: 30s
+        allowCrossNamespaceImport: true
+        instanceSelector:
+          matchLabels:
+            dashboards: '{{ grafana_dashboard_instance }}'
+        folder: "PhDAssess"
+        configMapRef:
+          key: json
+          name: 'zeebe-grafana-dashboard'
