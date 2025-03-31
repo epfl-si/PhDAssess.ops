@@ -32,7 +32,6 @@
                     cpu: "10m"
                     memory: "400Mi"
                   limits:
-                    cpu: "100m"
                     memory: "1Gi"
                 volumeMounts:
                   - name: data-db

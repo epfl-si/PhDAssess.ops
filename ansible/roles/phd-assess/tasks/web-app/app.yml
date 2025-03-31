@@ -40,7 +40,6 @@
                     cpu: "50m"
                     memory: "800Mi"
                   limits:
-                    cpu: "100m"
                     memory: "4Gi"
                 readinessProbe:
                   httpGet:
