@@ -1,5 +1,15 @@
 # Howto
 
+## web-app Meteor
+### Update the image
+
+- Building the image directly from Openshift is stuck behind a custom NPM repository permissions.
+- Temporary solution:
+        
+        cd PhDAssess/fillForm
+        docker build . -t quay-its.epfl.ch/svc1394/meteor-web-app --build-arg BASE_IMAGE=quay-its.epfl.ch/svc1394/ubuntu-node-14
+        docker push quay-its.epfl.ch/svc1394/meteor-web-app
+
 ## Zeebe
 
 ### Status
