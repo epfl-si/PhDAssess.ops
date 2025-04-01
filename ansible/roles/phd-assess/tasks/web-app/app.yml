@@ -83,3 +83,5 @@
                     value: "{{ web_app_node_env }}"
                   - name: "NODE_OPTIONS"
                     value: "{{ web_app_node_options }}"
+                  - name: "TEQUILA_ALLOWED_REQUEST_HOSTS"
+                    value: "{{ tequila_allowed_request_hosts }}"

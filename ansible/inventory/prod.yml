@@ -75,3 +75,6 @@ all:
 
     ## ISA
     isa_url: "{{ lookup('file', keybase_secrets_folder + 'ISA_POST_STUDENT_RESULT_URL') }}"
+
+    ### Security
+    tequila_allowed_request_hosts: "10.180.21.0/24"
