@@ -43,7 +43,7 @@
                     memory: "4Gi"
                 readinessProbe:
                   httpGet:
-                    path: /
+                    path: /metrics
                     port: 3000
                   initialDelaySeconds: 15
                   periodSeconds: 3
