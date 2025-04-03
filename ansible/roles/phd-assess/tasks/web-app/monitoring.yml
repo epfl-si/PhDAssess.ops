@@ -1,43 +1,43 @@
-- name: Zeebe Prometheus PodMonitor
+- name: Web-app ServiceMonitor
   kubernetes.core.k8s:
     definition:
       apiVersion: monitoring.coreos.com/v1
-      kind: PodMonitor
+      kind: ServiceMonitor
       metadata:
-        name: zeebe-monitoring
+        name: web-app-monitoring
         namespace: '{{ openshift_namespace }}'
       spec:
+        endpoints:
+          - interval: 15s
+            targetPort: 3000
+            path: /metrics
         selector:
           matchLabels:
-            app.kubernetes.io/name: 'zeebe'
-        podMetricsEndpoints:
-          - port: "metrics"
-            path: '/actuator/prometheus'
-            interval: '15s'
+            app.kubernetes.io/name: "web-app-service"
 
 - name: Set Grafana folder
   ansible.builtin.include_tasks:
     file: grafana.yml
-
-- name: Zeebe Grafana dashboard config
+    
+- name: Web App Grafana dashboard config
   kubernetes.core.k8s:
     definition:
       apiVersion: v1
       kind: ConfigMap
       metadata:
-        name: 'zeebe-grafana-dashboard'
+        name: 'web-app-grafana-dashboard'
         namespace: '{{ openshift_namespace }}'
       data:
         json: >
-          {{ lookup('file', 'templates/grafana-dashboards/zeebe.json') | string }}
+          {{ lookup('file', 'templates/grafana-dashboards/web-app-meteor.json') | string }}
 
-- name: Zeebe Grafana dashboard
+- name: Web App Grafana dashboard
   kubernetes.core.k8s:
     definition:
       apiVersion: grafana.integreatly.org/v1beta1
       kind: GrafanaDashboard
       metadata:
-        name: 'zeebe'
+        name: 'web-app'
         namespace: '{{ openshift_namespace }}'
       spec:
         resyncPeriod: 30s
@@ -48,4 +48,4 @@
         folder: "{{ grafana_folder_name }}"
         configMapRef:
           key: json
-          name: 'zeebe-grafana-dashboard'
+          name: 'web-app-grafana-dashboard'

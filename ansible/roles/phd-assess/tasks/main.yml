@@ -69,6 +69,7 @@
     - web-app.db
     - web-app.meteor
     - web-app.services
+    - web-app.monitoring
 
 - name: Doing the monitoring setups...
   ansible.builtin.include_tasks:

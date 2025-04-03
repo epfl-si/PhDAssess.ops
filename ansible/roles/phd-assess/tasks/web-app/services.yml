@@ -4,8 +4,10 @@
       apiVersion: v1
       kind: Service
       metadata:
-        name: "web-app-service"
+        name: "web-app"
         namespace: "{{ openshift_namespace }}"
+        labels:
+          app.kubernetes.io/name: "web-app-service"
       spec:
         type: ClusterIP
         ports:
