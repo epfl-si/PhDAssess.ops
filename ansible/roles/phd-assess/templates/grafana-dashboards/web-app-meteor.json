@@ -313,7 +313,7 @@
           "calcs": [
             "mean"
           ],
-          "fields": "/^v14\\.20\\.1$/",
+          "fields": "",
           "values": false
         },
         "showPercentChange": false,
@@ -328,7 +328,7 @@
             "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
           },
           "editorMode": "code",
-          "expr": "sum(nodejs_version_info{instance=~\"$instance\"}) by (version)",
+          "expr": "nodejs_version_info",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -1075,8 +1075,8 @@
             "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
           },
           "editorMode": "code",
-          "expr": "increase(atomix_partition_raft_commit_index{app_instance=\"prod\"}[5m])",
-          "legendFormat": "{{instance}}",
+          "expr": "increase(atomix_partition_raft_commit_index[5m])",
+          "legendFormat": "{{pod}}",
           "range": true,
           "refId": "A"
         },
@@ -1657,8 +1657,8 @@
   "schemaVersion": 40,
   "tags": [
     "nodejs",
-    "PhDAssess",
-    "Zeebe"
+    "meteor",
+    "app data"
   ],
   "templating": {
     "list": [
@@ -1708,7 +1708,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "PhDAssess",
+  "title": "Web App",
   "uid": "huA0tufnk",
   "version": 1,
   "weekStart": ""
