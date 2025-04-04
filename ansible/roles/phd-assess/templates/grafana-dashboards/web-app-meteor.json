@@ -328,7 +328,7 @@
             "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
           },
           "editorMode": "code",
-          "expr": "nodejs_version_info",
+          "expr": "nodejs_version_info{instance=~\"$instance\",service=\"web-app\"}",
           "format": "time_series",
           "instant": false,
           "interval": "",
