@@ -97,8 +97,11 @@ https://docs.camunda.io/docs/self-managed/operational-guides/backup-restore/zeeb
 
         ./phdsible --dev -t quay
 
-- Delete the Zeebe `zeebe-0`, `zeebe-1`, `zeebe-2` Statefulsets
-- Recreate it with
+- Delete the Zeebe Statefulsets
+
+        oc delete statefulsets zeebe-0 zeebe-1 zeebe-2
+
+- Once really deleted, recreate it with
 
         ./phdsible --dev -t zeebe.quorum
 
