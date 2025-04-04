@@ -3,9 +3,11 @@
     file: quay/serviceAccounts.yml
     apply:
       tags:
+        - always
         - quay
         - serviceAccounts
   tags:
+    - always
     - quay
     - serviceAccounts
 
