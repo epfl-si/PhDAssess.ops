@@ -69,16 +69,10 @@
     - web-app.db
     - web-app.meteor
     - web-app.services
+    - web-app.route
     - web-app.monitoring
 
-- name: Applying route(s)...
-  ansible.builtin.include_tasks:
-    file: routes.yml
-    apply:
-      tags: routes
-  tags: routes
-
-- name: Applying network policies..
+- name: Network policies
   ansible.builtin.include_tasks:
     file: networkPolicies.yml
     apply:

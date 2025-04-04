@@ -20,6 +20,6 @@
           insecureEdgeTerminationPolicy: Redirect
         to:
           kind: Service
-          name: "web-app-service"
+          name: "web-app"
           weight: 100
         wildcardPolicy: None
