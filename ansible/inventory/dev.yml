@@ -14,7 +14,7 @@ all:
     zeebe_version:
       '8.3.3'
     zeebe_repository:
-      "ghcr.io/camunda-community-hub"
+      "docker.io"
     zeebe_camunda_image_path:
       "{{ zeebe_repository }}/camunda/zeebe"
     zeebe_camunda_image_full_path:
