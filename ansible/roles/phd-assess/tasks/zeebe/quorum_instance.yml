@@ -32,6 +32,8 @@
         podManagementPolicy: Parallel
         template:
           metadata:
+            annotations:
+              kubectl.kubernetes.io/default-container: "zeebe"
             labels:
               for-service: "{{ zeebe_gateway_service_name }}"
               for-prometheus-job: zeebe
