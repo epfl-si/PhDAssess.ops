@@ -27,6 +27,14 @@ all:
     zeebe_backup_s3_secret_key_file:
       "{{keybase_secrets_folder }}S3-zeebe-backup/SECRETKEY"
 
+    ## Quay Image destination config
+    zeebe_quay_image_name:
+      "camunda/zeebe"
+    zeebe_quay_image_path:
+      "{{ quay_repo }}/{{ zeebe_quay_image_name }}"
+    zeebe_quay_image_full_path:
+      "{{ zeebe_quay_image_path }}:{{ zeebe_version }}"
+
     # Meteor
     node_for_meteor_image_name: 'ubuntu-node-14'
     web_app_image_name: 'meteor-web-app'
@@ -42,6 +50,7 @@ all:
     web_app_debug_env: "phd-assess:*"
     web_app_node_env: "production"
     web_app_node_options: "--max_old_space_size=1536"
+    web_app_db_image: "{{ quay_repo }}/{{ db_image_name }}:{{ db_image_tag }}"
 
     web_app_secret_mongo_persistent_db: true
 
