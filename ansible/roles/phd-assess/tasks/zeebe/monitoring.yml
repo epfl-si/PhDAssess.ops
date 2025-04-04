@@ -1,4 +1,4 @@
-- name: Applying PodMonitor on Zeebe instances...
+- name: Zeebe metrics reader
   kubernetes.core.k8s:
     definition:
       apiVersion: monitoring.coreos.com/v1
@@ -14,6 +14,9 @@
           - port: "metrics"
             path: '/actuator/prometheus'
             interval: '15s'
+          - port: "metrics"
+            path: '/metrics'
+            interval: '30s'
 
 - name: Set Grafana folder...
   ansible.builtin.include_tasks:

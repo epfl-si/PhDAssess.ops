@@ -42,6 +42,28 @@
           spec:
             serviceAccountName: "{{ quay_service_account_name }}"
             containers:
+              - name: "zeebe-db-monitor"
+                image: "{{ zeebe_db_monitor_image }}:latest"
+                env:
+                  - name: 'ZEEBE_DATA_RO_PATH'
+                    value: '/zeebe-data-ro/raft-partition/partitions/1/runtime/'
+                volumeMounts:
+                  - mountPath: /zeebe-data-ro
+                    name: zeebe-data
+                    readOnly: true
+                  # the working path where you can find the symlinked zeebe data
+                  - mountPath: /zeebe-data-rw
+                    name: volume-zeebe-data-symlinks-rw
+                resources:
+                  requests:
+                    cpu: "5m"
+                    memory: "50Mi"
+                  limits:
+                    cpu: "50m"
+                    memory: "300Mi"
+                ports:
+                  - name: metrics
+                    containerPort: 8080
               - name: "zeebe"
                 image:
                   "{{ zeebe_quay_image_full_path }}"
@@ -88,6 +110,8 @@
               - name: zeebe-data
                 persistentVolumeClaim:
                   claimName: "{{ item.data_claim_name }}"
+              - name: volume-zeebe-data-symlinks-rw
+                emptyDir: {}
             # Keep the pods spread into different physical nodes
             affinity:
               podAntiAffinity:
