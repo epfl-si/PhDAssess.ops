@@ -1,4 +1,4 @@
-- name: PhD GrafanaFolder
+- name: PhD base folder for Grafana
   kubernetes.core.k8s:
     state: present
     definition:

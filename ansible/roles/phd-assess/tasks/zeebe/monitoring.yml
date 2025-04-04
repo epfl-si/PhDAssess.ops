@@ -18,11 +18,11 @@
             path: '/metrics'
             interval: '30s'
 
-- name: Set Grafana folder...
+- name: Grafana base folder
   ansible.builtin.include_tasks:
     file: grafana.yml
 
-- name: Set the Grafana dashboard config for Zeebe data...
+- name: Zeebe data dashboard definition
   kubernetes.core.k8s:
     definition:
       apiVersion: v1
@@ -34,7 +34,7 @@
         json: >
           {{ lookup('file', 'templates/grafana-dashboards/zeebe.json') | string }}
 
-- name: Set the Grafana dashboard for Zeebe data...
+- name: Zeebe data dashboard in Grafana
   kubernetes.core.k8s:
     definition:
       apiVersion: grafana.integreatly.org/v1beta1

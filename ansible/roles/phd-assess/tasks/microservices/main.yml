@@ -1,4 +1,4 @@
-- name: Setting the microservices as Zeebe Clients
+- name: Microservices (Zeebe clients)
   ansible.builtin.include_tasks: _microservice.yml
   loop:
     - name: "notifier"

@@ -1,4 +1,4 @@
-- name: Web-app ServiceMonitor
+- name: Web app metrics reader
   kubernetes.core.k8s:
     definition:
       apiVersion: monitoring.coreos.com/v1
@@ -15,11 +15,11 @@
           matchLabels:
             app.kubernetes.io/name: "web-app-service"
 
-- name: Set Grafana folder
+- name: Grafana base folder
   ansible.builtin.include_tasks:
     file: grafana.yml
-    
-- name: Web App Grafana dashboard config
+
+- name: Web app Grafana dashboard definition
   kubernetes.core.k8s:
     definition:
       apiVersion: v1
@@ -31,7 +31,7 @@
         json: >
           {{ lookup('file', 'templates/grafana-dashboards/web-app-meteor.json') | string }}
 
-- name: Web App Grafana dashboard
+- name: Web app dashboard in Grafana
   kubernetes.core.k8s:
     definition:
       apiVersion: grafana.integreatly.org/v1beta1

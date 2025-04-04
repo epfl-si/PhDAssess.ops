@@ -1,4 +1,4 @@
-- name: Applying Microservice...
+- name: Set Microservice
   vars:
     current_microservice:
       "Applying {{ item.name }}..."

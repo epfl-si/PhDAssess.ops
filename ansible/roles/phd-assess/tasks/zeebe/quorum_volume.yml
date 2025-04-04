@@ -1,4 +1,4 @@
-- name: "Applying one PVC for a Zeebe instance"
+- name: One Zeebe instance PVC
   kubernetes.core.k8s:
     definition:
       apiVersion: v1

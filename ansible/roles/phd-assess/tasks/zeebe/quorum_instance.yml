@@ -1,4 +1,4 @@
-- name: "Applying one Zeebe StatefulSet"   # noqa name[template]
+- name: One Zeebe StatefulSet   # noqa name[template]
   vars:
     _instance_env:
       ZEEBE_BROKER_CLUSTER_NODEID: "{{ item.node_id }}"

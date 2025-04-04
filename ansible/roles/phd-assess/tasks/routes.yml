@@ -1,4 +1,4 @@
-- name: Web Route
+- name: Web route
   kubernetes.core.k8s:
     definition:
       apiVersion: route.openshift.io/v1

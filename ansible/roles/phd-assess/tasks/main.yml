@@ -1,4 +1,4 @@
-- name: Setup service account for Quay...
+- name: Service account for Quay
   ansible.builtin.include_tasks:
     file: quay/serviceAccounts.yml
     apply:
@@ -11,7 +11,7 @@
     - quay
     - serviceAccounts
 
-- name: "[localhost] Doing Quay images upload..."
+- name: "[On localhost] Doing Quay images upload..."
   ansible.builtin.include_tasks:
     file: quay/images.yml
     apply:
@@ -22,14 +22,14 @@
     - quay
     - never
 
-- name: Applying secrets(s)...
+- name: Secrets
   ansible.builtin.include_tasks:
     file: secrets.yml
     apply:
       tags: secrets
   tags: secrets
 
-- name: Applying build config(s)...
+- name: BuildConfigs
   when: >-
     openshift_namespace in ["svc1394d-phd-assess"]
   ansible.builtin.include_tasks:
@@ -40,7 +40,7 @@
   tags:
     - buildConfigs
 
-- name: Doing the Zeebe stack...
+- name: Zeebe stack
   ansible.builtin.include_tasks:
     file: zeebe/main.yml
   tags:
@@ -51,7 +51,7 @@
     - zeebe.service
     - zeebe.monitoring
 
-- name: Applying Notifier microservice...
+- name: Notifier microservice
   ansible.builtin.include_tasks:
     file: microservices/main.yml
     apply:
@@ -60,7 +60,7 @@
   tags:
     - microservices
 
-- name: Doing the Web app setups...
+- name: Web App
   ansible.builtin.include_tasks:
     file: web-app/main.yml
   tags:
@@ -70,16 +70,6 @@
     - web-app.meteor
     - web-app.services
     - web-app.monitoring
-
-- name: Doing the monitoring setups...
-  ansible.builtin.include_tasks:
-    file: monitoring/main.yml
-  tags:
-    - monitoring
-    - monitoring.prometheus
-    - monitoring.prometheus.restart
-    - monitoring.disk-usage
-    - monitoring.zeebe-db-monitor
 
 - name: Applying route(s)...
   ansible.builtin.include_tasks:

@@ -1,4 +1,4 @@
-- name: Zeebe Broker configMap
+- name: Zeebe Broker config
   kubernetes.core.k8s:
     definition:
       apiVersion: v1

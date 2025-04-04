@@ -1,4 +1,4 @@
-- name: Applying Meteor App secrets...
+- name: Web app secrets
   ansible.builtin.include_tasks:
     file: web-app/secrets.yml
     apply:
@@ -9,7 +9,7 @@
     - web-app
     - web-app.secrets
 
-- name: Applying Mongo for the Meteor App...
+- name: Web app Mongo DB
   ansible.builtin.include_tasks:
     file: web-app/db.yml
     apply:
@@ -20,7 +20,7 @@
     - web-app
     - web-app.db
 
-- name: Applying Meteor App...
+- name: Web app Meteor
   ansible.builtin.include_tasks:
     file: web-app/app.yml
     apply:
@@ -31,7 +31,7 @@
     - web-app
     - web-app.meteor
 
-- name: Applying Web App services...
+- name: Web app services
   ansible.builtin.include_tasks:
     file: web-app/services.yml
     apply:
@@ -42,7 +42,7 @@
     - web-app
     - web-app.services
 
-- name: Applying Web App monitoring...
+- name: Web app monitoring
   ansible.builtin.include_tasks:
     file: web-app/monitoring.yml
     apply:

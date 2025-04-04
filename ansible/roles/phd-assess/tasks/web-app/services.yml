@@ -1,4 +1,4 @@
-- name: Web app Service
+- name: Web app service
   kubernetes.core.k8s:
     definition:
       apiVersion: v1

@@ -35,7 +35,7 @@
     - "zeebe-quorum-2"
   tags: zeebe.service
 
-- name: "Zeebe Gateway Service"
+- name: Zeebe Gateway service
   kubernetes.core.k8s:
     definition:
       apiVersion: v1
