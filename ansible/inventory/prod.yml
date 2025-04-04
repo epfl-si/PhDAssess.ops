@@ -73,12 +73,12 @@ all:
     microservice_node_base_tag: "18-alpine"
 
     ## Notifier
-    #notifier_send_real_email: true
+    # notifier_send_real_email: true
     notifier_send_real_email: false
     notifier_from_address: "Annual report <noreply@epfl.ch>"
 
     ## GED
-    #alfresco_url: "https://ged-etu.epfl.ch"
+    # alfresco_url: "https://ged-etu.epfl.ch"
     alfresco_url: "https://integration-gedetu.epfl.ch"
     alfresco_username: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_USERNAME') }}"
     alfresco_password: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_PASSWORD') }}"
