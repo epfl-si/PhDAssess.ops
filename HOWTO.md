@@ -84,3 +84,22 @@
 #### References
 
 https://docs.camunda.io/docs/self-managed/operational-guides/backup-restore/zeebe-backup-and-restore/
+
+### Upgrade
+
+- Push the image on quay
+
+        docker logout quay-its.epfl.ch
+        docker login -u='svc1394+fetch_docker_hub_bot_account' -p='{PASSWORD}' quay-its.epfl.ch
+
+- Set the correct version in the inventory file on the var `zeebe_version`
+- Push the image into quay, if needed
+
+        ./phdsible --dev -t quay
+
+- Delete the Zeebe `zeebe-0`, `zeebe-1`, `zeebe-2` Statefulsets
+- Recreate it with
+
+        ./phdsible --dev -t zeebe.quorum
+
+- Hooray ! Be adverted it may take some times to allow the creation of new process (like 5min)
