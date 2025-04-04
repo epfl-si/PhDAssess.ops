@@ -63,15 +63,23 @@
 ---
 
 - Start x brokers, x being the same number as the backup source
+- Assert you are on the right project
+
+        oc project
+
 - On every broker, clean the data:
   
-        rm -rf /usr/local/zeebe/data/*
+        oc exec pod/zeebe-0-0 -- bash -c "rm -rf /usr/local/zeebe/data/*"
+        oc exec pod/zeebe-1-0 -- bash -c "rm -rf /usr/local/zeebe/data/*"
+        oc exec pod/zeebe-2-0 -- bash -c "rm -rf /usr/local/zeebe/data/*"
 
 - The, on every broker, start the restoration process:
-
-        ./bin/restore --backupId=<backupId>
-
-- Restart the brokers (by deleting the pods if some Statefulsets are in usage)
+ 
+        oc exec pod/zeebe-0-0 -- bash -c "./bin/restore --backupId=<backupId>"
+        oc exec pod/zeebe-1-0 -- bash -c "./bin/restore --backupId=<backupId>"
+        oc exec pod/zeebe-2-0 -- bash -c "./bin/restore --backupId=<backupId>"
+  
+- Restart the brokers (if some Statefulsets are in usage -> by deleting the pods)
 
 #### References
 
