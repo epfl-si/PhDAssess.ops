@@ -73,8 +73,7 @@ all:
     microservice_node_base_tag: "18-alpine"
 
     ## Notifier
-    notifier_port: "587"
-    notifier_host: "smtp.ethereal.email"
+    notifier_send_real_email: false
     notifier_from_address: "Annual report test <noreply@epfl.ch>"
 
     ## GED

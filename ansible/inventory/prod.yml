@@ -72,8 +72,7 @@ all:
     microservice_node_base_tag: "18-alpine"
 
     ## Notifier
-    notifier_port: "25"
-    notifier_host: "mail.epfl.ch"
+    notifier_send_real_email: false
     notifier_from_address: "Annual report <noreply@epfl.ch>"
 
     ## GED

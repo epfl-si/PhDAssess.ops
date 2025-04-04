@@ -47,6 +47,9 @@ microservice_node_22_base_tag: "22-alpine"
 microservice_node_22_base_image: "node:{{ microservice_node_22_base_tag }}"
 
 notifier_service_name: "notifier"
+notifier_port: "{{ '25' if notifier_send_real_email else '587' }}"
+notifier_host: "{{ 'mail.epfl.ch' if notifier_send_real_email else 'smtp.ethereal.email' }}"
+
 pdf_service_name: "pdf"
 
 # Monitoring
