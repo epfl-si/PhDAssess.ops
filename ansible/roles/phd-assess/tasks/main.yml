@@ -84,15 +84,3 @@
     apply:
       tags: network-policies
   tags: network-policies
-
-- name: Post process suggestions
-  vars:
-    post_process_message: |
-      Now you can:
-        - Check the Zeebe stack status with zbctl
-          - oc port-forward pod/zeebe-0-0 26501:26500
-          - watch zbctl status --insecure --port 26501
-  ansible.builtin.debug:
-    msg: "{{ post_process_message.split('\n') }}"
-  tags:
-    - zeebe
