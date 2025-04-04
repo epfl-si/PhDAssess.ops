@@ -44,11 +44,26 @@
 
 - name: Setting the Zeebe monitoring...
   ansible.builtin.include_tasks:
-    file: zeebe/monitoring.yml
+    file: zeebe/monitoring/raft_instances.yml
     apply:
       tags:
         - zeebe
         - zeebe.monitoring
+        - zeebe.monitoring.raft
   tags:
     - zeebe
     - zeebe.monitoring
+    - zeebe.monitoring.raft
+
+- name: Applying the Zeebe DB monitoring...
+  ansible.builtin.include_tasks:
+    file: zeebe/monitoring/db.yml
+    apply:
+      tags:
+        - zeebe
+        - zeebe.monitoring
+        - zeebe.monitoring.db
+  tags:
+    - zeebe
+    - zeebe.monitoring
+    - zeebe.monitoring.db

@@ -1,4 +1,4 @@
-- name: Zeebe Prometheus PodMonitor
+- name: Applying PodMonitor on Zeebe instances...
   kubernetes.core.k8s:
     definition:
       apiVersion: monitoring.coreos.com/v1
@@ -15,11 +15,11 @@
             path: '/actuator/prometheus'
             interval: '15s'
 
-- name: Set Grafana folder
+- name: Set Grafana folder...
   ansible.builtin.include_tasks:
     file: grafana.yml
 
-- name: Zeebe Grafana dashboard config
+- name: Set the Grafana dashboard config for Zeebe data...
   kubernetes.core.k8s:
     definition:
       apiVersion: v1
@@ -31,7 +31,7 @@
         json: >
           {{ lookup('file', 'templates/grafana-dashboards/zeebe.json') | string }}
 
-- name: Zeebe Grafana dashboard
+- name: Set the Grafana dashboard for Zeebe data...
   kubernetes.core.k8s:
     definition:
       apiVersion: grafana.integreatly.org/v1beta1
