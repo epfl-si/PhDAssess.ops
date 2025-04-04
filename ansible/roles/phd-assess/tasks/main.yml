@@ -3,13 +3,19 @@
     file: quay/serviceAccounts.yml
     apply:
       tags:
-        - always
-        - quay
         - serviceAccounts
+        - quay
+        - buildConfigs
   tags:
-    - always
-    - quay
     - serviceAccounts
+    - quay
+    - buildConfigs
+    - zeebe
+    - zeebe.quorum
+    - microservices
+    - web-app
+    - web-app.db
+    - web-app.meteor
 
 - name: "[On localhost] Doing Quay images upload..."
   ansible.builtin.include_tasks:
