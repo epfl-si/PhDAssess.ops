@@ -10,6 +10,7 @@
         PORT: '{{ zeebe_gateway_network_port | string }}'
         JAVA_OPTS: "{{ '-Xmx2024m' }}"
         ZEEBE_BROKER_NETWORK_MONITORINGAPI_HOST: "0.0.0.0"
+        ZEEBE_BROKER_NETWORK_HOST: "0.0.0.0"
         # https://docs.camunda.io/docs/self-managed/zeebe-deployment/operations/setting-up-a-cluster/
         ZEEBE_LOG_APPENDER: "Stackdriver"
         ZEEBE_BROKER_BACKPRESSURE_ALGORITHM: "fixed"
