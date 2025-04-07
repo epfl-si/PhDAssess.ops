@@ -90,7 +90,7 @@
                     mountPath: /usr/local/zeebe/data
                 readinessProbe:
                   httpGet:
-                    path: "/actuator/health/readiness"
+                    path: "/actuator"
                     scheme: "HTTP"
                     port: "{{ zeebe_broker_network_monitoring_api_port }}"
                   initialDelaySeconds: 60
@@ -100,7 +100,7 @@
                   timeoutSeconds: 1
                 livenessProbe:
                   httpGet:
-                    path: "/actuator/health/liveness"
+                    path: "/actuator"
                     scheme: "HTTP"
                     port: "{{ zeebe_broker_network_monitoring_api_port }}"
                   initialDelaySeconds: 30
