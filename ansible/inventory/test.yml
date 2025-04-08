@@ -66,6 +66,9 @@ all:
     db_image_name: "mongo"
     db_image_tag: "6"
 
+    ## Security
+    web_app_tequila_allowed_request_hosts: "10.180.21.0/24"
+
     # Route
     avi_route_access_level: private
 
@@ -85,8 +88,5 @@ all:
     ## ISA
     isa_url: "{{ lookup('file', keybase_secrets_folder + 'ISA_POST_STUDENT_RESULT_URL') }}"
 
-    ### Security
-    tequila_allowed_request_hosts: "10.180.21.0/24"
-
-    ## Monitoring
+    # Monitoring
     grafana_dashboard_instance: grafana-test
