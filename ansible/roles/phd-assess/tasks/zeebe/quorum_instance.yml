@@ -65,7 +65,7 @@
                     memory: "300Mi"
                 ports:
                   - name: metrics
-                    containerPort: 8080
+                    containerPort: 8081
               - name: "zeebe"
                 image:
                   "{{ zeebe_quay_image_full_path }}"
