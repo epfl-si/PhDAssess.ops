@@ -1,0 +1,183 @@
+
+- name: Secret - Bot Token (Telegram)
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Secret
+      type: Opaque
+      metadata:
+        name: telegram-bot-token
+        namespace: "{{ openshift_namespace }}"
+      data:
+        access_token: "{{ telegram_bot_token | b64encode }}"
+
+- name: Monitoring - AlertmanagerConfig
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: monitoring.coreos.com/v1beta1
+      kind: AlertmanagerConfig
+      metadata:
+        name: alertmanager-telegram
+        namespace: "{{ openshift_namespace }}"
+      spec:
+        route:
+          receiver: "telegram"
+          groupBy: ["instance"]
+          groupWait: 20s
+          groupInterval: 5m
+          repeatInterval: 3h
+          matchers:
+            - name: sendto
+              value: telegram
+              matchType: "="
+        receivers:
+          - name: "telegram"
+            telegramConfigs:
+              - botToken:
+                  name: telegram-bot-token
+                  key: access_token
+                chatID: "{{ telegram_chat_id }}"
+                message: |
+                  {% raw %}
+                  {{ if .Alerts }}
+                  {{ $first := index .Alerts 0 }}
+                  {{ if eq $first.Status "firing" }}
+                  🔥 FIRING -- {{ $first.Annotations.summary }}
+                  {{ $first.Annotations.description }}
+                  Started at (UTC): {{ $first.StartsAt.Format "2006-01-02 15:04:05" }}
+                  {{ else if eq $first.Status "resolved" }}
+                  ✅ RESOLVED -- {{ $first.Annotations.summary }}
+                  {{ $first.Annotations.description }}
+                  Started at (UTC): {{ $first.StartsAt.Format "2006-01-02 15:04:05" }}
+                  Ended at (UTC): {{ $first.EndsAt.Format "2006-01-02 15:04:05" }}
+                  {{ end }}
+                  {{ if gt (len .Alerts) 1 }}
+                  There are multiple alerts of this type: {{ len .Alerts }}
+                  {{ end }}
+                  {{ end }}
+                  {% endraw %}
+                sendResolved: true
+
+- name: Monitoring - PrometheusRule
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: monitoring.coreos.com/v1
+      kind: PrometheusRule
+      metadata:
+        name: phd-assess-alerts
+        namespace: "{{ openshift_namespace }}"
+      spec:
+        groups:
+          - name: test-alerts
+            rules:
+              - alert: AlwaysRising
+                expr: >-
+                  vector(1)
+                for: 1m
+                labels:
+                  severity: critical
+                  sendto: telegram
+                annotations:
+                  summary: "Test please ignore"
+                  description: >-
+                    {% raw -%}
+                    This is an alert that fires all the time.
+                    {%- endraw %}
+
+          - name: monitoring-system
+            rules:
+              - alert: NoMonitoring
+                expr: >-
+                  up{namespace="{{ openshift_namespace }}"} == 0
+                for: 3m
+                labels:
+                  severity: critical
+                  sendto: telegram
+                annotations:
+                  summary: "Monitoring target is down"
+                  description: >-
+                    {% raw -%}
+                    The Prometheus target {{ $labels.endpoint }} (job: {{ $labels.job }}, pod: {{ $labels.pod }}, instance: {{ $labels.instance }})
+                    has been down for over 3 minutes.
+                    {%- endraw %}
+
+          - name: zeebe-db
+            rules:
+              - alert: ZeebeBackloggedActivatableJobs
+                expr: |-
+                  zeebe_db_column_family_entries{column_family="JOB_ACTIVATABLE"}
+                  != 0
+                for: 1h
+                labels:
+                  severity: critical
+                  sendto: telegram
+                annotations:
+                  description: |-
+                    {% raw -%}
+                    Zeebe's ActivateJobs gRPC is backlogged. {{ $value }} jobs are activatable.
+                    {%- endraw %}
+
+              - alert: ZeebeDbIncidents
+                expr: |-
+                  rate(
+                    zeebe_db_column_family_incident_entries{
+                      error_message!='Expected at least one condition to evaluate to true, or to have a default flow'
+                    }[1h]
+                  )
+                  != 0
+                for: 1m
+                labels:
+                  severity: critical
+                  sendto: telegram
+                annotations:
+                  description: |-
+                    {% raw -%}
+                    Zeebe is encountering new incidents. Rate: {{ $value }}/sec
+                    {%- endraw %}
+
+          - name: Zeebe
+            rules:
+              - alert: ZeebeQuorumNoLeader
+                expr: >-
+                  count(atomix_role{namespace="{{ openshift_namespace }}"} == 3) != 1
+                for: 5m
+                labels:
+                  severity: critical
+                  sendto: telegram
+                annotations:
+                  description: |-
+                    {% raw -%}
+                    Production Zeebe quorum doesn't currently have exactly one leader (it has {{ $value }}).
+                    {%- endraw %}
+
+              - alert: ZeebeQuorumAbsentee
+                expr: >-
+                  (
+                    count(atomix_role{namespace="{{ openshift_namespace }}"} ==  1) + 
+                    count(atomix_role{namespace="{{ openshift_namespace }}"} ==  3) - 
+                    count(atomix_role{namespace="{{ openshift_namespace }}"})
+                  ) 
+                  != 0
+                for: 5m
+                labels:
+                  severity: critical
+                  sendto: telegram
+                annotations:
+                  description: |-
+                    Production Zeebe quorum has absentees.
+                    All quorum members should participate in the Raft protocol, either as a leader or a follower. This is not the case currently.
+
+              - alert: ZeebeQuorumIncomplete
+                expr: >-
+                  count(
+                    atomix_role{namespace="{{ openshift_namespace }}"}
+                  ) != 3
+                for: 1h
+                labels:
+                  severity: critical
+                  sendto: telegram
+                annotations:
+                  description: |-
+                    {% raw -%}
+                    Production Zeebe quorum is comprised of {{ $value }} members instead of 3.
+                    {%- endraw %}
