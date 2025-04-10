@@ -68,21 +68,21 @@
         namespace: "{{ openshift_namespace }}"
       spec:
         groups:
-          - name: test-alerts
-            rules:
-              - alert: AlwaysRising
-                expr: >-
-                  vector(1)
-                for: 1m
-                labels:
-                  severity: critical
-                  sendto: telegram
-                annotations:
-                  summary: "Test please ignore"
-                  description: >-
-                    {% raw -%}
-                    This is an alert that fires all the time.
-                    {%- endraw %}
+#          - name: test-alerts
+#            rules:
+#              - alert: AlwaysRising
+#                expr: >-
+#                  vector(1)
+#                for: 1m
+#                labels:
+#                  severity: critical
+#                  sendto: telegram
+#                annotations:
+#                  summary: "Test please ignore"
+#                  description: >-
+#                    {% raw -%}
+#                    This is an alert that fires all the time.
+#                    {%- endraw %}
 
           - name: monitoring-system
             rules:
