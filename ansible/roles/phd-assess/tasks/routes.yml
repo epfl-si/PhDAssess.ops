@@ -5,7 +5,7 @@
       apiVersion: route.openshift.io/v1
       kind: Route
       metadata:
-        name: "registered"
+        name: "{{ web_app_url }}"
         namespace: "{{ openshift_namespace }}"
         labels:
           app: "web-app"
