@@ -1,5 +1,5 @@
 - name: Web route
-  when: web_app_url
+  when: web_app_url is defined
   kubernetes.core.k8s:
     definition:
       apiVersion: route.openshift.io/v1
