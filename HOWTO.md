@@ -55,7 +55,7 @@
 
 - Open a port forward to the 'Leader':
 
-        oc -n phd-assess port-forward pod/zeebe-1-0 9600:9600
+        oc port-forward pod/zeebe-1-0 9600:9600
 
 - Set yourself a backup ID. You should take the bigger number of the list of all backups and add 1
 
@@ -70,7 +70,7 @@
 #### Restore
 
 - ⚠ Assert you are ready to lose data on the volume you will operate on ⚠
-- Asset you are running the same version / brokers number
+- Assert you are running the same version / brokers number
 - Have the ID of the backup you want to restore. See previous section.
 
 ---
