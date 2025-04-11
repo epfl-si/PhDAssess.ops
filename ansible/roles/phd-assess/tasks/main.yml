@@ -84,3 +84,12 @@
     apply:
       tags: network-policies
   tags: network-policies
+
+- name: Routes
+  ansible.builtin.include_tasks:
+    file: routes.yml
+    apply:
+      tags:
+        - routes
+  tags:
+    - routes

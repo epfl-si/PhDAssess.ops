@@ -42,17 +42,6 @@
     - web-app
     - web-app.services
 
-- name: Web app route
-  ansible.builtin.include_tasks:
-    file: web-app/route.yml
-    apply:
-      tags:
-        - web-app
-        - web-app.route
-  tags:
-    - web-app
-    - web-app.route
-
 - name: Web app monitoring
   ansible.builtin.include_tasks:
     file: web-app/monitoring.yml

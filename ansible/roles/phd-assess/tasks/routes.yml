@@ -1,0 +1,52 @@
+- name: Web route
+  when: web_app_url
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: route.openshift.io/v1
+      kind: Route
+      metadata:
+        name: "registered"
+        namespace: "{{ openshift_namespace }}"
+        labels:
+          app: "web-app"
+          route: "{{ avi_route_access_level }}"
+        annotations:
+          console.alpha.openshift.io/overview-app-route: "true"
+      spec:
+        host: "{{ web_app_url }}"
+        port:
+          targetPort: "http-web"
+        tls:
+          termination: edge
+          insecureEdgeTerminationPolicy: Redirect
+        to:
+          kind: Service
+          name: "web-app"
+          weight: 100
+        wildcardPolicy: None
+
+- name: Web nip.io route
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: route.openshift.io/v1
+      kind: Route
+      metadata:
+        name: "nip-io"
+        namespace: "{{ openshift_namespace }}"
+        labels:
+          app: "web-app"
+          route: "{{ avi_route_access_level }}"
+        annotations:
+          console.alpha.openshift.io/overview-app-route: "true"
+      spec:
+        host: "{{ web_app_nip_io_url }}"
+        port:
+          targetPort: "http-web"
+        tls:
+          termination: edge
+          insecureEdgeTerminationPolicy: Redirect
+        to:
+          kind: Service
+          name: "web-app"
+          weight: 100
+        wildcardPolicy: None
