@@ -10,6 +10,19 @@
         docker build . -t quay-its.epfl.ch/svc1394/meteor-web-app --build-arg BASE_IMAGE=quay-its.epfl.ch/svc1394/ubuntu-node-14
         docker push quay-its.epfl.ch/svc1394/meteor-web-app
 
+## MongoDB
+
+### Backups
+
+#### Generate
+
+        mongodump --uri='mongodb://{USER}:{PASSWORD}@mongodb.epfl.ch:27017/phd-assess'
+
+#### Restore
+
+        mongorestore --uri='mongodb://{USER}:{PASSWORD}@mongodb-test.epfl.ch:27017/phd-assess' --drop ~/tmp/dump/phd-assess
+
+
 ## Zeebe
 
 ### Status
