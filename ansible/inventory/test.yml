@@ -1,6 +1,6 @@
 all:
   hosts:
-    openshift-4-dev:
+    openshift-4-test:
       ansible_connection: local
       ansible_host: localhost
       ansible_python_interpreter: "{{ phdisble_suitcase_dir }}/bin/python3"
