@@ -88,15 +88,25 @@
                 volumeMounts:
                   - name: zeebe-data
                     mountPath: /usr/local/zeebe/data
+                startupProbe:
+                  httpGet:
+                    path: "/actuator/health/startup"
+                    scheme: "HTTP"
+                    port: "{{ zeebe_broker_network_monitoring_api_port }}"
+                  initialDelaySeconds: 30
+                  periodSeconds: 30
+                  successThreshold: 1
+                  failureThreshold: 5
+                  timeoutSeconds: 1
                 readinessProbe:
                   httpGet:
                     path: "/actuator"
                     scheme: "HTTP"
                     port: "{{ zeebe_broker_network_monitoring_api_port }}"
-                  initialDelaySeconds: 60
+                  initialDelaySeconds: 30
                   periodSeconds: 30
                   successThreshold: 1
-                  failureThreshold: 10
+                  failureThreshold: 5
                   timeoutSeconds: 1
                 livenessProbe:
                   httpGet:
