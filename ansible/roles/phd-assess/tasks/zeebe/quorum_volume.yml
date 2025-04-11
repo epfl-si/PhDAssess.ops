@@ -12,4 +12,4 @@
         storageClassName: thin-csi
         resources:
           requests:
-            storage: 9Gi
+            storage: 5Gi
