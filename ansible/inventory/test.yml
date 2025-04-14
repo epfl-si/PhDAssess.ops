@@ -45,8 +45,8 @@ all:
     web_app_image_tag: 'latest'
 
     web_app_nip_io_url: "phd-assess-test.10.98.42.205.nip.io"
-    #web_app_url: "phd-annual-report-test.epfl.ch"
-    web_app_full_url: "https://{{ web_app_nip_io_url }}"
+    web_app_url: "phd-annual-report-test.epfl.ch"
+    web_app_full_url: "https://{{ web_app_url }}"
 
     web_app_mongo_url: "mongodb://web-app-db:27017/meteor"
     web_app_secret_mongo_persistent_db: true
