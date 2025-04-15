@@ -112,7 +112,7 @@ https://docs.camunda.io/docs/self-managed/operational-guides/backup-restore/zeeb
 
         ./phdsible --dev -t quay
 
-- Delete the Zeebe Statefulsets
+- Delete the Zeebe Statefulsets and wait for the pods to be terminated
 
         oc delete statefulsets zeebe-0 zeebe-1 zeebe-2
 
