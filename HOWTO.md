@@ -94,6 +94,8 @@
   
 - Restart the brokers (if some Statefulsets are in usage -> by deleting the pods)
 
+        oc delete pods zeebe-0-0 zeebe-1-0 zeebe-2-0
+
 #### References
 
 https://docs.camunda.io/docs/self-managed/operational-guides/backup-restore/zeebe-backup-and-restore/
