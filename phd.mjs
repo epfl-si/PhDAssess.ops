@@ -21,6 +21,8 @@ if (argv.help || argv._[0] === 'help') {
   await test(...argv._.slice(1));
 } else if (argv._[0] === 'clean') {
   await clean(...argv._.slice(1));
+} else if (argv._[0] === 'restore') {
+  await restore(...argv._.slice(1));
 } else if (argv._[0] === 'deploy-bpmn') {
   await deployProcess();
 } else if (argv._[0] === 'stringify-snapshot') {
@@ -42,6 +44,7 @@ Usage:
   phd logs                    Show the latest docker logs, since 5min
   phd stop                    Stop the docker stack
   phd clean                   Wipe all data. All steps have to be confirmed
+  phd restore                 Restore data from S3. Be sure to have set the .env correctly
   phd test                    Launch tests
   phd test e2e                Launch e2e tests with a headless browser
   phd test load-fixtures      Load locally task fixtures
@@ -93,27 +96,8 @@ async function showLatestDockerLogs(args) {
 
 async function clean(args) {
   if (await question(`Clean Zeebe partitions ? [y/N] `) === 'y') {
-    const pathZeebeVolume = path.join(__dirname, `docker/volumes`);
-
-    if (await question(`Backup Zeebe partitions before deleting ? (${ path.join(__dirname, `docker/volumes/`) }*.bak) [y/N] `) === 'y') {
-      ['zeebe_data_node_0', 'zeebe_data_node_1', 'zeebe_data_node_2'].forEach((pathVolume) => {
-        const partitionInstanceVolumePath = path.join(pathZeebeVolume, pathVolume);
-        const bakPartitionInstanceVolumePath = path.join(pathZeebeVolume, `${ pathVolume }.bak`);
-        fs.pathExistsSync(partitionInstanceVolumePath) &&
-        fs.moveSync(partitionInstanceVolumePath, bakPartitionInstanceVolumePath);
-        console.log(`Successfully moved ${ partitionInstanceVolumePath } to ${ bakPartitionInstanceVolumePath }`)
-      });
-    } else {
-      ['zeebe_data_node_0', 'zeebe_data_node_1', 'zeebe_data_node_2'].forEach((pathVolume) => {
-        const partitionInstanceVolumePath = path.join(pathZeebeVolume, pathVolume);
-        fs.pathExistsSync(partitionInstanceVolumePath) &&
-        fs.removeSync(partitionInstanceVolumePath);
-        console.log(`Successfully deleted ${ partitionInstanceVolumePath }`)
-      });
-
-      console.log(`Warning. You may need to run a permission change on next start.`)
-      console.log(`To do so, maybe: sudo chown -R root:${ userInfo().username } ${ pathZeebeVolume }`)
-    }
+    cd(path.join(__dirname, `docker`));
+    await $`docker compose down -v zeebe_node_0 zeebe_node_1 zeebe_node_2`;
   }
 
   if (await question('Clean meteor db ? [y/N] ') === 'y') {
@@ -128,6 +112,28 @@ async function clean(args) {
     const simpleMonitorVolumePath = path.join(__dirname, `docker/volumes/simple_monitor_h2_db`);
     await fs.remove(path.join(simpleMonitorVolumePath, 'simple-monitor.mv.db'));
     console.log(`Successfully removed ${path.join(simpleMonitorVolumePath, 'simple-monitor.mv.db')}`)
+  }
+}
+
+async function restore(args) {
+  if (await question('Did you clean the partitions ? (phd clean) [y/N] ') === 'y') {
+    console.log(`Fetch the list of the available backup ids:`);
+
+    const response = await $`curl --request GET 'http://localhost:9600/actuator/backups' 2>/dev/null`;
+    console.log(response.stdout);
+
+    const backupId = await question('Please enter the Id to restore: ')
+
+    if (backupId) {
+      console.log(`Starting restore for backupId ${ backupId }`);
+
+      cd(path.join(__dirname, `docker`));
+      await $`docker compose exec zeebe_node_0 bash -c './bin/restore --backupId=${ backupId }'`;
+      await $`docker compose exec zeebe_node_1 bash -c './bin/restore --backupId=${ backupId }'`;
+      await $`docker compose exec zeebe_node_2 bash -c './bin/restore --backupId=${ backupId }'`;
+    } else {
+      console.log('aborted');
+    }
   }
 }
 
