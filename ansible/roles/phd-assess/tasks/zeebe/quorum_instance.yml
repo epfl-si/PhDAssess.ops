@@ -64,7 +64,7 @@
                     cpu: "50m"
                     memory: "300Mi"
                 ports:
-                  - name: metrics
+                  - name: db-metrics
                     containerPort: 8081
               - name: "zeebe"
                 image:
