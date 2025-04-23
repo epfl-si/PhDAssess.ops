@@ -12,10 +12,7 @@ all:
     # Zeebe
     ## Camunda Image config
     zeebe_version:
-      '8.3.3'
-      # '8.3.20'
-      # '8.4.18'
-      # '8.5.17'
+      '8.5.17'
     zeebe_repository:
       "docker.io"
     zeebe_camunda_image_path:
@@ -45,8 +42,8 @@ all:
     web_app_image_tag: 'latest'
 
     web_app_nip_io_url: "phd-assess-prod.128.178.211.3.nip.io"
-    #web_app_url: "phd-annual-report.epfl.ch"
-    web_app_full_url: "https://{{ web_app_nip_io_url }}"
+    web_app_url: "phd-annual-report.epfl.ch"
+    web_app_full_url: "https://{{ web_app_url }}"
 
     web_app_mongo_url: "mongodb://web-app-db:27017/meteor"
 
@@ -54,13 +51,12 @@ all:
     web_app_debug_env: "phd-assess:*"
     web_app_node_env: "production"
     web_app_node_options: "--max_old_space_size=1536"
+    web_app_db_image: "{{ quay_repo }}/{{ db_image_name }}:{{ db_image_tag }}"
 
     web_app_secret_mongo_persistent_db: true
 
     web_app_meteor_settings:
       public:
-        isTest:
-          "false"
         phdAssessRoleAdmin:
           "PhD-annual-report-admin"
         phdAssessRoleProgramAssistant:
@@ -79,13 +75,11 @@ all:
     microservice_node_base_tag: "18-alpine"
 
     ## Notifier
-    # notifier_send_real_email: true
-    notifier_send_real_email: false
+    notifier_send_real_email: true
     notifier_from_address: "Annual report <noreply@epfl.ch>"
 
     ## GED
-    # alfresco_url: "https://ged-etu.epfl.ch"
-    alfresco_url: "https://integration-gedetu.epfl.ch"
+    alfresco_url: "https://ged-etu.epfl.ch"
     alfresco_username: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_USERNAME') }}"
     alfresco_password: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_PASSWORD') }}"
 
