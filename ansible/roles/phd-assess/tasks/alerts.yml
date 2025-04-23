@@ -89,7 +89,7 @@
               - alert: NoMonitoring
                 expr: >-
                   count(up{namespace="svc1394d-phd-assess"} == 1) < 3
-                for: 3m
+                for: 30m
                 labels:
                   severity: critical
                   sendto: telegram
@@ -97,8 +97,7 @@
                   summary: "Monitoring target is down"
                   description: >-
                     {% raw -%}
-                    The Prometheus target {{ $labels.endpoint }} (job: {{ $labels.job }}, pod: {{ $labels.pod }}, instance: {{ $labels.instance }})
-                    has been down for over 3 minutes.
+                    Some Prometheus targets in PhDAssess are failing their scrapes.
                     {%- endraw %}
 
           - name: zeebe-db
