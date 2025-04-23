@@ -94,3 +94,6 @@ all:
 
     # Monitoring
     grafana_dashboard_instance: grafana-prod
+
+    # Alerting
+    telegram_chat_id: -1848690641  # PhDAssess group

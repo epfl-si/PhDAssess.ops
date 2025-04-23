@@ -93,3 +93,10 @@
         - routes
   tags:
     - routes
+
+- name: Alerts
+  ansible.builtin.include_tasks:
+    file: alerts.yml
+    apply:
+      tags: alerts
+  tags: alerts

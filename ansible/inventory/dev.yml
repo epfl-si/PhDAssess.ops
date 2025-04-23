@@ -94,3 +94,6 @@ all:
 
     # Monitoring
     grafana_dashboard_instance: grafana-dev
+
+    # Alerting
+    telegram_chat_id: -4759311199

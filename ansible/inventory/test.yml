@@ -93,3 +93,5 @@ all:
 
     # Monitoring
     grafana_dashboard_instance: grafana-test
+
+  telegram_chat_id: -4712944442

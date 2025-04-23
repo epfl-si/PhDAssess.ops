@@ -56,3 +56,6 @@ pdf_service_name: "pdf"
 monitoring_node_disk_usage_exporter_image: "{{ quay_repo }}/disk-usage-exporter"
 zeebe_db_monitor_image: "{{ quay_repo }}/zeebe-db-monitor"
 grafana_folder_name: "PhDAssess"
+
+# Alerts
+telegram_bot_token: "{{ lookup('file', '/keybase/team/epfl_phdassess/TELEGRAM_BOT_TOKEN') }}"
