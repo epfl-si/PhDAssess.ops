@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=camunda/zeebe:8.3.3
+ARG BASE_IMAGE=camunda/zeebe:8.5.17
 
 FROM $BASE_IMAGE
 
@@ -8,4 +8,4 @@ USER root
 
 RUN chmod 755 /usr/local/zeebe/lib/*jar
 
-USER zeebe:zeebe
+USER 1001:1001
