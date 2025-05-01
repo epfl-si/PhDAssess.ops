@@ -1,6 +1,5 @@
 x-zeebe-template: &zeebe-broker
-  build:
-    context: ./zeebe
+  image: camunda/zeebe:8.5.17
   networks:
     - zeebe_network
   environment:
@@ -9,9 +8,6 @@ x-zeebe-template: &zeebe-broker
     - ZEEBE_BROKER_CLUSTER_INITIALCONTACTPOINTS=zeebe_node_0:26502,zeebe_node_1:26502,zeebe_node_2:26502
     - ZEEBE_BROKER_CLUSTER_PARTITIONSCOUNT=1
     - ZEEBE_BROKER_CLUSTER_REPLICATIONFACTOR=3
-    - ZEEBE_BROKER_EXPORTERS_HAZELCAST_CLASSNAME=io.zeebe.hazelcast.exporter.HazelcastExporter
-    - ZEEBE_BROKER_EXPORTERS_HAZELCAST_JARPATH=lib/zeebe-hazelcast-exporter.jar
-    #- ZEEBE_BROKER_DATA_DISKUSAGEMONITORINGENABLED=false
   env_file:  # additional env that has not shared on git
     - .env
 
