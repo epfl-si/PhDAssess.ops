@@ -170,11 +170,11 @@
               - alert: ZeebeQuorumAbsentee
                 expr: >-
                   (
-                    count(atomix_role{namespace="{{ openshift_namespace }}"} ==  1) + 
-                    count(atomix_role{namespace="{{ openshift_namespace }}"} ==  3) - 
-                    count(atomix_role{namespace="{{ openshift_namespace }}"})
-                  ) 
-                  != 0
+                    count(atomix_role{namespace="{{ openshift_namespace }}"} ==  1) +
+                     count(atomix_role{namespace="{{ openshift_namespace }}"} ==  3) -
+                     count(atomix_role{namespace="{{ openshift_namespace }}"})
+                  )
+                   != 0
                 for: 5m
                 labels:
                   severity: critical
