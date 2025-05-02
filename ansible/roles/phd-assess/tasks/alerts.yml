@@ -96,9 +96,7 @@
                 annotations:
                   summary: "Monitoring target is down"
                   description: >-
-                    {% raw -%}
-                    Some Prometheus targets in PhDAssess are failing their scrapes.
-                    {%- endraw %}
+                    {% raw -%} Some Prometheus targets in PhDAssess are failing their scrapes.{%- endraw %}
 
           - name: zeebe-db
             rules:
