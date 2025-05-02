@@ -134,6 +134,24 @@
                     Zeebe is encountering new incidents. Rate: {{ $value }}/sec
                     {%- endraw %}
 
+              - alert: ZeebeDbIncidentsKnownToBeRaising
+                expr: |-
+                  rate(
+                    zeebe_db_column_family_incident_entries{
+                      error_message!='Expected at least one condition to evaluate to true, or to have a default flow'
+                    }[1h]
+                  )
+                  > 0.52
+                for: 1m
+                labels:
+                  severity: critical
+                  sendto: telegram
+                annotations:
+                  description: |-
+                    {% raw -%}
+                    Zeebe db is encountering a incident that is known to raise, but he is raising too fast at the moment !. Rate: {{ $value }}/sec
+                    {%- endraw %}
+
           - name: Zeebe
             rules:
               - alert: ZeebeQuorumNoLeader
@@ -180,3 +198,15 @@
                     {% raw -%}
                     Production Zeebe quorum is comprised of {{ $value }} members instead of 3.
                     {%- endraw %}
+
+              - alert: ZeebeQuorumUnhealthy
+                expr: |-
+                  zeebe_health{app_instance="prod"}
+                  < 1.0
+                for: 5m
+                labels:
+                  severity: critical
+                  sendto: telegram
+                annotations:
+                  description: |-
+                    Production Zeebe quorum is unhealthy.
