@@ -98,5 +98,4 @@
                     cpu: "5m"
                     memory: "300Mi"
                   limits:
-                    cpu: "20m"
                     memory: "800Mi"
