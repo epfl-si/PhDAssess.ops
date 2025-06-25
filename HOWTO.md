@@ -12,6 +12,7 @@
         docker push quay-its.epfl.ch/svc1394/meteor-web-app
 
 - Then you can trigger a new pod for web-app deployment
+- If you need to update the production image, you should tag it with 'prod' in quay firstly
 
 ## Zeebe microservices
 
@@ -32,6 +33,9 @@ All microservices should follow the same process to be updated as they share the
 
 - Once the build is over, you can go into the corresponding 
   deployment, set the pod to 0, wait and set it to a positive number again.
+
+    - If you need to update the image in production, you should first tag it with 'prod' in quay before
+    resetting the pod number value 
  
 ## MongoDB
 
