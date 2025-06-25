@@ -7,6 +7,8 @@
 - Temporary solution -> go on the PhDAssess project, and do:
         
         cd apps/fillForm
+        cd PhDAssess/fillForm
+        meteor npm i
         docker build . -t quay-its.epfl.ch/svc1394/meteor-web-app --build-arg BASE_IMAGE=quay-its.epfl.ch/svc1394/ubuntu-node-14
         docker push quay-its.epfl.ch/svc1394/meteor-web-app
 
