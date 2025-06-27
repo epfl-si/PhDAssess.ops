@@ -18,6 +18,8 @@
       stringData: "{{ item.additional_secrets }}"
 
 - name: Microservice BuildConfig
+  when: >-
+    openshift_namespace in ["svc1394d-phd-assess", "svc1394t-phd-assess"]
   kubernetes.core.k8s:
     definition:
       apiVersion: build.openshift.io/v1
