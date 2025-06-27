@@ -29,7 +29,6 @@
         ALFRESCO_PASSWORD: "{{ alfresco_password }}"
     - name: "isa"
       image_tag: "{{ isa_image_tag }}"
-      node_version: "22-alpine"
       git_url: "https://github.com/epfl-si/PhDAssess-ISA"
       additional_env:
         - ZEEBE_TASK_TYPE: "phdISAPostStudentResult"

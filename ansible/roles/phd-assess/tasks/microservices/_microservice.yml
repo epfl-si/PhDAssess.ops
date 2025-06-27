@@ -40,7 +40,7 @@
             buildArgs:
               - name: "BASE_IMAGE"
                 value:
-                  "{{ quay_repo }}/node:{{ item.node_version | default('18-alpine') }}"
+                  "{{ quay_repo }}/node:{{ item.node_version | default('22-alpine') }}"
         output:
           to:
             kind: DockerImage
