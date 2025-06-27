@@ -12,13 +12,18 @@
     - name: "pdf"
       image_tag: "{{ pdf_image_tag }}"
       git_url: "https://github.com/epfl-si/PhDAssess-PDF"
-      git_branch: "master"
+      git_branch: "feature/pdf-file"
       additional_env:
         - ZEEBE_TASK_TYPE: "phdBuildPDF"
+          ALFRESCO_URL: "{{ alfresco_url }}"
+          NODE_TLS_REJECT_UNAUTHORIZED:
+            "{{ 0 if alfresco_ignore_TLS_error is defined and alfresco_ignore_TLS_error == true }}"
+      additional_secrets:
+        ALFRESCO_USERNAME: "{{ alfresco_username }}"
+        ALFRESCO_PASSWORD: "{{ alfresco_password }}"
     - name: "ged"
       image_tag: "{{ alfresco_image_tag }}"
       git_url: "https://github.com/epfl-si/PhDAssess-GED"
-      git_branch: "master"
       additional_env:
         - ZEEBE_TASK_TYPE: "phdGEDDeposit"
           ALFRESCO_URL: "{{ alfresco_url }}"
