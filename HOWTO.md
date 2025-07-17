@@ -28,7 +28,7 @@ All microservices should follow the same process to be updated as they share the
   `./phdsible -t microservices`
   
 - As there is no trigger on BuildConfigs change,
-  start building manually the new images for every changed
+  start building manually the new images for all changed
   microservices (ex.: `oc start-build <buildconfig-name>`)
 
 - Once the build is over, you can go into the corresponding 
