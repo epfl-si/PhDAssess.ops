@@ -57,7 +57,7 @@
 
         oc port-forward pod/zeebe-1-0 9600:9600
 
-- Set yourself a backup ID. You should take the bigger number of the list of all backups and add 1
+- Set yourself a backup ID. It is recommended to take the bigger number of the list and add 1
 
 - Adapt the next command with your new backup ID and launch the backup process:
 
@@ -71,7 +71,7 @@
 
 - ⚠ Assert you are ready to lose data on the volume you will operate on ⚠
 - Assert you are running the same version / brokers number
-- Have the ID of the backup you want to restore. See previous section.
+- Have the ID of the backup you want to restore. See the previous section.
 
 ---
 
@@ -86,13 +86,13 @@
         oc exec pod/zeebe-1-0 -- bash -c "rm -rf /usr/local/zeebe/data/*"
         oc exec pod/zeebe-2-0 -- bash -c "rm -rf /usr/local/zeebe/data/*"
 
-- The, on every broker, start the restoration process:
+- Then, on every broker, start the restoration process:
  
         oc exec pod/zeebe-0-0 -- bash -c "./bin/restore --backupId=<backupId>"
         oc exec pod/zeebe-1-0 -- bash -c "./bin/restore --backupId=<backupId>"
         oc exec pod/zeebe-2-0 -- bash -c "./bin/restore --backupId=<backupId>"
   
-- Restart the brokers (if some Statefulsets are in usage -> by deleting the pods)
+- Restart the brokers (if some Statefulsets are in usage, deleting the pods is a valid move)
 
         oc delete pods zeebe-0-0 zeebe-1-0 zeebe-2-0
 
@@ -120,4 +120,4 @@ https://docs.camunda.io/docs/self-managed/operational-guides/backup-restore/zeeb
 
         ./phdsible --dev -t zeebe.quorum
 
-- Hooray ! Be adverted it may take some times to allow the creation of new process (like 5min)
+- Hooray! Be adverted, it may take some time to allow the creation of new process (like 5 min)

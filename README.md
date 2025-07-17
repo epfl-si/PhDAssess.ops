@@ -1,7 +1,9 @@
 # PhDAssess Ops
 
 This repository regroups the configuration-as-code to provision, configure,
-deploy and manage the EPFL's PhDAssess stack. It uses Ansible wrapped in a
+ deploy, and manage the EPFL's PhDAssess stack.
+
+The deploy part uses Ansible wrapped in a
 convenient [suitcase](https://github.com/epfl-si/ansible.suitcase), called [phdsible](phdsible).
 
 ## Prerequisites
@@ -11,12 +13,12 @@ convenient [suitcase](https://github.com/epfl-si/ansible.suitcase), called [phds
     * `/keybase/team/epfl_phdassess/test/`
     * `/keybase/team/epfl_phdassess/prod/`
 * Access to the OpenShift.
-* Some basic understanding of [the architecture of the stack](ARCHITECTURE.md)
+* Some basic understanding of the stack. See [the architecture of the stack](ARCHITECTURE.md).
 
 ## Usage
 
 `./phdsible`
 
-Setup the dev. environment on Openshift and run the stack.
+Set up the development environment on Openshift and run the stack.
 
 Use `--prod` to do the same in the production environment.
