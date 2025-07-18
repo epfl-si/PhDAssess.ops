@@ -106,7 +106,7 @@ services:
 # Warning, the nginx part has not been tested
 #
 #  mongo:
-#    image: mongo:6
+#    image: mongo:7
 #    restart: always
 #
 #  nginx:
