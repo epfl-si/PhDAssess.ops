@@ -199,12 +199,11 @@
 
               - alert: ZeebeQuorumUnhealthy
                 expr: |-
-                  zeebe_health{app_instance="prod"}
-                  < 1.0
+                  min(zeebe_health{namespace="{{ openshift_namespace }}"}) == 0
                 for: 5m
                 labels:
                   severity: critical
                   sendto: telegram
                 annotations:
                   description: |-
-                    Production Zeebe quorum is unhealthy.
+                    One or more Zeebe instances became unhealthy.
