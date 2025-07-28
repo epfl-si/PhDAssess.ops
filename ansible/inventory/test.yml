@@ -32,12 +32,14 @@ all:
       "{{ zeebe_quay_image_path }}:{{ zeebe_version }}"
 
     ## Backup / Restore S3
+    s3_files_keybase_path:
+      "/keybase/team/epfl_phdassess/test/"
     zeebe_backup_s3_bucket_name_file:
-      "{{keybase_secrets_folder }}S3-zeebe-backup/BUCKETNAME"
+      "{{s3_files_keybase_path }}S3-zeebe-backup/BUCKETNAME"
     zeebe_backup_s3_access_key_file:
-      "{{keybase_secrets_folder }}S3-zeebe-backup/ACCESSKEY"
+      "{{s3_files_keybase_path }}S3-zeebe-backup/ACCESSKEY"
     zeebe_backup_s3_secret_key_file:
-      "{{keybase_secrets_folder }}S3-zeebe-backup/SECRETKEY"
+      "{{s3_files_keybase_path }}S3-zeebe-backup/SECRETKEY"
 
     # Meteor
     node_for_meteor_image_name: 'ubuntu-node-14'
