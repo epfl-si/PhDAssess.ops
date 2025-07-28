@@ -80,18 +80,12 @@
 
         oc project
 
-- On every broker, clean the data:
+- On every broker, clean the data and start the restoration process:
   
-        oc exec pod/zeebe-0-0 -- bash -c "rm -rf /usr/local/zeebe/data/*"
-        oc exec pod/zeebe-1-0 -- bash -c "rm -rf /usr/local/zeebe/data/*"
-        oc exec pod/zeebe-2-0 -- bash -c "rm -rf /usr/local/zeebe/data/*"
+        oc exec pod/zeebe-0-0 -- bash -c "rm -rf /usr/local/zeebe/data/{*,.*} && ./bin/restore --backupId=<backupId>"
+        oc exec pod/zeebe-1-0 -- bash -c "rm -rf /usr/local/zeebe/data/{*,.*} && ./bin/restore --backupId=<backupId>"
+        oc exec pod/zeebe-2-0 -- bash -c "rm -rf /usr/local/zeebe/data/{*,.*} && ./bin/restore --backupId=<backupId>"
 
-- Then, on every broker, start the restoration process:
- 
-        oc exec pod/zeebe-0-0 -- bash -c "./bin/restore --backupId=<backupId>"
-        oc exec pod/zeebe-1-0 -- bash -c "./bin/restore --backupId=<backupId>"
-        oc exec pod/zeebe-2-0 -- bash -c "./bin/restore --backupId=<backupId>"
-  
 - Restart the brokers (if some Statefulsets are in usage, deleting the pods is a valid move)
 
         oc delete pods zeebe-0-0 zeebe-1-0 zeebe-2-0
