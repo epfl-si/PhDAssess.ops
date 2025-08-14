@@ -2,6 +2,7 @@
   ansible.builtin.include_tasks: _microservice.yml
   loop:
     - name: "notifier"
+      image_tag: "{{ notifier_image_tag }}"
       git_url: "https://github.com/epfl-si/PhDAssess-Notifier"
       additional_env:
         - ZEEBE_TASK_TYPE: "notification"
@@ -9,11 +10,13 @@
           NOTIFIER_HOST: "{{ notifier_host }}"
           NOTIFIER_FROM_ADDRESS: "{{ notifier_from_address }}"
     - name: "pdf"
+      image_tag: "{{ pdf_image_tag }}"
       git_url: "https://github.com/epfl-si/PhDAssess-PDF"
       git_branch: "master"
       additional_env:
         - ZEEBE_TASK_TYPE: "phdBuildPDF"
     - name: "ged"
+      image_tag: "{{ ged_image_tag }}"
       git_url: "https://github.com/epfl-si/PhDAssess-GED"
       git_branch: "master"
       additional_env:
@@ -25,6 +28,7 @@
         ALFRESCO_USERNAME: "{{ alfresco_username }}"
         ALFRESCO_PASSWORD: "{{ alfresco_password }}"
     - name: "isa"
+      image_tag: "{{ isa_image_tag }}"
       node_version: "22-alpine"
       git_url: "https://github.com/epfl-si/PhDAssess-ISA"
       additional_env:

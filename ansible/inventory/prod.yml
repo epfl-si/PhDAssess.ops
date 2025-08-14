@@ -39,7 +39,7 @@ all:
     # Meteor
     node_for_meteor_image_name: 'ubuntu-node-14'
     web_app_image_name: 'meteor-web-app'
-    web_app_image_tag: 'latest'
+    web_app_image_tag: 'prod'
 
     web_app_nip_io_url: "phd-assess-prod.128.178.211.3.nip.io"
     web_app_url: "phd-annual-report.epfl.ch"
@@ -74,16 +74,22 @@ all:
     # Microservices
     microservice_node_base_tag: "18-alpine"
 
+    ## PDF
+    pdf_image_tag: "prod"
+
     ## Notifier
+    notifier_image_tag: "prod"
     notifier_send_real_email: true
     notifier_from_address: "Annual report <noreply@epfl.ch>"
 
     ## GED
+    ged_image_tag: "prod"
     alfresco_url: "https://ged-etu.epfl.ch"
     alfresco_username: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_USERNAME') }}"
     alfresco_password: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_PASSWORD') }}"
 
     ## ISA
+    isa_image_tag: "prod"
     isa_url: "{{ lookup('file', keybase_secrets_folder + 'ISA_POST_STUDENT_RESULT_URL') }}"
 
     # Monitoring
