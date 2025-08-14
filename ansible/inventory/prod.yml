@@ -83,7 +83,7 @@ all:
     notifier_from_address: "Annual report <noreply@epfl.ch>"
 
     ## GED
-    alfresco_image_tag: "prod"
+    ged_image_tag: "prod"
     alfresco_url: "https://ged-etu.epfl.ch"
     alfresco_username: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_USERNAME') }}"
     alfresco_password: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_PASSWORD') }}"

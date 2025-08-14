@@ -23,7 +23,7 @@
           NODE_TLS_REJECT_UNAUTHORIZED:
             "{{ 0 if alfresco_ignore_TLS_error is defined and alfresco_ignore_TLS_error == true }}"
     - name: "ged"
-      image_tag: "{{ alfresco_image_tag }}"
+      image_tag: "{{ ged_image_tag }}"
       git_url: "https://github.com/epfl-si/PhDAssess-GED"
       additional_env:
         - ZEEBE_TASK_TYPE: "phdGEDDeposit"
@@ -35,6 +35,7 @@
         ALFRESCO_PASSWORD: "{{ alfresco_password }}"
     - name: "isa"
       image_tag: "{{ isa_image_tag }}"
+      node_version: "22-alpine"
       git_url: "https://github.com/epfl-si/PhDAssess-ISA"
       additional_env:
         - ZEEBE_TASK_TYPE: "phdISAPostStudentResult"
