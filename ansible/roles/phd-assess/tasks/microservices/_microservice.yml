@@ -84,7 +84,7 @@
             serviceAccountName: "{{ quay_service_account_name }}"
             containers:
               - name: "{{ item.name }}"
-                image: "{{ quay_repo }}/microservice-{{ item.name }}:{{ item.image_tag}}"
+                image: "{{ quay_repo }}/microservice-{{ item.name }}:{{ item.image_tag }}"
                 env: >-
                   {{ _instance_env
                   | combine(item.additional_env)
