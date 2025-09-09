@@ -1,15 +1,42 @@
 # Howto
 
-## web-app Meteor
+## Meteor web-app
 ### Update the image
 
 - Building the image directly from Openshift is stuck behind a custom NPM repository permissions.
-- Temporary solution:
+- Temporary solution → go on the PhDAssess project, and do:
         
-        cd PhDAssess/fillForm
+        cd apps/fillForm
+        meteor npm i
         docker build . -t quay-its.epfl.ch/svc1394/meteor-web-app --build-arg BASE_IMAGE=quay-its.epfl.ch/svc1394/ubuntu-node-14
         docker push quay-its.epfl.ch/svc1394/meteor-web-app
 
+- Then you can trigger a new pod for web-app deployment
+- If you need to update the production image, you should tag it with 'prod' in quay firstly
+
+## Zeebe microservices
+
+### Update the images
+
+All microservices should follow the same process to be updated as they share the same Ansible process:
+ 
+- If you have a custom branch, edit
+  `ansible/roles/phd-assess/tasks/microservices/main.yml` to 
+  create/change the `git_branch` value.
+
+- Redeploy BuildConfigs and Deployments with
+  `./phdsible -t microservices`
+  
+- As there is no trigger on BuildConfigs change,
+  start building manually the new images for all changed
+  microservices (ex.: `oc start-build <buildconfig-name>`)
+
+- Once the build is over, you can go into the corresponding 
+  deployment, set the pod to 0, wait and set it to a positive number again.
+
+    - If you need to update the image in production, you should first tag it with 'prod' in quay before
+    resetting the pod number value 
+ 
 ## MongoDB
 
 ### Backups

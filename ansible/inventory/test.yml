@@ -91,6 +91,7 @@ all:
     ## GED
     ged_image_tag: "latest"
     alfresco_url: "https://test-gedetu.epfl.ch"
+    alfresco_image_tag: "latest"
     alfresco_ignore_TLS_error: true
     alfresco_username: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_USERNAME') }}"
     alfresco_password: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_PASSWORD') }}"

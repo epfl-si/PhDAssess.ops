@@ -18,6 +18,8 @@
       stringData: "{{ item.additional_secrets }}"
 
 - name: Microservice BuildConfig
+  when: >-
+    openshift_namespace in ["svc1394d-phd-assess", "svc1394t-phd-assess"]
   kubernetes.core.k8s:
     definition:
       apiVersion: build.openshift.io/v1
@@ -38,7 +40,7 @@
             buildArgs:
               - name: "BASE_IMAGE"
                 value:
-                  "{{ quay_repo }}/node:{{ item.node_version | default('18-alpine') }}"
+                  "{{ quay_repo }}/node:{{ item.node_version | default('22-alpine') }}"
         output:
           to:
             kind: DockerImage
