@@ -45,6 +45,8 @@ microservice_node_18_base_tag: "18-alpine"
 microservice_node_18_base_image: "node:{{ microservice_node_18_base_tag }}"
 microservice_node_22_base_tag: "22-alpine"
 microservice_node_22_base_image: "node:{{ microservice_node_22_base_tag }}"
+microservice_node_24_base_tag: "24-alpine"
+microservice_node_24_base_image: "node:{{ microservice_node_24_base_tag }}"
 
 notifier_service_name: "notifier"
 notifier_port: "{{ '25' if notifier_send_real_email else '587' }}"

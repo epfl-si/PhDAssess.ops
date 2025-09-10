@@ -56,6 +56,20 @@
     push: true
     source: local
 
+- name: Images - Pull the Node 24 for microservices as base image
+  community.docker.docker_image:
+    name: "node"
+    tag: "{{ microservice_node_24_base_tag }}"
+    source: pull
+
+- name: Images - Tag and push Node 24
+  community.docker.docker_image:
+    name: "node"
+    repository: "{{ quay_repo }}/node"
+    tag: "{{ microservice_node_24_base_tag }}"
+    push: true
+    source: local
+
 - name: Images - Pull the MongoDB for web-app
   community.docker.docker_image:
     name: "{{ db_image_name }}"
