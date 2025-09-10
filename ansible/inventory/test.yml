@@ -45,6 +45,7 @@ all:
     node_for_meteor_image_name: 'ubuntu-node-14'
     web_app_image_name: 'meteor-web-app'
     web_app_image_tag: 'latest'
+    web_app_repository_tag: 'main'
 
     web_app_nip_io_url: "phd-assess-test.10.98.42.205.nip.io"
     web_app_url: "phd-annual-report-test.epfl.ch"
