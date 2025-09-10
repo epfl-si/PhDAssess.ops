@@ -56,7 +56,7 @@ All microservices should follow the same process to be updated as they share the
 
 - Set the bridge from your computer to the broker to use the gateway
 
-        oc port-forward pod/zeebe-0-0 26501:26500
+        oc -n project_namespace port-forward pod/zeebe-0-0 26501:26500
  
 - See the status of the quorum
 
@@ -67,7 +67,7 @@ All microservices should follow the same process to be updated as they share the
 
 - Set the bridge from your computer to the broker to use the management api
 
-        oc port-forward service/zeebe-quorum-0 9600:9600
+        oc -n project_namespace port-forward service/zeebe-quorum-0 9600:9600
  
 - Test by listing the backups
 
@@ -77,12 +77,12 @@ All microservices should follow the same process to be updated as they share the
 
 - Identify the 'Leader' number:
 
-        oc port-forward service/zeebe-gateway 26501:26500
+        oc -n project_namespace port-forward service/zeebe-gateway 26501:26500
         watch zbctl status --insecure --port 26501
 
 - Open a port forward to the 'Leader':
 
-        oc port-forward pod/zeebe-1-0 9600:9600
+        oc -n project_namespace port-forward pod/zeebe-1-0 9600:9600
 
 - Set yourself a backup ID. It is recommended to take the bigger number of the list and add 1
 
@@ -97,7 +97,8 @@ All microservices should follow the same process to be updated as they share the
 #### Restore
 
 - ⚠ Assert you are ready to lose data on the volume you will operate on ⚠
-- Assert you are running the same version / brokers number
+- Assert you are running the same version / brokers number.
+- Assert your env. vars are aiming for the backups.
 - Have the ID of the backup you want to restore. See the previous section.
 
 ---
@@ -109,13 +110,13 @@ All microservices should follow the same process to be updated as they share the
 
 - On every broker, clean the data and start the restoration process:
   
-        oc exec pod/zeebe-0-0 -- bash -c "rm -rf /usr/local/zeebe/data/{*,.*} && ./bin/restore --backupId=<backupId>"
-        oc exec pod/zeebe-1-0 -- bash -c "rm -rf /usr/local/zeebe/data/{*,.*} && ./bin/restore --backupId=<backupId>"
-        oc exec pod/zeebe-2-0 -- bash -c "rm -rf /usr/local/zeebe/data/{*,.*} && ./bin/restore --backupId=<backupId>"
+        oc -n project_namespace exec pod/zeebe-0-0 -- bash -c "rm -rf /usr/local/zeebe/data/{*,.*} && ./bin/restore --backupId=<backupId>"
+        oc -n project_namespace exec pod/zeebe-1-0 -- bash -c "rm -rf /usr/local/zeebe/data/{*,.*} && ./bin/restore --backupId=<backupId>"
+        oc -n project_namespace exec pod/zeebe-2-0 -- bash -c "rm -rf /usr/local/zeebe/data/{*,.*} && ./bin/restore --backupId=<backupId>"
 
 - Restart the brokers (if some Statefulsets are in usage, deleting the pods is a valid move)
 
-        oc delete pods zeebe-0-0 zeebe-1-0 zeebe-2-0
+        oc -n project_namespace delete pods zeebe-0-0 zeebe-1-0 zeebe-2-0
 
 #### References
 
@@ -135,7 +136,7 @@ https://docs.camunda.io/docs/self-managed/operational-guides/backup-restore/zeeb
 
 - Delete the Zeebe Statefulsets and wait for the pods to be terminated
 
-        oc delete statefulsets zeebe-0 zeebe-1 zeebe-2
+        oc -n project_namespace delete statefulsets zeebe-0 zeebe-1 zeebe-2
 
 - Once really deleted, recreate it with
 
