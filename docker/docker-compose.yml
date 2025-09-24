@@ -15,8 +15,8 @@ services:
     volumes:
       - ./volumes/zeebe_data_node_0:/usr/local/zeebe/data
     ports:
-      - "29501-26503:26500-26502"
-      - "9600:9600"
+      - "29501-29503:26500-26502"
+      - "19600:9600"
 
   zeebe_node_1:
     extends:
@@ -28,8 +28,8 @@ services:
     volumes:
       - ./volumes/zeebe_data_node_1:/usr/local/zeebe/data
     ports:
-      - "29504-26506:26500-26502"
-      - "9601:9600"
+      - "29504-29506:26500-26502"
+      - "19601:9600"
 
   zeebe_node_2:
     extends:
@@ -41,8 +41,8 @@ services:
     volumes:
       - ./volumes/zeebe_data_node_2:/usr/local/zeebe/data
     ports:
-      - "29507-26509:26500-26502"
-      - "9602:9600"
+      - "29507-29509:26500-26502"
+      - "19602:9600"
 
 #  simple-monitor:
 #    container_name: zeebe_simple_monitor
