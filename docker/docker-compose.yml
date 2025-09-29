@@ -101,6 +101,8 @@ services:
     profiles: [web-app]
     image: mongo:7
     restart: always
+    ports:
+      - "27117:27017"
 
   nginx:
     profiles: [web-app]
