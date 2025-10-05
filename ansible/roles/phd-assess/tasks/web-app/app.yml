@@ -30,7 +30,7 @@
               - name: "web-app"
                 image: "{{ quay_repo }}/{{ web_app_image_name }}:{{ web_app_image_tag }}"
                 command:
-                  - /usr/bin/node
+                  - node
                   - main.js
                 ports:
                   - name: meteor

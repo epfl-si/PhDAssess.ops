@@ -37,7 +37,8 @@ all:
       "{{keybase_secrets_folder }}S3-zeebe-backup/SECRETKEY"
 
     # Meteor
-    node_for_meteor_image_name: 'ubuntu-node-14'
+    node_for_meteor_image_name: 'node:22-trixie'
+    meteor_entra_auth_secrets_name: 'meteor-app-entra-auth-config'
     web_app_image_name: 'meteor-web-app'
     web_app_image_tag: 'latest'
     web_app_repository_tag: 'main'
