@@ -7,7 +7,6 @@
         name: zeebe-image
         namespace: "{{ openshift_namespace }}"
       spec:
-        serviceAccount: "{{ quay_service_account_name }}"
         source:
           type: Git
           git:
@@ -16,6 +15,8 @@
         strategy:
           type: Docker
           dockerStrategy:
+            pullSecret:
+              name: quay-pull-push-secret
             buildArgs:
               - name: "BASE_IMAGE"
                 value: "{{ zeebe_camunda_image_path }}:{{ zeebe_version }}"
@@ -24,6 +25,8 @@
           to:
             kind: DockerImage
             name: "{{ zeebe_quay_image_path }}:{{ zeebe_version }}"
+          pushSecret:
+            name: quay-pull-push-secret
         resources:
           requests:
             cpu: "10m"
@@ -38,7 +41,6 @@
         name: "{{ node_for_meteor_image_name }}"
         namespace: "{{ openshift_namespace }}"
       spec:
-        serviceAccount: "{{ quay_service_account_name }}"
         source:
           type: Git
           git:
@@ -47,6 +49,8 @@
         strategy:
           type: Docker
           dockerStrategy:
+            pullSecret:
+              name: quay-pull-push-secret
             buildArgs:
               - name: "BASE_IMAGE"
                 value: "{{ quay_repo }}/ubuntu:focal"
@@ -55,6 +59,8 @@
           to:
             kind: DockerImage
             name: "{{ quay_repo }}/{{ node_for_meteor_image_name }}"
+          pushSecret:
+            name: quay-pull-push-secret
         resources:
           requests:
             cpu: "10m"
@@ -69,7 +75,6 @@
         name: "{{ web_app_image_name }}"
         namespace: "{{ openshift_namespace }}"
       spec:
-        serviceAccount: "{{ quay_service_account_name }}"
         source:
           type: Git
           git:
@@ -79,6 +84,8 @@
         strategy:
           type: Docker
           dockerStrategy:
+            pullSecret:
+              name: quay-pull-push-secret
             buildArgs:
               - name: "BASE_IMAGE"
                 value: "{{ quay_repo }}/{{ node_for_meteor_image_name }}"
@@ -86,6 +93,8 @@
           to:
             kind: DockerImage
             name: "{{ quay_repo }}/{{ web_app_image_name }}:{{ web_app_image_tag }}"
+          pushSecret:
+            name: quay-pull-push-secret
         resources:
           requests:
             cpu: "10m"
@@ -100,7 +109,6 @@
         name: "disk-usage-exporter"
         namespace: "{{ openshift_namespace }}"
       spec:
-        serviceAccount: "{{ quay_service_account_name }}"
         source:
           type: Git
           git:
@@ -110,6 +118,8 @@
         strategy:
           type: Docker
           dockerStrategy:
+            pullSecret:
+              name: quay-pull-push-secret
             buildArgs:
               - name: "BASE_IMAGE"
                 value: "{{ quay_repo }}/node:22-alpine"
@@ -117,6 +127,8 @@
           to:
             kind: DockerImage
             name: "{{ monitoring_node_disk_usage_exporter_image }}:latest"
+          pushSecret:
+            name: quay-pull-push-secret
         resources:
           requests:
             cpu: "10m"
@@ -131,7 +143,6 @@
         name: "zeebe-db-monitor"
         namespace: "{{ openshift_namespace }}"
       spec:
-        serviceAccount: "{{ quay_service_account_name }}"
         source:
           type: Git
           git:
@@ -139,6 +150,8 @@
         strategy:
           type: Docker
           dockerStrategy:
+            pullSecret:
+              name: quay-pull-push-secret
             buildArgs:
               - name: "BASE_IMAGE"
                 value: "{{ quay_repo }}/node:18-alpine"
@@ -146,6 +159,8 @@
           to:
             kind: DockerImage
             name: "{{ zeebe_db_monitor_image }}:latest"
+          pushSecret:
+            name: quay-pull-push-secret
         resources:
           requests:
             cpu: "10m"
