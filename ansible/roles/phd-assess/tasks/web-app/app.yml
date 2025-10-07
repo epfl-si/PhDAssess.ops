@@ -83,8 +83,6 @@
                     value: "50"
                   - name: "TZ"
                     value: "Europe/Zurich"
-                  - name: "NODE_ENV"
-                    value: "{{ web_app_node_env }}"
                   - name: "NODE_OPTIONS"
                     value: "{{ web_app_node_options }}"
                   - name: "TEQUILA_ALLOWED_REQUEST_HOSTS"

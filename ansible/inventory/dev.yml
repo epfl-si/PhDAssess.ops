@@ -52,7 +52,6 @@ all:
 
     web_app_zeebe_log_level: "ERROR"
     web_app_debug_env: "phd-assess:*"
-    web_app_node_env: "development"
     web_app_node_options: "--max_old_space_size=1536"
 
     web_app_db_image: "{{ quay_repo }}/{{ db_image_name }}:{{ db_image_tag }}"
