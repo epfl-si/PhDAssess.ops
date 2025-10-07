@@ -32,40 +32,6 @@
             cpu: "10m"
             memory: "2Gi"
 
-- name: BuildConfig for the node image
-  kubernetes.core.k8s:
-    definition:
-      apiVersion: build.openshift.io/v1
-      kind: BuildConfig
-      metadata:
-        name: "{{ node_for_meteor_image_name }}"
-        namespace: "{{ openshift_namespace }}"
-      spec:
-        source:
-          type: Git
-          git:
-            ref: "master"
-            uri: "https://github.com/epfl-si/PhDAssess"
-        strategy:
-          type: Docker
-          dockerStrategy:
-            pullSecret:
-              name: quay-pull-push-secret
-            buildArgs:
-              - name: "BASE_IMAGE"
-                value: "{{ quay_repo }}/ubuntu:focal"
-            dockerfilePath: "docker/node-base/Dockerfile"
-        output:
-          to:
-            kind: DockerImage
-            name: "{{ quay_repo }}/{{ node_for_meteor_image_name }}"
-          pushSecret:
-            name: quay-pull-push-secret
-        resources:
-          requests:
-            cpu: "10m"
-            memory: "2Gi"
-
 - name: BuildConfig for the Meteor App
   kubernetes.core.k8s:
     definition:
