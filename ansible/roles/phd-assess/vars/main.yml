@@ -40,6 +40,9 @@ zeebe_broker_network_monitoring_api_port: 9600
 
 zeebe_route_name: "zeebe"
 
+# Web-app
+meteor_entra_auth_secrets_name: 'meteor-app-entra-auth-config'
+
 # Microservices
 microservice_node_18_base_tag: "18-alpine"
 microservice_node_18_base_image: "node:{{ microservice_node_18_base_tag }}"
