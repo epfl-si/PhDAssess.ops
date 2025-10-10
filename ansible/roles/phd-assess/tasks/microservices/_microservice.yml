@@ -87,6 +87,7 @@
             containers:
               - name: "{{ item.name }}"
                 image: "{{ quay_repo }}/microservice-{{ item.name }}:{{ item.image_tag }}"
+                imagePullPolicy: Always
                 env: >-
                   {{ _instance_env
                   | combine(item.additional_env)

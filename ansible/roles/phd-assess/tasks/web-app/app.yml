@@ -29,6 +29,7 @@
             containers:
               - name: "web-app"
                 image: "{{ quay_repo }}/{{ web_app_image_name }}:{{ web_app_image_tag }}"
+                imagePullPolicy: Always
                 command:
                   - node
                   - main.js

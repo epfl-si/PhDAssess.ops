@@ -46,6 +46,7 @@
             containers:
               - name: "zeebe-db-monitor"
                 image: "{{ zeebe_db_monitor_image }}:latest"
+                imagePullPolicy: Always
                 env:
                   - name: 'ZEEBE_DATA_RO_PATH'
                     value: '/zeebe-data-ro/raft-partition/partitions/1/runtime/'
@@ -66,8 +67,8 @@
                   - name: db-metrics
                     containerPort: 8081
               - name: "zeebe"
-                image:
-                  "{{ zeebe_quay_image_full_path }}"
+                image: "{{ zeebe_quay_image_full_path }}"
+                imagePullPolicy: Always
                 env: >-
                   {{ _instance_env | to_k8s_env }}
                 envFrom:
