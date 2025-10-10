@@ -61,6 +61,8 @@ all:
       public:
         isTest:
           "true"
+        setYellowBackgroundColor:
+          "true"
         phdAssessRoleAdmin:
           "PhD-annual-report-admin"
         phdAssessRoleProgramAssistant:
