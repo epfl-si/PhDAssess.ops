@@ -12,9 +12,6 @@ all:
     # Zeebe
     ## Camunda Image config
     zeebe_version:
-      # '8.3.3'
-      # '8.3.20'
-      # '8.4.18'
       '8.5.17'
     zeebe_repository:
       "docker.io"
@@ -42,9 +39,10 @@ all:
       "{{s3_files_keybase_path }}S3-zeebe-backup/SECRETKEY"
 
     # Meteor
-    node_for_meteor_image_name: 'ubuntu-node-14'
+    node_for_meteor_image_name: 'node:22-trixie'
+
     web_app_image_name: 'meteor-web-app'
-    web_app_image_tag: 'latest'
+    web_app_image_tag: 'test'
     web_app_repository_tag: 'main'
 
     web_app_nip_io_url: "phd-assess-test.10.98.42.205.nip.io"
@@ -56,13 +54,14 @@ all:
 
     web_app_zeebe_log_level: "ERROR"
     web_app_debug_env: "phd-assess:*"
-    web_app_node_env: "production"
     web_app_node_options: "--max_old_space_size=1536"
     web_app_db_image: "{{ quay_repo }}/{{ db_image_name }}:{{ db_image_tag }}"
 
     web_app_meteor_settings:
       public:
         isTest:
+          "true"
+        setYellowBackgroundColor:
           "true"
         phdAssessRoleAdmin:
           "PhD-annual-report-admin"
@@ -79,20 +78,20 @@ all:
     avi_route_access_level: private
 
     # Microservices
-    microservice_node_base_tag: "18-alpine"
+    microservice_node_image_base_tag: "22-alpine"
+    microservice_built_image_tag: "test"
 
     ## PDF
-    pdf_image_tag: "latest"
+    pdf_image_tag: "test"
 
     ## Notifier
-    notifier_image_tag: "latest"
+    notifier_image_tag: "test"
     notifier_send_real_email: false
     notifier_from_address: "Annual report test <noreply@epfl.ch>"
 
     ## GED
-    ged_image_tag: "latest"
+    ged_image_tag: "test"
     alfresco_url: "https://test-gedetu.epfl.ch"
-    alfresco_image_tag: "latest"
     alfresco_ignore_TLS_error: true
     alfresco_username: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_USERNAME') }}"
     alfresco_password: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_PASSWORD') }}"

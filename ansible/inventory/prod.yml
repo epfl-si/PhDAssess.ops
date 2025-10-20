@@ -50,7 +50,6 @@ all:
 
     web_app_zeebe_log_level: "ERROR"
     web_app_debug_env: "phd-assess:*"
-    web_app_node_env: "production"
     web_app_node_options: "--max_old_space_size=1536"
     web_app_db_image: "{{ quay_repo }}/{{ db_image_name }}:{{ db_image_tag }}"
 
@@ -73,7 +72,7 @@ all:
     avi_route_access_level: public
 
     # Microservices
-    microservice_node_base_tag: "18-alpine"
+    microservice_node_image_base_tag: "22-alpine"
 
     ## PDF
     pdf_image_tag: "prod"

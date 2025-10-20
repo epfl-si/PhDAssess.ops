@@ -29,8 +29,9 @@
             containers:
               - name: "web-app"
                 image: "{{ quay_repo }}/{{ web_app_image_name }}:{{ web_app_image_tag }}"
+                imagePullPolicy: Always
                 command:
-                  - /usr/bin/node
+                  - node
                   - main.js
                 ports:
                   - name: meteor
@@ -55,6 +56,8 @@
                       name: "{{ meteor_secrets_name }}"
                   - secretRef:
                       name: "microservice.ged"
+                  - secretRef:
+                      name: "{{ meteor_entra_auth_secrets_name }}"
                 env:
                   - name: "PORT"
                     value: "3000"
@@ -81,8 +84,6 @@
                     value: "50"
                   - name: "TZ"
                     value: "Europe/Zurich"
-                  - name: "NODE_ENV"
-                    value: "{{ web_app_node_env }}"
                   - name: "NODE_OPTIONS"
                     value: "{{ web_app_node_options }}"
                   - name: "TEQUILA_ALLOWED_REQUEST_HOSTS"

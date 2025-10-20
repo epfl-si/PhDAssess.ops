@@ -3,8 +3,8 @@
   loop:
     - name: "notifier"
       image_tag: "{{ notifier_image_tag }}"
+      node_version: "{{ microservice_node_image_base_tag }}"
       git_url: "https://github.com/epfl-si/PhDAssess-Notifier"
-      git_branch: "feature/pdf-file"
       additional_env:
         - ZEEBE_TASK_TYPE: "notification"
           ALFRESCO_URL: "{{ alfresco_url }}"
@@ -16,14 +16,15 @@
         ALFRESCO_PASSWORD: "{{ alfresco_password }}"
     - name: "pdf"
       image_tag: "{{ pdf_image_tag }}"
+      node_version: "{{ microservice_node_image_base_tag }}"
       git_url: "https://github.com/epfl-si/PhDAssess-PDF"
-      git_branch: "feature/pdf-file"
       additional_env:
         - ZEEBE_TASK_TYPE: "phdBuildPDF"
           NODE_TLS_REJECT_UNAUTHORIZED:
             "{{ 0 if alfresco_ignore_TLS_error is defined and alfresco_ignore_TLS_error == true }}"
     - name: "ged"
       image_tag: "{{ ged_image_tag }}"
+      node_version: "{{ microservice_node_image_base_tag }}"
       git_url: "https://github.com/epfl-si/PhDAssess-GED"
       additional_env:
         - ZEEBE_TASK_TYPE: "phdGEDDeposit"
@@ -35,7 +36,7 @@
         ALFRESCO_PASSWORD: "{{ alfresco_password }}"
     - name: "isa"
       image_tag: "{{ isa_image_tag }}"
-      node_version: "22-alpine"
+      node_version: "{{ microservice_node_image_base_tag }}"
       git_url: "https://github.com/epfl-si/PhDAssess-ISA"
       additional_env:
         - ZEEBE_TASK_TYPE: "phdISAPostStudentResult"

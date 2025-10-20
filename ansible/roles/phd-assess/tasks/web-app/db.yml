@@ -27,6 +27,7 @@
             containers:
               - name: "web-app-db"
                 image: "{{ web_app_db_image }}"
+                imagePullPolicy: Always
                 resources:
                   requests:
                     cpu: "10m"
