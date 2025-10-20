@@ -59,14 +59,11 @@ async function dockerRun(args) {
   cd(path.join(__dirname, `docker`));
 
   console.log('Starting the zeebe stack..')
-  await $`docker compose up -d zeebe_node_0 zeebe_node_1 zeebe_node_2`;
+  await $`docker compose --profile zeebe up -d`;
 
   if (args !== 'zeebe') {
     console.log('Starting the pdf, notifier, ged, isa..')
-    await $`docker compose up -d pdf notifier ged isa`;
-
-    console.log('Starting the simple-monitor (localhost:8082)..')
-    await $`docker compose up -d simple-monitor`;
+    await $`docker compose --profile microservices up -d`;
   }
 
   console.log(`Stack started.`);

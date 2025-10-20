@@ -1,7 +1,5 @@
 x-zeebe-template: &zeebe-broker
   image: camunda/zeebe:8.5.17
-  networks:
-    - zeebe_network
   healthcheck:
     test: [ "CMD-SHELL", "timeout 10s bash -c ':> /dev/tcp/127.0.0.1/9600' || exit 1" ]
     interval: 30s

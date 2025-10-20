@@ -121,16 +121,19 @@ services:
     profiles: [web-app]
     build:
       context: ../apps/fillForm
+      dockerfile: DockerfileDev
     depends_on:
       - mongo
     env_file:
       - ../apps/fillForm/.env
     environment:
-      ROOT_URL: http://127.0.0.1
+      ROOT_URL: http://localhost
       PORT: 3000
       MONGO_URL: mongodb://mongo:27017/meteor
       MONGO_PERSISTENT_URL: mongodb://mongo:27017/meteor
       ISA_LOCAL_DATA: 'true'
       ZEEBE_ADDRESS: zeebe_node_0:26500
+      DEBUG: >
+        *,-router,-router:*,-send,-body-parser:*,-compression,-combined-stream2,-express:*
     ports:
       - "3000:3000"
