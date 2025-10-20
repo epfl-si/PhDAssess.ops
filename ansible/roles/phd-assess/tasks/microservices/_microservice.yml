@@ -28,7 +28,6 @@
         name: "{{ item.name }}-image"
         namespace: "{{ openshift_namespace }}"
       spec:
-        serviceAccount: "{{ quay_service_account_name }}"
         source:
           type: Git
           git:
@@ -37,15 +36,19 @@
         strategy:
           type: Docker
           dockerStrategy:
+            pullSecret:
+              name: quay-pull-push-secret
             buildArgs:
               - name: "BASE_IMAGE"
                 value:
-                  "{{ quay_repo }}/node:{{ item.node_version | default('22-alpine') }}"
+                  "{{ quay_repo }}/node:{{ item.node_version }}"
         output:
           to:
             kind: DockerImage
             name:
-              "{{ quay_repo }}/microservice-{{ item.name }}:latest"
+              "{{ quay_repo }}/microservice-{{ item.name }}:{{ microservice_built_image_tag }}"
+          pushSecret:
+            name: quay-pull-push-secret
         resources:
           requests:
             cpu: "10m"

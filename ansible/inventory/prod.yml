@@ -72,7 +72,7 @@ all:
     avi_route_access_level: public
 
     # Microservices
-    microservice_node_base_tag: "18-alpine"
+    microservice_node_image_base_tag: "22-alpine"
 
     ## PDF
     pdf_image_tag: "prod"

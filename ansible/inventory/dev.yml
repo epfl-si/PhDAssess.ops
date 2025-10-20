@@ -76,7 +76,8 @@ all:
     avi_route_access_level: private
 
     # Microservices
-    microservice_node_base_tag: "18-alpine"
+    microservice_node_image_base_tag: "22-alpine"
+    microservice_built_image_tag: "latest"
 
     ## PDF
     pdf_image_tag: "latest"
@@ -89,7 +90,6 @@ all:
     ## GED
     ged_image_tag: "latest"
     alfresco_url: "https://test-gedetu.epfl.ch"
-    alfresco_image_tag: "latest"
     alfresco_ignore_TLS_error: true
     alfresco_username: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_USERNAME') }}"
     alfresco_password: "{{ lookup('file', '/keybase/team/epfl_phdassess/ALFRESCO_PASSWORD') }}"
