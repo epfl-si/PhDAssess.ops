@@ -76,7 +76,7 @@ async function dockerStop(args) {
   cd(path.join(__dirname, `docker`));
 
   await spinner(`Stopping the containers`, async () => {
-    await $`docker compose stop`;
+    await $`docker compose --profile "*" stop`;
   });
 
   console.log('Containers stopped.')
