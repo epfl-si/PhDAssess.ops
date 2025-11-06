@@ -10,7 +10,7 @@
         source:
           type: Git
           git:
-            ref: "master"
+            ref: "main"
             uri: "https://github.com/epfl-si/PhDAssess"
         strategy:
           type: Docker
