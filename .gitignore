@@ -1,2 +1,4 @@
 # ansible tmp
 ansible/ansible-deps-cache
+zeebe-backuper/dist
+zeebe-backuper/node_modules

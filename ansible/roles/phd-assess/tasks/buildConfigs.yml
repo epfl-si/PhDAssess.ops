@@ -32,6 +32,40 @@
             cpu: "10m"
             memory: "2Gi"
 
+- name: BuildConfig for the Zeebe backuper tool
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: build.openshift.io/v1
+      kind: BuildConfig
+      metadata:
+        name: zeebe-backuper-image
+        namespace: "{{ openshift_namespace }}"
+      spec:
+        source:
+          type: Git
+          git:
+            uri: "https://github.com/epfl-si/PhDAssess.ops"
+            ref: "feature/zeebe-backuper"
+          contextDir: zeebe-backuper
+        strategy:
+          type: Docker
+          dockerStrategy:
+            pullSecret:
+              name: quay-pull-push-secret
+            buildArgs:
+              - name: "BASE_IMAGE"
+                value: "{{ quay_repo }}/node:22-alpine"
+        output:
+          to:
+            kind: DockerImage
+            name: "{{ quay_repo }}/zeebe-backuper:latest"
+          pushSecret:
+            name: quay-pull-push-secret
+        resources:
+          requests:
+            cpu: "10m"
+            memory: "2Gi"
+
 - name: BuildConfig for the Meteor App
   kubernetes.core.k8s:
     definition:
