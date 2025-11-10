@@ -28,7 +28,10 @@ all:
     zeebe_quay_image_full_path:
       "{{ zeebe_quay_image_path }}:{{ zeebe_version }}"
 
-    ## Backup / Restore S3
+    ## Backups / Restore S3
+    # Once a week
+    zeebe_backup_automatic_schedule: "0 2 * * 1"
+
     s3_files_keybase_path:
       "/keybase/team/epfl_phdassess/test/"
     zeebe_backup_s3_bucket_name_file:

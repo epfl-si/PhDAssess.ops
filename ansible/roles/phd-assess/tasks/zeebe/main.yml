@@ -31,6 +31,17 @@
     - zeebe
     - zeebe.quorum
 
+- name: Zeebe backuper
+  ansible.builtin.include_tasks:
+    file: zeebe/cronJobs.yml
+    apply:
+      tags:
+        - zeebe
+        - zeebe.cronJobs
+  tags:
+    - zeebe
+    - zeebe.cronJobs
+
 - name: Zeebe services
   ansible.builtin.include_tasks:
     file: zeebe/services.yml

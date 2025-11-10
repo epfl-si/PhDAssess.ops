@@ -1,0 +1,37 @@
+- name: Zeebe backuper CronJob
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: batch/v1
+      kind: CronJob
+      metadata:
+        name: zeebe-backuper
+        namespace: '{{ openshift_namespace }}'
+        labels:
+          app.kubernetes.io/name: "zeebe-s3-backuper"
+          app.kubernetes.io/component: "backend"
+          app.kubernetes.io/part-of: "zeebe-quorum"
+      spec:
+        schedule: "{{ zeebe_backup_automatic_schedule }}"
+        successfulJobsHistoryLimit: 3
+        failedJobsHistoryLimit: 3
+        concurrencyPolicy: Forbid
+        jobTemplate:
+          spec:
+            template:
+              spec:
+                serviceAccountName: "{{ quay_service_account_name }}"
+                restartPolicy: Never
+                containers:
+                  - name: zeebe-backuper
+                    image: "{{ quay_repo }}/zeebe-backuper:latest"
+                    imagePullPolicy: Always
+                    env:
+                      # API URL to trigger backup (your Node app may call this internally)
+                      - name: ZEEBE_API_URL
+                        value: "http://zeebe-quorum-0:9600"
+                    resources:
+                      requests:
+                        cpu: "5m"
+                        memory: "50Mi"
+                      limits:
+                        memory: "300Mi"
