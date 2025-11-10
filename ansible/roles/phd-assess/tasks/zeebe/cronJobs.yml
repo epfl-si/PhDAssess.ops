@@ -11,8 +11,7 @@
           app.kubernetes.io/component: "backend"
           app.kubernetes.io/part-of: "zeebe-quorum"
       spec:
-        # Runs every night at 2 AM
-        schedule: "0 2 * * *"
+        schedule: "{{ zeebe_backup_automatic_schedule }}"
         successfulJobsHistoryLimit: 3
         failedJobsHistoryLimit: 3
         concurrencyPolicy: Forbid
