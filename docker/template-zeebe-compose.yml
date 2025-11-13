@@ -1,0 +1,24 @@
+x-zeebe-template: &zeebe-broker
+  image: camunda/zeebe:8.5.17
+  healthcheck:
+    test: [ "CMD-SHELL", "timeout 10s bash -c ':> /dev/tcp/127.0.0.1/9600' || exit 1" ]
+    interval: 30s
+    timeout: 5s
+    retries: 5
+    start_period: 30s
+  environment:
+    - ZEEBE_LOG_LEVEL=info
+    - ZEEBE_BROKER_CLUSTER_CLUSTERSIZE=3
+    - ZEEBE_BROKER_CLUSTER_INITIALCONTACTPOINTS=zeebe_node_0:26502,zeebe_node_1:26502,zeebe_node_2:26502
+    - ZEEBE_BROKER_CLUSTER_PARTITIONSCOUNT=1
+    - ZEEBE_BROKER_CLUSTER_REPLICATIONFACTOR=3
+  env_file:  # additional env that has not shared on git
+    - .env
+
+services:
+  zeebe_node_0:
+    <<: *zeebe-broker
+  zeebe_node_1:
+    <<: *zeebe-broker
+  zeebe_node_2:
+    <<: *zeebe-broker

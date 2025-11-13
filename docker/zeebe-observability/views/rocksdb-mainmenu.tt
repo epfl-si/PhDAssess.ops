@@ -1,0 +1,9 @@
+<% USE JSON.Escape (pretty => 1) %>
+<div id="page">
+  <div id="content">
+    <h1><% moniker %></h1>
+    <pre>
+    <% dump.json %>
+    </pre>
+  </div>
+</div>

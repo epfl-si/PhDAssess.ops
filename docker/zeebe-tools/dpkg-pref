@@ -1,0 +1,7 @@
+Package: librocksdb*
+Pin: release n=impish
+Pin-Priority: 500
+
+Package: *
+Pin: release n=impish
+Pin-Priority: -100
