@@ -13,7 +13,8 @@ x-zeebe-template: &zeebe-broker
     - ZEEBE_BROKER_CLUSTER_PARTITIONSCOUNT=1
     - ZEEBE_BROKER_CLUSTER_REPLICATIONFACTOR=3
   env_file:  # additional env that has not shared on git
-    - .env
+    - path: .env
+      required: false
 
 services:
   zeebe_node_0:
