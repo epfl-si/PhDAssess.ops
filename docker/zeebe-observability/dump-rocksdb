@@ -1,0 +1,101 @@
+#!/usr/bin/perl -w
+
+use strict;
+use v5.21;
+no strict 'subs';
+
+our $jvm_pid;
+BEGIN {
+  use IPC::Open2;
+  use Symbol 'gensym';
+  $jvm_pid = open2(
+    my $child_out, my $child_in,
+    "java", "-classpath", "/usr/local/lib/JavaServer.jar:/usr/local/bin/zdb.jar:/usr/local/lib/PerlBiConsumer.jar", "com.zzo.javaserver.JavaServer");
+  # Leave some time for the Java server to start up:
+  select(undef, undef, undef, 0.2);
+}
+END {
+  if ($jvm_pid) {
+    kill 'TERM' => $jvm_pid;
+    waitpid($jvm_pid, 0);
+  }
+}
+
+use Error qw(:try);
+use MIME::Base64;
+use Java;
+our $java = new Java(use_tied_arrays=>1);
+
+sub dbopen {
+  my ($path) = @_;
+
+  my $companion = $java->get_field("io.zell.zdb.db.readonly.transaction.ReadonlyTransactionDb", "Companion");
+  my $path_obj = $java->java_nio_file_Paths(
+    "get", $path,
+    # https://stackoverflow.com/a/2600890/435004 says dot-dot-dots are
+    # like an array as far as reflection is concerned, and indeed this
+    # works:
+    $java->create_array("java.lang.String", 0));
+  return $companion->openReadonlyDb($path_obj);
+}
+
+sub dump_class {
+  my ($class) = @_;
+
+  my $methods = $class->getMethods();
+  my @methodNames;
+  foreach my $i (0..$#{$methods}) {
+    $methodNames[$i] = $methods->[$i]->getName()->get_value();
+  }
+
+  return sprintf("%s <%s>",
+                 $class->getName()->get_value(),
+                 join(" ", @methodNames));
+}
+
+our %cf_types; BEGIN { %cf_types = (
+  INCIDENTS => { key => "io.camunda.zeebe.db.impl.DbLong", value => "io.camunda.zeebe.engine.state.instance.Incident" }
+) };
+
+do {
+  my $counter = 0;
+  sub newsym {
+    my ($package) = @_;
+    $counter++;
+    return "${package}::newsym$counter";
+  }
+};
+
+sub walk_cf {
+  my ($db, $cf_name, $coderef) = @_;
+
+  my $funcname = newsym();
+  do {
+    no strict "refs";
+    *{$funcname} = sub {
+      $coderef->(decode_base64($_[0]), decode_base64($_[1]));
+    }
+  };
+
+  my $cf = $db->createColumnFamily(
+    $java->get_field("io.camunda.zeebe.engine.state.ZbColumnFamilies", $cf_name),
+    $db->createContext(),
+    $java->create_object($cf_types{$cf_name}->{key}),
+    $java->create_object($cf_types{$cf_name}->{value}));
+
+  my $walker = $java->create_object("PerlBiConsumer", $java->get_callback_object());
+  $walker->setFormat(qq(&$funcname("%s", "%s");));
+  $cf->forEach($walker);
+}
+
+my $db = dbopen(
+  "/PhDassess/snapshots/raft-partition/partitions/1/snapshots/77647385-89-78090659-78090661");
+
+try {
+  walk_cf($db, "INCIDENTS", sub { warn join(" ", @_); });
+} except {
+  say join("\n", $java->get_stack_trace);
+};
+
+1;
+

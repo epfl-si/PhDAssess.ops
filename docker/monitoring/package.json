@@ -1,0 +1,38 @@
+{
+  "name": "phdassess-monitoring",
+  "version": "1.0.0",
+  "description": "Some Prometheus metrics for the PhDAssess application",
+  "main": "server.ts",
+  "scripts": {
+    "start": "npx ts-node server.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/epfl-si/PhDAssess.git"
+  },
+  "keywords": [
+    "monitoring",
+    "EPFL",
+    "prometheus",
+    "metrics",
+    "PhDAssess"
+  ],
+  "author": "EPFL IDEV-FSD <idev-fsd@groupes.epfl.ch>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/epfl-si/PhDAssess/issues"
+  },
+  "homepage": "https://github.com/epfl-si/PhDAssess#readme",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "prom-client": "^14.0.0",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.4.4"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^16.11.6"
+  }
+}
