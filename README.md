@@ -1,10 +1,14 @@
 # PhDAssess Ops
 
-This repository regroups the configuration-as-code to provision, configure,
- deploy, and manage the EPFL's PhDAssess stack.
+This repository regroups:
+- `./phdsible`, the configuration-as-code to provision, configure, deploy, and manage the EPFL's PhDAssess stack
+- `./phd.mjs`, a tool for cli operations
+- `./scripts/` for some useful JS, Nushell, and perl scripts
+- a `./HOWTO.md`, for some useful recipes
+- a `./ARCHITECTURE.md`, to understand what is all about
 
-The deploy part uses Ansible wrapped in a
-convenient [suitcase](https://github.com/epfl-si/ansible.suitcase), called [phdsible](phdsible).
+# Configuration-as-code
+Aka phdsible, the Ansible deployer
 
 ## Prerequisites
 
@@ -21,4 +25,44 @@ convenient [suitcase](https://github.com/epfl-si/ansible.suitcase), called [phds
 
 Set up the development environment on Openshift and run the stack.
 
-Use `--prod` to do the same in the production environment.
+Add `--prod` to do the same in the production environment.
+
+# DevOps locally
+
+Use the cli `./phd.mjs`, or follow this steps:
+
+## Understand
+
+See `./ARCHITECTURE.md`
+
+## Where to start?
+
+How about launching the app locally?
+
+### Zeebe
+
+- Build the docker images:
+    - `docker compose -f ./docker/docker-compose.yml build zeebe_node_0 zeebe_node_1 zeebe_node_2`
+- Launch the Zeebe server with:
+    - `docker compose -f ./docker/docker-compose.yml up zeebe_node_0 zeebe_node_1 zeebe_node_2`
+- Once Zeebe is running (`watch zbctl status --insecure --port 26501`, you can deploy the bpmn on it.
+  You can use this command to help with the process:
+    - `./phd.mjs deploy-bpmn`
+
+### Micro-services
+
+- In the parent directory of this projet, clone the other services:
+    - `cd ..`
+    - `git clone https://github.com/epfl-si/phdAssess-PDF`
+    - `git clone https://github.com/epfl-si/phdAssess-Notifier`
+    - `git clone https://github.com/epfl-si/phdAssess-GED`
+    - `git clone https://github.com/epfl-si/phdAssess-ISA`
+- Come back into the projet folder
+    - `cd PhDAssess`
+- Build and start the services
+    - `docker compose -f ./docker/docker-compose.yml build pdf notifier ged isa`
+    - `docker compose -f ./docker/docker-compose.yml up pdf notifier ged isa`
+
+## Run your frontend
+
+Follow https://github.com/epfl-si/PhDAssess
