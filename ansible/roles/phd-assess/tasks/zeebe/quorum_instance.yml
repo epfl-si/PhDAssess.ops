@@ -44,28 +44,29 @@
           spec:
             serviceAccountName: "{{ quay_service_account_name }}"
             containers:
-              - name: "zeebe-db-monitor"
-                image: "{{ zeebe_db_monitor_image }}:latest"
-                imagePullPolicy: Always
-                env:
-                  - name: 'ZEEBE_DATA_RO_PATH'
-                    value: '/zeebe-data-ro/raft-partition/partitions/1/runtime/'
-                volumeMounts:
-                  - mountPath: /zeebe-data-ro
-                    name: zeebe-data
-                    readOnly: true
-                  # the working path where you can find the symlinked zeebe data
-                  - mountPath: /zeebe-data-rw
-                    name: volume-zeebe-data-symlinks-rw
-                resources:
-                  requests:
-                    cpu: "5m"
-                    memory: "50Mi"
-                  limits:
-                    memory: "300Mi"
-                ports:
-                  - name: db-metrics
-                    containerPort: 8081
+#              # This code is waiting for zeebe-db-monitor project to be updated
+#              - name: "zeebe-db-monitor"
+#                image: "{{ zeebe_db_monitor_image }}:latest"
+#                imagePullPolicy: Always
+#                env:
+#                  - name: 'ZEEBE_DATA_RO_PATH'
+#                    value: '/zeebe-data-ro/raft-partition/partitions/1/runtime/'
+#                volumeMounts:
+#                  - mountPath: /zeebe-data-ro
+#                    name: zeebe-data
+#                    readOnly: true
+#                  # the working path where you can find the symlinked zeebe data
+#                  - mountPath: /zeebe-data-rw
+#                    name: volume-zeebe-data-symlinks-rw
+#                resources:
+#                  requests:
+#                    cpu: "5m"
+#                    memory: "50Mi"
+#                  limits:
+#                    memory: "300Mi"
+#                ports:
+#                  - name: db-metrics
+#                    containerPort: 8081
               - name: "zeebe"
                 image: "{{ zeebe_quay_image_full_path }}"
                 imagePullPolicy: Always
