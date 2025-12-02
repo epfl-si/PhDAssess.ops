@@ -80,7 +80,6 @@
           git:
             ref: "{{ web_app_repository_tag | default('main') }}"
             uri: "https://github.com/epfl-si/PhDAssess"
-          contextDir: "apps/fillForm"
         strategy:
           type: Docker
           dockerStrategy:
