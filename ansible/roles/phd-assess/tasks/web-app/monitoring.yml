@@ -49,3 +49,34 @@
         configMapRef:
           key: json
           name: 'web-app-grafana-dashboard'
+
+- name: Trace logs Grafana dashboard definition
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: 'trace-logs-grafana-dashboard'
+        namespace: '{{ openshift_namespace }}'
+      data:
+        json: >
+          {{ lookup('file', 'templates/grafana-dashboards/trace-logs.json') | string }}
+
+- name: Trace logs in Grafana
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: grafana.integreatly.org/v1beta1
+      kind: GrafanaDashboard
+      metadata:
+        name: 'trace-logs'
+        namespace: '{{ openshift_namespace }}'
+      spec:
+        resyncPeriod: 30s
+        allowCrossNamespaceImport: true
+        instanceSelector:
+          matchLabels:
+            dashboards: '{{ grafana_dashboard_instance }}'
+        folder: "{{ grafana_folder_name }}"
+        configMapRef:
+          key: json
+          name: 'trace-logs-grafana-dashboard'
