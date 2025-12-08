@@ -50,7 +50,7 @@
           key: json
           name: 'web-app-grafana-dashboard'
 
-- name: Trace logs Grafana dashboard definition
+- name: Trace logs Grafana dashboard definition ConfigMap
   kubernetes.core.k8s:
     definition:
       apiVersion: v1
@@ -60,9 +60,9 @@
         namespace: '{{ openshift_namespace }}'
       data:
         json: >
-          {{ lookup('file', 'templates/grafana-dashboards/trace-logs.json') | string }}
+          {{ lookup('template', 'templates/grafana-dashboards/trace-logs.json') }}
 
-- name: Trace logs in Grafana
+- name: Trace logs dashboard in Grafana
   kubernetes.core.k8s:
     definition:
       apiVersion: grafana.integreatly.org/v1beta1
