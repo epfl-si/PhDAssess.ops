@@ -52,3 +52,34 @@
         configMapRef:
           key: json
           name: 'zeebe-grafana-dashboard'
+
+- name: Zeebe DB monitor data dashboard definition
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: 'zeebe-db-monitor-grafana-dashboard'
+        namespace: '{{ openshift_namespace }}'
+      data:
+        json: >
+          {{ lookup('file', 'templates/grafana-dashboards/zeebe-db-monitor.json') | string }}
+
+- name: Zeebe data dashboard in Grafana
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: grafana.integreatly.org/v1beta1
+      kind: GrafanaDashboard
+      metadata:
+        name: 'zeebe-db-monitor'
+        namespace: '{{ openshift_namespace }}'
+      spec:
+        resyncPeriod: 30s
+        allowCrossNamespaceImport: true
+        instanceSelector:
+          matchLabels:
+            dashboards: '{{ grafana_dashboard_instance }}'
+        folder: "{{ grafana_folder_name }}"
+        configMapRef:
+          key: json
+          name: 'zeebe-db-monitor-grafana-dashboard'
