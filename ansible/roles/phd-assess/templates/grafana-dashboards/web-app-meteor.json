@@ -993,8 +993,7 @@
   "schemaVersion": 42,
   "tags": [
     "nodejs",
-    "meteor",
-    "app data"
+    "meteor"
   ],
   "templating": {
     "list": [
