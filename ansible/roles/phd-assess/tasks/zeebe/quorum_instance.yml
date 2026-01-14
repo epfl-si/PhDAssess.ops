@@ -11,6 +11,68 @@
         {{ item.quorum_name }}
       ZEEBE_BROKER_NETWORK_COMMANDAPI_ADVERTISEDHOST: >-
         {{ item.quorum_name }}
+    _zeebe_container:
+      name: "zeebe"
+      image: "{{ zeebe_quay_image_full_path }}"
+      imagePullPolicy: Always
+      env: >-
+        {{ _instance_env | to_k8s_env }}
+      envFrom:
+        - configMapRef:
+            name: "zeebe-broker"
+        - secretRef:
+            name: "{{ zeebe_secrets_name }}-s3"
+      resources:
+        requests:
+          cpu: '15m'
+          memory: '2000Mi'
+        limits:
+          memory: '4000Mi'
+      ports:
+        - name: metrics
+          containerPort: "{{ zeebe_broker_network_monitoring_api_port }}"
+      volumeMounts:
+        - name: zeebe-data
+          mountPath: /usr/local/zeebe/data
+    _zeebe_monitor_container:
+      name: "zeebe-db-monitor"
+      image: "{{ zeebe_db_monitor_image }}:{{ zeebe_db_monitor_image_tag }}"
+      imagePullPolicy: Always
+      env:
+        - name: 'ZEEBE_DB_MONITOR_SNAPSHOT_PATH'
+          value: '/data/raft-partition/partitions/1/runtime'
+        - name: 'ZEEBE_DB_MONITOR_SECONDARY_PATH'
+          value: '/zeebe-db-monitor-secondary'
+        - name: 'ZEEBE_DB_MONITOR_LDB_RESULTS_CACHE_TTL'
+          value: '30000'
+        - name: 'ZEEBE_DB_MONITOR_CMD_DEBUG'
+          value: 'false'
+        - name: 'ZEEBE_DB_MONITOR_DECODER_SHOW_WARNING_IN_CONSOLE'
+          value: 'false'
+      volumeMounts:
+        - mountPath: /data/
+          name: zeebe-data
+          readOnly: true
+        # the working path where you can find the symlinked zeebe data
+        - mountPath: /zeebe-db-monitor-secondary
+          name: volume-zeebe-db-monitor-secondary
+      resources:
+        requests:
+          cpu: "5m"
+          memory: "50Mi"
+        limits:
+          memory: "300Mi"
+      ports:
+        - name: db-metrics
+          containerPort: 8081
+    _instance_containers: >-
+      {{ [_zeebe_monitor_container, _zeebe_container] if item.node_id == 0 else [_zeebe_container] }}
+    _instance_volumes: |
+      {% set vols = [{ 'name': 'zeebe-data', 'persistentVolumeClaim': { 'claimName': item.data_claim_name } }] %}
+      {% if item.node_id == 0 %}
+      {% set _ = vols.append({ 'name': 'volume-zeebe-db-monitor-secondary', 'emptyDir': {} }) %}
+      {% endif %}
+      {{ vols | to_json }}
   kubernetes.core.k8s:
     definition:
       state: latest
@@ -43,88 +105,8 @@
               app.kubernetes.io/name: "zeebe"
           spec:
             serviceAccountName: "{{ quay_service_account_name }}"
-            containers:
-#              # This code is waiting for zeebe-db-monitor project to be updated
-#              - name: "zeebe-db-monitor"
-#                image: "{{ zeebe_db_monitor_image }}:latest"
-#                imagePullPolicy: Always
-#                env:
-#                  - name: 'ZEEBE_DATA_RO_PATH'
-#                    value: '/zeebe-data-ro/raft-partition/partitions/1/runtime/'
-#                volumeMounts:
-#                  - mountPath: /zeebe-data-ro
-#                    name: zeebe-data
-#                    readOnly: true
-#                  # the working path where you can find the symlinked zeebe data
-#                  - mountPath: /zeebe-data-rw
-#                    name: volume-zeebe-data-symlinks-rw
-#                resources:
-#                  requests:
-#                    cpu: "5m"
-#                    memory: "50Mi"
-#                  limits:
-#                    memory: "300Mi"
-#                ports:
-#                  - name: db-metrics
-#                    containerPort: 8081
-              - name: "zeebe"
-                image: "{{ zeebe_quay_image_full_path }}"
-                imagePullPolicy: Always
-                env: >-
-                  {{ _instance_env | to_k8s_env }}
-                envFrom:
-                  - configMapRef:
-                      name: "zeebe-broker"
-                  - secretRef:
-                      name: "{{ zeebe_secrets_name }}-s3"
-                resources:
-                  requests:
-                    cpu: '15m'
-                    memory: '2000Mi'
-                  limits:
-                    memory: '4000Mi'
-                ports:
-                  - name: metrics
-                    containerPort: "{{ zeebe_broker_network_monitoring_api_port }}"
-                volumeMounts:
-                  - name: zeebe-data
-                    mountPath: /usr/local/zeebe/data
-#                startupProbe:
-#                  httpGet:
-#                    path: "/actuator/health/startup"
-#                    scheme: "HTTP"
-#                    port: "{{ zeebe_broker_network_monitoring_api_port }}"
-#                  initialDelaySeconds: 30
-#                  periodSeconds: 30
-#                  successThreshold: 1
-#                  failureThreshold: 5
-#                  timeoutSeconds: 1
-#                readinessProbe:
-#                  httpGet:
-#                    path: "/actuator"
-#                    scheme: "HTTP"
-#                    port: "{{ zeebe_broker_network_monitoring_api_port }}"
-#                  initialDelaySeconds: 30
-#                  periodSeconds: 30
-#                  successThreshold: 1
-#                  failureThreshold: 5
-#                  timeoutSeconds: 1
-#                livenessProbe:
-#                  httpGet:
-#                    path: "/actuator"
-#                    scheme: "HTTP"
-#                    port: "{{ zeebe_broker_network_monitoring_api_port }}"
-#                  initialDelaySeconds: 30
-#                  periodSeconds: 30
-#                  successThreshold: 1
-#                  failureThreshold: 5
-#                  timeoutSeconds: 1
-            volumes:
-              - name: zeebe-data
-                persistentVolumeClaim:
-                  claimName: "{{ item.data_claim_name }}"
-              - name: volume-zeebe-data-symlinks-rw
-                emptyDir: {}
+            containers: "{{ _instance_containers }}"
+            volumes: "{{ _instance_volumes }}"
             # Keep the pods spread into different physical nodes
             affinity:
               podAntiAffinity:
