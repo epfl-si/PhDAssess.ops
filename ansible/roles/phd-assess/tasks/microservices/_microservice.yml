@@ -102,6 +102,6 @@
                 resources:
                   requests:
                     cpu: "5m"
-                    memory: "300Mi"
+                    memory: "400Mi"
                   limits:
                     memory: "800Mi"
