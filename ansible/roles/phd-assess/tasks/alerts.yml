@@ -116,38 +116,17 @@
 
               - alert: ZeebeDbIncidents
                 expr: |-
-                  rate(
-                    zeebe_db_column_family_incident_entries{
-                      error_message!='Expected at least one condition to evaluate to true, or to have a default flow'
-                    }[1h]
-                  )
-                  != 0
-                for: 1m
+                  deriv(zeebe_db_column_family_incident_entries{
+                    error_message!~".*This is a safe fail."
+                  }[15m]) > 0.005
+                for: 5m
                 labels:
                   severity: critical
                   sendto: telegram
                 annotations:
                   description: |-
                     {% raw -%}
-                    Zeebe is encountering new incidents. Rate: {{ $value }}/sec
-                    {%- endraw %}
-
-              - alert: ZeebeDbIncidentsKnownToBeRaising
-                expr: |-
-                  rate(
-                    zeebe_db_column_family_incident_entries{
-                      error_message!='Expected at least one condition to evaluate to true, or to have a default flow'
-                    }[1h]
-                  )
-                  > 0.52
-                for: 1m
-                labels:
-                  severity: critical
-                  sendto: telegram
-                annotations:
-                  description: |-
-                    {% raw -%}
-                    Zeebe db is encountering a incident that is known to raise, but he is raising too fast at the moment !. Rate: {{ $value }}/sec
+                    Some Zeebe incident is trending upward at value {{ $value }}/sec
                     {%- endraw %}
 
           - name: Zeebe
