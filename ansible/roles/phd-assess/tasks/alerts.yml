@@ -118,7 +118,7 @@
                 expr: |-
                   deriv(zeebe_db_column_family_incident_entries{
                     error_message!~".*This is a safe fail."
-                  }[15m]) > 0.005
+                  }[15m]) > 0.05
                 for: 5m
                 labels:
                   severity: critical
