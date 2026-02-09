@@ -134,7 +134,7 @@
             "type": "prometheus",
             "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
           },
-          "expr": "irate(process_cpu_user_seconds_total{instance=~\"$instance\"}[2m]) * 100",
+          "expr": "irate(process_cpu_user_seconds_total{container=\"web-app\"}[2m]) * 100",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "User CPU - {{instance}}",
@@ -145,7 +145,7 @@
             "type": "prometheus",
             "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
           },
-          "expr": "irate(process_cpu_system_seconds_total{instance=~\"$instance\"}[2m]) * 100",
+          "expr": "irate(process_cpu_system_seconds_total{container=\"web-app\"}[2m]) * 100",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Sys CPU - {{instance}}",
@@ -249,7 +249,7 @@
             "type": "prometheus",
             "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
           },
-          "expr": "nodejs_eventloop_lag_seconds{instance=~\"$instance\"}",
+          "expr": "nodejs_eventloop_lag_seconds{container=\"web-app\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{instance}}",
@@ -330,7 +330,7 @@
             "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
           },
           "editorMode": "code",
-          "expr": "nodejs_version_info{instance=~\"$instance\",service=\"web-app\"}",
+          "expr": "nodejs_version_info{container=\"web-app\",service=\"web-app\"}",
           "format": "time_series",
           "instant": false,
           "interval": "",
@@ -413,7 +413,7 @@
             "type": "prometheus",
             "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
           },
-          "expr": "sum(changes(process_start_time_seconds{instance=~\"$instance\"}[1m]))",
+          "expr": "sum(changes(process_start_time_seconds{container=\"web-app\"}[1m]))",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "{{instance}}",
@@ -517,7 +517,7 @@
             "type": "prometheus",
             "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
           },
-          "expr": "process_resident_memory_bytes{instance=~\"$instance\"}",
+          "expr": "process_resident_memory_bytes{container=\"web-app\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Process Memory - {{instance}}",
@@ -528,7 +528,7 @@
             "type": "prometheus",
             "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
           },
-          "expr": "nodejs_heap_size_total_bytes{instance=~\"$instance\"}",
+          "expr": "nodejs_heap_size_total_bytes{container=\"web-app\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Heap Total - {{instance}}",
@@ -539,7 +539,7 @@
             "type": "prometheus",
             "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
           },
-          "expr": "nodejs_heap_size_used_bytes{instance=~\"$instance\"}",
+          "expr": "nodejs_heap_size_used_bytes{container=\"web-app\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Heap Used - {{instance}}",
@@ -550,7 +550,7 @@
             "type": "prometheus",
             "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
           },
-          "expr": "nodejs_external_memory_bytes{instance=~\"$instance\"}",
+          "expr": "nodejs_external_memory_bytes{container=\"web-app\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "External Memory - {{instance}}",
@@ -654,7 +654,7 @@
             "type": "prometheus",
             "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
           },
-          "expr": "nodejs_active_handles_total{instance=~\"$instance\"}",
+          "expr": "nodejs_active_handles_total{container=\"web-app\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Active Handler - {{instance}}",
@@ -665,7 +665,7 @@
             "type": "prometheus",
             "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
           },
-          "expr": "nodejs_active_requests_total{instance=~\"$instance\"}",
+          "expr": "nodejs_active_requests_total{container=\"web-app\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Active Request - {{instance}}",
@@ -769,7 +769,7 @@
             "type": "prometheus",
             "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
           },
-          "expr": "nodejs_heap_space_size_total_bytes{instance=~\"$instance\"}",
+          "expr": "nodejs_heap_space_size_total_bytes{container=\"web-app\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Heap Total - {{instance}} - {{space}}",
@@ -873,7 +873,7 @@
             "type": "prometheus",
             "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
           },
-          "expr": "nodejs_heap_space_size_used_bytes{instance=~\"$instance\"}",
+          "expr": "nodejs_heap_space_size_used_bytes{container=\"web-app\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Heap Used - {{instance}} - {{space}}",
@@ -977,7 +977,7 @@
             "type": "prometheus",
             "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
           },
-          "expr": "nodejs_heap_space_size_available_bytes{instance=~\"$instance\"}",
+          "expr": "nodejs_heap_space_size_available_bytes{container=\"web-app\"}",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Heap Used - {{instance}} - {{space}}",
