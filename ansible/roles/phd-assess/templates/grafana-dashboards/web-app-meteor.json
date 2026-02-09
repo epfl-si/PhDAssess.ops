@@ -995,46 +995,6 @@
     "nodejs",
     "meteor"
   ],
-  "templating": {
-    "list": [
-      {
-        "current": {
-          "text": "All",
-          "value": [
-            "$__all"
-          ]
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "73a57e8b-7679-4a18-915c-292f143448c7"
-        },
-        "definition": "label_values(nodejs_version_info, instance)",
-        "includeAll": true,
-        "label": "instance",
-        "multi": true,
-        "name": "instance",
-        "options": [],
-        "query": {
-          "query": "label_values(nodejs_version_info, instance)",
-          "refId": "idevfsd-prometheus-instance-Variable-Query"
-        },
-        "refresh": 1,
-        "regex": "",
-        "sort": 1,
-        "type": "query"
-      },
-      {
-        "baseFilters": [],
-        "datasource": {
-          "type": "prometheus",
-          "uid": "PA7DAED22D5425F49"
-        },
-        "filters": [],
-        "name": "Filters",
-        "type": "adhoc"
-      }
-    ]
-  },
   "time": {
     "from": "now-12h",
     "to": "now"
