@@ -60,7 +60,7 @@ pdf_service_name: "pdf"
 # Monitoring
 monitoring_node_disk_usage_exporter_image: "{{ quay_repo }}/disk-usage-exporter"
 zeebe_db_monitor_image: "{{ quay_repo }}/zeebe-db-monitor"
-zeebe_db_monitor_image_tag: "ldb"
+zeebe_db_monitor_image_tag: "prod"
 grafana_folder_name: "PhDAssess"
 
 # Alerts
