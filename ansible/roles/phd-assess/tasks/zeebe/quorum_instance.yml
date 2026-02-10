@@ -44,7 +44,7 @@
         - name: 'ZEEBE_DB_MONITOR_SECONDARY_PATH'
           value: '/zeebe-db-monitor-secondary'
         - name: 'ZEEBE_DB_MONITOR_LDB_RESULTS_CACHE_TTL'
-          value: '30000'
+          value: '60000'
         - name: 'ZEEBE_DB_MONITOR_CMD_DEBUG'
           value: 'false'
         - name: 'ZEEBE_DB_MONITOR_DECODER_SHOW_WARNING_IN_CONSOLE'
