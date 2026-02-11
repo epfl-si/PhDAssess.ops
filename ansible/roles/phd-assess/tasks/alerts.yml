@@ -102,7 +102,7 @@
             rules:
               - alert: ZeebeBackloggedActivatableJobs
                 expr: |-
-                  zeebe_db_column_family_entries{column_family="JOB_ACTIVATABLE"}
+                  zeebe_db_column_family_entries{namespace="{{ openshift_namespace }}",column_family="JOB_ACTIVATABLE"}
                   != 0
                 for: 1h
                 labels:
@@ -117,7 +117,8 @@
               - alert: ZeebeDbIncidents
                 expr: |-
                   deriv(zeebe_db_column_family_incident_entries{
-                    error_message!~".*This is a safe fail."
+                    error_message!~".*This is a safe fail.",
+                    namespace="{{ openshift_namespace }}"
                   }[15m]) > 0.05
                 for: 5m
                 labels:
