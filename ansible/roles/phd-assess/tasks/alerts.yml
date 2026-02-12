@@ -133,11 +133,17 @@
               - alert: ZeebeDbIncidentsNeverSeenBefore
                 expr: |-
                   count by (error_message) (
-                    zeebe_db_column_family_incident_entries{namespace="{{ openshift_namespace }}"}
+                    zeebe_db_column_family_incident_entries{
+                      namespace="{{ openshift_namespace }}",
+                      error_message!~"Failed to send activated jobs to client"
+                    }
                   )
                   unless
                   count by (error_message) (
-                    zeebe_db_column_family_incident_entries{namespace="{{ openshift_namespace }}"} offset 10m
+                    zeebe_db_column_family_incident_entries{
+                      namespace="{{ openshift_namespace }}",
+                      error_message!~"Failed to send activated jobs to client"
+                    } offset 10m
                   ) != 0
                 for: 1m
                 labels:
