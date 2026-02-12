@@ -133,11 +133,11 @@
               - alert: ZeebeDbIncidentsNeverSeenBefore
                 expr: |-
                   count by (error_message) (
-                    zeebe_db_column_family_incident_entries{namespace="svc1394t-phd-assess"}
+                    zeebe_db_column_family_incident_entries{namespace="{{ openshift_namespace }}"}
                   )
                   unless
                   count by (error_message) (
-                    zeebe_db_column_family_incident_entries{namespace="svc1394t-phd-assess"} offset 10m
+                    zeebe_db_column_family_incident_entries{namespace="{{ openshift_namespace }}"} offset 10m
                   ) != 0
                 for: 1m
                 labels:
