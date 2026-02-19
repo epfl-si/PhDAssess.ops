@@ -37,7 +37,7 @@
 
 - name: BuildConfigs
   when: >-
-    openshift_namespace in ["svc1394d-phd-assess", "svc1394t-phd-assess"]
+    openshift_environnement in ["development", "test"]
   ansible.builtin.include_tasks:
     file: buildConfigs.yml
     apply:
