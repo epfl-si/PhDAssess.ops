@@ -6,6 +6,7 @@ all:
       ansible_python_interpreter: "{{ phdisble_suitcase_dir }}/bin/python3"
       openshift_namespace: svc1394t-phd-assess
   vars:
+    openshift_environnement: test
     # Secrets
     keybase_secrets_folder: "/keybase/team/epfl_phdassess/test/"
 
