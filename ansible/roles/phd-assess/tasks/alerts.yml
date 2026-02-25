@@ -171,9 +171,7 @@
                   description: |-
                     One or more Zeebe instances became unhealthy.
 
-- name: Alerting for new Zeebe Incidents (for production only) - PrometheusRule
-  when: >-
-    openshift_environnement == "production"
+- name: Alerting for new Zeebe Incidents - PrometheusRule
   kubernetes.core.k8s:
     definition:
       apiVersion: monitoring.coreos.com/v1
@@ -183,31 +181,37 @@
         namespace: "{{ openshift_namespace }}"
       spec:
         groups:
-          - alert: ZeebeDbIncidentsNeverSeenBefore
-
-            expr: |-
-              count by (error_message) (
-                zeebe_db_column_family_incident_entries{
-                  namespace="{{ openshift_namespace }}",
-                  error_message!~"Failed to send activated jobs to client"
-                }
-              )
-              unless
-              count by (error_message) (
-                zeebe_db_column_family_incident_entries{
-                  namespace="{{ openshift_namespace }}",
-                  error_message!~"Failed to send activated jobs to client"
-                } offset 10m
-              ) != 0
-            for: 1m
-            labels:
-              severity: warning
-              sendto: telegram
-            annotations:
-              description: |-
-                {% raw -%}
-                A new incident type has appeared on Zeebe. The error message: "{{ $labels.error_message }}"
-                {%- endraw %}
+          - name: test-alerts
+            rules:
+              - alert: ZeebeDbIncidentsNeverSeenBefore
+                expr: |-
+                  (
+                    max by (error_message) (
+                      max_over_time (
+                        zeebe_db_column_family_incident_entries {
+    
+                          error_message!~"Failed to send activated jobs to client"
+                        }[3m]
+                      )
+                    )
+                  ) unless (
+                    max by (error_message) (
+                      max_over_time (
+                        zeebe_db_column_family_incident_entries {
+                          error_message!~"Failed to send activated jobs to client"
+                        }[3m]
+                      offset 5m )
+                    )
+                  )
+                for: 1m
+                labels:
+                  severity: warning
+                  sendto: telegram
+                annotations:
+                  description: |-
+                    {% raw -%}
+                    A new incident type has appeared on Zeebe. The error message: "{{ $labels.error_message }}"
+                    {%- endraw %}
 
 - name: Alerts test - PrometheusRule
   when: >-
