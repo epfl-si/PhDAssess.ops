@@ -1,5 +1,6 @@
 #!/usr/bin/env -S npm exec --yes --package=zx@latest zx --
 import { userInfo } from 'os';
+import { stat } from 'fs/promises'
 
 import deployProcess from './cli/deployProcess.mjs'
 import { stringifySnapshot } from './cli/snapshots.mjs'
@@ -55,10 +56,46 @@ Usage:
   `
 }
 
-async function dockerRun(args) {
-  cd(path.join(__dirname, `docker`));
+async function checkForDockerVolumePermissions(volumeFolder) {
+  const neededGroup = 1000;
+  const stats = await stat(volumeFolder);
+  console.debug(`fstated ${volumeFolder}: ${JSON.stringify(stats)}`)
 
-  console.log('Starting the zeebe stack..')
+  const isGroupGood = stats.gid == neededGroup
+  console.debug(`group ${volumeFolder}: ${JSON.stringify(stats.gid)}`)
+  const isReadable = !!(stats.mode & 0o040)
+  console.debug(`readable ${volumeFolder}: ${isReadable} ${JSON.stringify(stats.mode)}`)
+  const isWritable = !!(stats.mode & 0o020)
+  console.debug(`writable ${volumeFolder}: ${isWritable} ${JSON.stringify(stats.mode)}`)
+
+  if (!isGroupGood) {
+    console.warn(`The docker volume folder (${volumeFolder}) is owned by the group ${stats.gid}.`);
+    console.warn(`It is expected to be owned by the group ${neededGroup}.`);
+    console.warn(`Please run the following command to fix the permissions:`);
+    console.warn(`  sudo chgrp -R ${neededGroup} ${volumeFolder}`);
+    return false;
+  }
+
+  if (!isReadable || !isWritable) {
+    console.warn(`The docker volume folder (${volumeFolder}) is not readable nor writable.`);
+    console.warn(`Please run the following command to fix the permissions:`);
+    console.warn(`  sudo chmod -R g+rw ${volumeFolder}`);
+    return false;
+  }
+
+  return true;
+}
+
+async function dockerRun(args) {
+
+  console.log('Checking volume permission on the Zeebe stack..')
+  const volumeFolder = './docker/volumes';
+  if (! (await checkForDockerVolumePermissions(volumeFolder))) return;
+  console.log('Look like the volume permissions are good, continuing..')
+
+  // get in the docker folder before continuing
+  cd(path.join(__dirname, `docker`));
+  console.log('Starting the Zeebe stack..')
   await $`docker compose --profile zeebe up -d`;
 
   if (args !== 'zeebe') {
@@ -69,6 +106,7 @@ async function dockerRun(args) {
   console.log(`Stack started.`);
   console.log(`To see the logs, use './phd.mjs logs' command`);
   console.log(`To stop, use the './phd.mjs stop' command`);
+
 }
 
 
