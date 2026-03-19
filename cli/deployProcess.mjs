@@ -6,8 +6,8 @@ export default async function() {
   const bpmnURL = 'https://raw.githubusercontent.com/epfl-si/PhDAssess-meta/main/bpmn/phdAssessProcess.bpmn'
   const bpmnFullPath = path.join(os.tmpdir(), 'phdAssessProcess.bpmn')
 
-  let zeebePort = await question('What port is your zeebe instance running on ? [26501] ')
-  if (!zeebePort) zeebePort = '26501'
+  let zeebePort = await question('What port is your zeebe instance running on ? [29501] ')
+  if (!zeebePort) zeebePort = '29501'
 
   const areYouReady = await question(`The bpmn from ${ bpmnURL } will be deployed with 'zbctl deploy'. Continue ? [Y/n] `)
   if (areYouReady && ( areYouReady === 'n' || areYouReady === 'N' )) {
