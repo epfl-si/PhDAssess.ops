@@ -54,7 +54,6 @@ Usage:
   phd test                    Launch tests
   phd test e2e                Launch e2e tests with a headless browser
   phd test load-fixtures      Load locally task fixtures
-  phd git-pull-all            Git refresh all the known modules / submodules
   phd deploy-bpmn             Interactively deploy a BPMN
   phd stringify-snapshot      Use the PERL-tools to export a DB to a *.txt. Use --path=PATH_TO_CURRENT
   phd generate-activity-logs  Initiate the activityLogs table for the new dashboard milestone (temp)
@@ -201,25 +200,5 @@ async function test(args) {
     await cd(path.join(__dirname, './apps/fillForm'));
     await $`TEST_SERVER=${testServer} TEST_CLIENT=${testClient} meteor test --driver-package meteortesting:mocha --port 3100`;
 
-  }
-}
-
-async function gitPullAll(args) {
-  const projectsPathes = [
-    path.join(__dirname, 'apps/fillForm'),
-    path.join(__dirname, '..', 'PhDAssess-meta'),
-    path.join(__dirname, '..', 'PhDAssess-PDF'),
-    path.join(__dirname, '..', 'PhDAssess-Notifier'),
-    path.join(__dirname, '..', 'PhDAssess-GED'),
-  ];
-  for (const projectPath of projectsPathes) {
-    if (fs.pathExistsSync(projectPath)) {
-      console.log(`Doing ${projectPath}..`)
-      cd(projectPath)
-      await $`git pull`
-      console.log(`${projectPath} done`)
-    } else {
-      console.log(`skipping inexisting ${projectPath}`)
-    }
   }
 }
