@@ -14,6 +14,9 @@ if (argv.help || argv._[0] === 'help') {
   argv._[0] !== 'help' && !argv._[1] && await help(...argv._)  // called with --help
 } else if (argv._[0] === 'run' || argv._[0] === 'start') {
   await dockerRun(...argv._.slice(1));
+} else if (argv._[0] === 'zeebe') {
+  if (argv._[1] === 'start') await dockerRun('zeebe');
+  if (argv._[1] === 'status') await $`zbctl status --port 29501 --insecure`.pipe(process.stdout);;
 } else if (argv._[0] === 'stop') {
   await dockerStop(...argv._.slice(1));
 } else if (argv._[0] === 'logs') {
@@ -41,7 +44,9 @@ async function help(args) {
 Usage:
   phd help                    Show this message
   phd start                   Start the docker stack. You can use 'phd run' too
-  phd start zeebe             Start the docker stack, but only the zeebe stack
+  phd start zeebe             Start the docker stack, but only the Zeebe quorum
+  phd zeebe start             Start the docker stack, but only the Zeebe quorum
+  phd zeebe status            Show the status of the Zeebe stack
   phd logs                    Show the latest docker logs, since 5min
   phd stop                    Stop the docker stack
   phd clean                   Wipe all data. All steps have to be confirmed
