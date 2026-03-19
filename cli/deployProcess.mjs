@@ -1,4 +1,4 @@
-import * as fs from 'fs'
+import { writeFile, unlink } from 'fs/promises'
 import * as os from 'os'
 import * as path from 'path'
 
@@ -18,14 +18,15 @@ export default async function() {
   try {
     await spinner(`Downloading the BPMN`, async () => {
       const res = await fetch(bpmnURL)
-      const dest = fs.createWriteStream(bpmnFullPath)
-      await res.body.pipe(dest)
-      console.log('File downloaded successfully')
+      const buffer = Buffer.from(await res.arrayBuffer());
+      await writeFile(bpmnFullPath, buffer);
+      console.log(`File downloaded successfully to ${bpmnFullPath}`)
     })
 
     await spinner(`Deploying the BPMN on Zeebe`, async () => {
       await $`zbctl deploy --port ${ zeebePort } --insecure ${ bpmnFullPath };`
     })
+    await unlink(bpmnFullPath);
 
     console.log('BPMN deployed successfully')
   } catch (err) {
