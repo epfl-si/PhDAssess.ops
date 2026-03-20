@@ -16,7 +16,10 @@ if (argv.help || argv._[0] === 'help') {
   await dockerRun(...argv._.slice(1));
 } else if (argv._[0] === 'zeebe') {
   if (argv._[1] === 'start') await dockerRun('zeebe');
+  if (argv._[1] === 'stop') await dockerStop();
   if (argv._[1] === 'status') await $`zbctl status --port 29501 --insecure`.pipe(process.stdout);;
+  if (argv._[1] === 'restore') await restore();
+  if (argv._[1] === 'deploy-bpmn') await deployProcess();
 } else if (argv._[0] === 'stop') {
   await dockerStop(...argv._.slice(1));
 } else if (argv._[0] === 'logs') {
@@ -25,10 +28,6 @@ if (argv.help || argv._[0] === 'help') {
   await test(...argv._.slice(1));
 } else if (argv._[0] === 'clean') {
   await clean(...argv._.slice(1));
-} else if (argv._[0] === 'restore') {
-  await restore(...argv._.slice(1));
-} else if (argv._[0] === 'deploy-bpmn') {
-  await deployProcess();
 } else if (argv._[0] === 'stringify-snapshot') {
   await stringifySnapshot(argv);
 } else if (argv._[0] === 'git-pull-all') {
@@ -44,17 +43,17 @@ async function help(args) {
 Usage:
   phd help                    Show this message
   phd start                   Start the docker stack. You can use 'phd run' too
-  phd start zeebe             Start the docker stack, but only the Zeebe quorum
   phd zeebe start             Start the docker stack, but only the Zeebe quorum
+  phd zeebe stop             Start the docker stack, but only the Zeebe quorum
   phd zeebe status            Show the status of the Zeebe stack
+  phd zeebe restore           Restore data from S3. Be sure to have set the .env correctly
+  phd zeebe deploy-bpmn             Interactively deploy a BPMN
   phd logs                    Show the latest docker logs, since 5min
   phd stop                    Stop the docker stack
   phd clean                   Wipe all data. All steps have to be confirmed
-  phd restore                 Restore data from S3. Be sure to have set the .env correctly
   phd test                    Launch tests
   phd test e2e                Launch e2e tests with a headless browser
   phd test load-fixtures      Load locally task fixtures
-  phd deploy-bpmn             Interactively deploy a BPMN
   phd stringify-snapshot      Use the PERL-tools to export a DB to a *.txt. Use --path=PATH_TO_CURRENT
   phd generate-activity-logs  Initiate the activityLogs table for the new dashboard milestone (temp)
   `
@@ -139,26 +138,15 @@ async function clean(args) {
     await $`docker compose down -v zeebe_node_0 zeebe_node_1 zeebe_node_2`;
   }
 
-  if (await question('Clean meteor db ? [y/N] ') === 'y') {
-    const fillFormPath = path.join(__dirname, `apps/fillForm`);
-    cd(fillFormPath);
-    await $`meteor reset`;
-    await $`meteor npm i`;
-    console.log(`Successfully reset the meteor db`)
-  }
-
-  if (await question('Clean simple monitor data ? [y/N] ') === 'y') {
-    const simpleMonitorVolumePath = path.join(__dirname, `docker/volumes/simple_monitor_h2_db`);
-    await fs.remove(path.join(simpleMonitorVolumePath, 'simple-monitor.mv.db'));
-    console.log(`Successfully removed ${path.join(simpleMonitorVolumePath, 'simple-monitor.mv.db')}`)
-  }
+  console.log(`It is recommended to clean the meteor db too. To do so, run: meteor reset --db in the PhDAsssess project.`)
 }
 
-async function restore(args) {
-  if (await question('Did you clean the partitions ? (phd clean) [y/N] ') === 'y') {
+async function restore() {
+  console.log(`This command will restore the Zeebe data from S3.`)
+  if (await question('Are you sure you want to continue ? The current Zeebe data will be lost [y/N]') === 'y') {
     console.log(`Fetch the list of the available backup ids:`);
 
-    const response = await $`curl --request GET 'http://localhost:9600/actuator/backups' 2>/dev/null`;
+    const response = await $`curl --request GET 'http://localhost:19600/actuator/backups' 2>/dev/null`;
     console.log(response.stdout);
 
     const backupId = await question('Please enter the Id to restore: ')
@@ -167,9 +155,14 @@ async function restore(args) {
       console.log(`Starting restore for backupId ${ backupId }`);
 
       cd(path.join(__dirname, `docker`));
-      await $`docker compose exec zeebe_node_0 bash -c './bin/restore --backupId=${ backupId }'`;
-      await $`docker compose exec zeebe_node_1 bash -c './bin/restore --backupId=${ backupId }'`;
-      await $`docker compose exec zeebe_node_2 bash -c './bin/restore --backupId=${ backupId }'`;
+      console.log(`Restoring zeebe_0..`);
+      await $`docker compose exec zeebe_node_0 bash -c 'rm -rf /usr/local/zeebe/data/{*,.*} && ./bin/restore --backupId=${ backupId }'`;
+      console.log(`Restoring zeebe_1..`);
+      await $`docker compose exec zeebe_node_1 bash -c 'rm -rf /usr/local/zeebe/data/{*,.*} && ./bin/restore --backupId=${ backupId }'`;
+      console.log(`Restoring zeebe_2..`);
+      await $`docker compose exec zeebe_node_2 bash -c 'rm -rf /usr/local/zeebe/data/{*,.*} && ./bin/restore --backupId=${ backupId }'`;
+      console.log(`Backup restored successfully!`);
+      console.log(`Please stop and restart the Zeebe stack to see the changes.`);
     } else {
       console.log('aborted');
     }
