@@ -191,7 +191,7 @@
                         zeebe_db_column_family_incident_entries {
     
                           error_message!~"Failed to send activated jobs to client"
-                        }[3m]
+                        }[4m]
                       )
                     )
                   ) unless (
@@ -199,7 +199,7 @@
                       max_over_time (
                         zeebe_db_column_family_incident_entries {
                           error_message!~"Failed to send activated jobs to client"
-                        }[3m]
+                        }[4m]
                       offset 5m )
                     )
                   )
