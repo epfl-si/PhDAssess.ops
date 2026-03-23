@@ -20,17 +20,15 @@
       git_url: "https://github.com/epfl-si/PhDAssess-PDF"
       additional_env:
         - ZEEBE_TASK_TYPE: "phdBuildPDF"
-          NODE_TLS_REJECT_UNAUTHORIZED:
-            "{{ 0 if alfresco_ignore_TLS_error is defined and alfresco_ignore_TLS_error == true }}"
+        - "{{ {'NODE_TLS_REJECT_UNAUTHORIZED': 0} if (alfresco_ignore_TLS_error | default(false)) else {} }}"
     - name: "ged"
       image_tag: "{{ ged_image_tag }}"
       node_version: "{{ microservice_node_image_base_tag }}"
       git_url: "https://github.com/epfl-si/PhDAssess-GED"
       additional_env:
         - ZEEBE_TASK_TYPE: "phdGEDDeposit"
-          ALFRESCO_URL: "{{ alfresco_url }}"
-          NODE_TLS_REJECT_UNAUTHORIZED:
-            "{{ 0 if alfresco_ignore_TLS_error is defined and alfresco_ignore_TLS_error == true }}"
+        - ALFRESCO_URL: "{{ alfresco_url }}"
+        - "{{ {'NODE_TLS_REJECT_UNAUTHORIZED': 0} if (alfresco_ignore_TLS_error | default(false)) else {} }}"
       additional_secrets:
         ALFRESCO_USERNAME: "{{ alfresco_username }}"
         ALFRESCO_PASSWORD: "{{ alfresco_password }}"

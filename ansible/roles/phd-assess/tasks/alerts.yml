@@ -189,7 +189,6 @@
                     max by (error_message) (
                       max_over_time (
                         zeebe_db_column_family_incident_entries {
-    
                           error_message!~"Failed to send activated jobs to client"
                         }[4m]
                       )
@@ -236,7 +235,7 @@
                   sendto: telegram
                 annotations:
                   summary: "Test please ignore"
-                  description: >-
+                  description: |-
                     {% raw -%}
                     This is an alert that fires all the time.
                     {%- endraw %}
