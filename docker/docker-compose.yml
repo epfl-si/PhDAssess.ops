@@ -6,7 +6,7 @@ services:
     extends:
       file: template-zeebe-compose.yml
       service: zeebe_node_0
-    container_name: zeebe_node_0
+    container_name: zeebe
     environment:
       - ZEEBE_BROKER_CLUSTER_NODEID=0
     volumes:
@@ -14,13 +14,16 @@ services:
     ports:
       - "29501-29503:26500-26502"
       - "19600:9600"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
 
   zeebe_node_1:
     profiles: [zeebe]
     extends:
       file: template-zeebe-compose.yml
       service: zeebe_node_1
-    container_name: zeebe_node_1
+    container_name: zeebe_1
     environment:
       - ZEEBE_BROKER_CLUSTER_NODEID=1
     volumes:
@@ -34,7 +37,7 @@ services:
     extends:
       file: template-zeebe-compose.yml
       service: zeebe_node_2
-    container_name: zeebe_node_2
+    container_name: zeebe2
     environment:
       - ZEEBE_BROKER_CLUSTER_NODEID=2
     volumes:
@@ -43,23 +46,44 @@ services:
       - "29507-29509:26500-26502"
       - "19602:9600"
 
-#  simple-monitor:
-#    container_name: zeebe_simple_monitor
-#    build: simple-monitor
-#    image: phd-assess/simple-monitor
-#    volumes:
-#      - ./volumes/simple_monitor_h2_db:/h2-db
-#    environment:
-#      - white-label.custom.title=PhD Assess Monitor
-#      - zeebe.client.broker.contactPoint=zeebe_node_0:26501
-#      - zeebe.client.worker.hazelcast.connection=zeebe_node_0:5701
-#      - spring.datasource.url=jdbc:h2:file:/h2-db/simple-monitor;DB_CLOSE_ON_EXIT=FALSE;AUTO_RECONNECT=TRUE;
-#      - spring.datasource.initialization-mode=never
-#      - spring.jpa.hibernate.ddl-auto=update
-#    ports:
-#      - "8082:8082"
-#    networks:
-#      - zeebe_network
+  operate:
+    profiles: [zeebe]
+    container_name: operate
+    image: camunda/operate:8.5.21
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      zeebe_node_0:
+        condition: service_healthy
+    ports:
+      - "8082:8080"
+    environment:
+      - CAMUNDA_OPERATE_ZEEBE_GATEWAYADDRESS=zeebe:26500  # keep it that way or enjoy the ride on the name configs
+      - camunda.operate.elasticsearch.url=http://elasticsearch:9200
+      - camunda.operate.zeebeelasticsearch.url=http://elasticsearch:9200
+
+  elasticsearch:
+    profiles: [zeebe]
+    image: elasticsearch:8.12.2
+    container_name: elasticsearch
+    environment:
+      - network.host=0.0.0.0
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false
+      - xpack.security.http.ssl.enabled=false
+      - xpack.security.transport.ssl.enabled=false
+      - transport.port=9300
+      - transport.host=0.0.0.0
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s"]
+      interval: 10s
+      retries: 15
+      start_period: 30s
 
   notifier:
     profiles: [microservices]
@@ -134,3 +158,6 @@ services:
       ZEEBE_ADDRESS: zeebe_node_0:26500
     ports:
       - "3000:3000"
+
+volumes:
+  es_data:
