@@ -13,13 +13,18 @@ if (argv.help || argv._[0] === 'help') {
   argv._[0] === 'help' && !argv._[1] && await help()  // called with help only
   argv._[0] !== 'help' && !argv._[1] && await help(...argv._)  // called with --help
 } else if (argv._[0] === 'run' || argv._[0] === 'start') {
-  await dockerRun(...argv._.slice(1));
+  await dockerRunZeebe();
+  await dockerRunMicroservices();
+  await dockerRunMonitoring();
 } else if (argv._[0] === 'zeebe') {
-  if (argv._[1] === 'start') await dockerRun('zeebe');
+  if (argv._[1] === 'start') await dockerRunZeebe();
   if (argv._[1] === 'stop') await dockerStop();
   if (argv._[1] === 'status') await $`zbctl status --port 29501 --insecure`.pipe(process.stdout);;
   if (argv._[1] === 'restore') await restore();
   if (argv._[1] === 'deploy-bpmn') await deployProcess();
+} else if (argv._[0] === 'monitoring') {
+  if (argv._[1] === 'start') await dockerRunMonitoring();
+  if (argv._[1] === 'stop') await dockerStop();
 } else if (argv._[0] === 'stop') {
   await dockerStop(...argv._.slice(1));
 } else if (argv._[0] === 'logs') {
@@ -43,11 +48,13 @@ async function help(args) {
 Usage:
   phd help                    Show this message
   phd start                   Start the docker stack. You can use 'phd run' too
-  phd zeebe start             Start the docker stack, but only the Zeebe quorum
-  phd zeebe stop             Start the docker stack, but only the Zeebe quorum
+  phd zeebe start             Start the docker stack, but only the Zeebe part
+  phd zeebe stop              Stop the docker stack
   phd zeebe status            Show the status of the Zeebe stack
   phd zeebe restore           Restore data from S3. Be sure to have set the .env correctly
-  phd zeebe deploy-bpmn             Interactively deploy a BPMN
+  phd zeebe deploy-bpmn       Interactively deploy a BPMN
+  phd monitoring start        Start the monitoring stack
+  phd monitoring stop         Stop the monitoring stack
   phd logs                    Show the latest docker logs, since 5min
   phd stop                    Stop the docker stack
   phd clean                   Wipe all data. All steps have to be confirmed
@@ -89,29 +96,29 @@ async function checkForDockerVolumePermissions(volumeFolder) {
   return true;
 }
 
-async function dockerRun(args) {
+async function dockerRunZeebe() {
+  cd(path.join(__dirname, `docker`));
 
   console.log('Checking volume permission on the Zeebe stack..')
-  const volumeFolder = './docker/volumes';
-  if (! (await checkForDockerVolumePermissions(volumeFolder))) return;
-  console.log('Look like the volume permissions are good, continuing..')
+  const volumeFolder = './volumes';
+  if (!( await checkForDockerVolumePermissions(volumeFolder) )) return;
 
-  // get in the docker folder before continuing
-  cd(path.join(__dirname, `docker`));
+  console.log('Look like the volume permissions are good, continuing..')
   console.log('Starting the Zeebe stack..')
   await $`docker compose --profile zeebe up -d`;
-
-  if (args !== 'zeebe') {
-    console.log('Starting the pdf, notifier, ged, isa..')
-    await $`docker compose --profile microservices up -d`;
-  }
-
-  console.log(`Stack started.`);
-  console.log(`To see the logs, use './phd.mjs logs' command`);
-  console.log(`To stop, use the './phd.mjs stop' command`);
-
 }
 
+async function dockerRunMonitoring() {
+  cd(path.join(__dirname, `docker`));
+  await $`docker compose --profile monitoring up -d`;
+  console.log('Open http://localhost:8082 to monitor the processes. Username: demo, password: demo')
+}
+
+async function dockerRunMicroservices() {
+  cd(path.join(__dirname, `docker`));
+  console.log('Starting the pdf, notifier, ged, isa..')
+  await $`docker compose --profile microservices up -d`;
+}
 
 async function dockerStop(args) {
   cd(path.join(__dirname, `docker`));

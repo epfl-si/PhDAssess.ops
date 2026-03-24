@@ -8,7 +8,7 @@ This repository regroups:
 - a `./ARCHITECTURE.md`, to understand what is all about
 
 # Configuration-as-code
-Aka phdsible, the Ansible deployer
+Aka `phdsible`, the Ansible deployer
 
 ## Prerequisites
 
@@ -25,6 +25,7 @@ Aka phdsible, the Ansible deployer
 
 Set up the development environment on Openshift and run the stack.
 
+Add `--test` to do the same in the testing environment.
 Add `--prod` to do the same in the production environment.
 
 # DevOps locally
@@ -41,13 +42,12 @@ How about launching the app locally?
 
 ### Zeebe
 
-- Build the docker images:
-    - `docker compose -f ./docker/docker-compose.yml build zeebe_node_0 zeebe_node_1 zeebe_node_2`
-- Launch the Zeebe server with:
-    - `docker compose -f ./docker/docker-compose.yml up zeebe_node_0 zeebe_node_1 zeebe_node_2`
-- Once Zeebe is running (`watch zbctl status --insecure --port 26501`, you can deploy the bpmn on it.
+- Launch the Zeebe stack with:
+    - `./phd.mjs zeebe start`
+- Once Zeebe is running (`./phd.mjs zeebe status`, you can deploy the bpmn on it.
   You can use this command to help with the process:
-    - `./phd.mjs deploy-bpmn`
+    - `./phd.mjs zeebe deploy-bpmn`
+- Once you start operating on it, you can see the processes on the operate app on `localhost:8082`
 
 ### Micro-services
 
