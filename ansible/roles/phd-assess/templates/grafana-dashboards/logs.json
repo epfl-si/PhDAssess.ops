@@ -224,7 +224,7 @@
         "type": "loki",
         "uid": "4b4e7fa0-9846-4a8a-9ab3-f09b21e777c8"
       },
-      "description": "Show interesting logs from the different pods to trace processes",
+      "description": "Show interesting logs from the different webservices",
       "fieldConfig": {
         "defaults": {},
         "overrides": []
@@ -275,7 +275,7 @@
           "refId": "B"
         }
       ],
-      "title": "Trace",
+      "title": "Logs",
       "type": "logs"
     }
   ],
@@ -327,7 +327,7 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Trace",
+  "title": "Logs",
   "uid": "dek8xcd",
   "version": 1
 }
