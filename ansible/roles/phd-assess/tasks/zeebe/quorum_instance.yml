@@ -68,11 +68,13 @@
     _instance_containers: >-
       {{ [_zeebe_monitor_container, _zeebe_container] if item.node_id == 0 else [_zeebe_container] }}
     _instance_volumes: |
-      {% set vols = [{'name': 'zeebe-data', 'persistentVolumeClaim': {'claimName': item.data_claim_name}}] %}
+      - name: zeebe-data
+        persistentVolumeClaim:
+          claimName: {{ item.data_claim_name }}
       {% if item.node_id == 0 %}
-      {% set _ = vols.append({'name': 'volume-zeebe-db-monitor-secondary', 'emptyDir': {}}) %}
+      - name: volume-zeebe-db-monitor-secondary
+        emptyDir: {}
       {% endif %}
-      {{ vols | to_json }}
   kubernetes.core.k8s:
     definition:
       state: latest
@@ -106,7 +108,7 @@
           spec:
             serviceAccountName: "{{ quay_service_account_name }}"
             containers: "{{ _instance_containers }}"
-            volumes: "{{ _instance_volumes }}"
+            volumes: "{{ _instance_volumes | from_yaml }}"
             # Keep the pods spread into different physical nodes
             affinity:
               podAntiAffinity:
