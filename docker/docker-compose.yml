@@ -51,8 +51,10 @@ services:
 
   elasticsearch:
     profiles: [zeebe, monitoring]
-    image: elasticsearch:8.12.2
+    image: elasticsearch:8.19.13
     container_name: elasticsearch
+    env_file:
+      - elasticsearch.s3.env
     environment:
       - network.host=0.0.0.0
       - discovery.type=single-node
@@ -66,15 +68,59 @@ services:
       - "9200:9200"
     volumes:
       - es_data:/usr/share/elasticsearch/data
+      - ./es-index-template.json:/templates/zeebe-record-template.json:ro
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s"]
       interval: 10s
       retries: 15
       start_period: 30s
 
+  es-init:
+    profiles: [zeebe, monitoring]
+    image: curlimages/curl:latest
+    container_name: es-init
+    command:
+      - sh
+      - -c
+      - |
+        echo "Waiting for Elasticsearch..."
+        until curl -sf http://elasticsearch:9200/_cluster/health; do sleep 5; done
+        echo "Elasticsearch is ready."
+        echo "Creating ILM retention policy..."
+        curl -sf -X PUT http://elasticsearch:9200/_ilm/policy/zeebe-records-retention \
+          -H "Content-Type: application/json" \
+          -d '{"policy":{"phases":{"hot":{"actions":{}},"delete":{"min_age":"180d","actions":{"delete":{}}}}}}'
+        echo "ILM policy created."
+        echo "Applying Zeebe index template..."
+        curl -sf -X PUT http://elasticsearch:9200/_index_template/zeebe-record-template \
+          -H "Content-Type: application/json" \
+          -d @/templates/zeebe-record-template.json
+        echo "Index template applied."
+        echo "Waiting for Kibana..."
+        until curl -sf http://kibana:5601/api/status; do sleep 5; done
+        echo "Kibana is ready."
+        echo "Creating Kibana data view for zeebe-record-*..."
+        curl -sf -X PUT http://kibana:5601/api/data_views/data_view/zeebe-records \
+          -H "Content-Type: application/json" \
+          -H "kbn-xsrf: true" \
+          -d '{
+            "data_view": {
+              "title": "zeebe-record-*",
+              "name": "Zeebe Records"
+            }
+          }'
+        echo "Kibana data view upserted."
+    volumes:
+      - ./es-index-template.json:/templates/zeebe-record-template.json:ro
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      kibana:
+        condition: service_started
+
   kibana:
     profiles: [monitoring]
-    image: kibana:8.12.2
+    image: kibana:8.19.13
     container_name: kibana
     depends_on:
       elasticsearch:

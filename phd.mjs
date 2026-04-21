@@ -112,6 +112,7 @@ async function dockerRunMonitoring() {
   cd(path.join(__dirname, `docker`));
   await $`docker compose --profile monitoring up -d`;
   console.log('Open http://localhost:8082 to monitor the processes. Username: demo, password: demo')
+  console.log('Open http://localhost:5601 to see the Zeebe logs')
 }
 
 async function dockerRunMicroservices() {

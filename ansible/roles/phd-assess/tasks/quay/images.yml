@@ -14,6 +14,36 @@
     push: true
     source: local
 
+- name: Images - Pull Elasticsearch image
+  community.docker.docker_image:
+    repository: "docker.elastic.co/elasticsearch/elasticsearch"
+    name: "elasticsearch"
+    tag: "{{ elasticsearch_kibana_version }}"
+    source: pull
+
+- name: Images - Tag and push Elasticsearch to Quay
+  community.docker.docker_image:
+    name: "elasticsearch"
+    repository: "{{ quay_repo }}/elasticsearch"
+    tag: "{{ elasticsearch_kibana_version }}"
+    push: true
+    source: local
+
+- name: Images - Pull Kibana image
+  community.docker.docker_image:
+    repository: "docker.elastic.co/kibana/kibana"
+    name: "kibana"
+    tag: "{{ elasticsearch_kibana_version }}"
+    source: pull
+
+- name: Images - Tag and push Kibana to Quay
+  community.docker.docker_image:
+    name: "kibana"
+    repository: "{{ quay_repo }}/kibana"
+    tag: "{{ elasticsearch_kibana_version }}"
+    push: true
+    source: local
+
 - name: Images - Pull the Node 22 for microservices as base image
   community.docker.docker_image:
     name: "node"

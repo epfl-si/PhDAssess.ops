@@ -1,0 +1,385 @@
+- name: Elasticsearch index template ConfigMap
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: zeebe-es-index-template
+        namespace: '{{ openshift_namespace }}'
+      data:
+        zeebe-record-template.json: |
+          {
+            "index_patterns": ["zeebe-record-*"],
+            "template": {
+              "settings": {
+                "number_of_shards": 1,
+                "number_of_replicas": 0,
+                "refresh_interval": "5s",
+                "index.default_pipeline": "drop-timeouts",
+                "index.lifecycle.name": "zeebe-records-audit-logs"
+              },
+              "mappings": {
+                "properties": {
+                  "partitionId": {"type": "integer"},
+                  "position": {"type": "long"},
+                  "key": {"type": "long"},
+                  "timestamp": {"type": "date", "format": "epoch_millis"},
+                  "recordType": {"type": "keyword"},
+                  "intent": {"type": "keyword"},
+                  "rejectionType": {"type": "keyword"},
+                  "rejectionReason": {"type": "text"},
+                  "brokerVersion": {"type": "keyword"},
+                  "sourceRecordPosition": {"type": "long"},
+                  "operationReference": {"type": "long"},
+                  "value": {"type": "object", "dynamic": true}
+                }
+              }
+            },
+            "priority": 100
+          }
+
+- name: S3 secrets for Elasticsearch snapshots
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: Secret
+      type: Opaque
+      metadata:
+        name: elasticsearch-s3
+        namespace: "{{ openshift_namespace }}"
+      stringData:
+        S3_ACCESS_KEY:
+          "{{ lookup('file',
+              zeebe_backup_s3_access_key_file)
+          }}"
+        S3_SECRET_KEY:
+          "{{ lookup('file',
+              zeebe_backup_s3_secret_key_file)
+          }}"
+        S3_BUCKETNAME:
+          "{{ lookup('file',
+              zeebe_backup_s3_bucket_name_file)
+          }}"
+        S3_ENDPOINT: "https://s3.epfl.ch"
+        S3_PROTOCOL: "https"
+
+- name: Elasticsearch post-start setup Job
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: batch/v1
+      kind: Job
+      metadata:
+        name: elasticsearch-post-start
+        namespace: '{{ openshift_namespace }}'
+        labels:
+          app.kubernetes.io/name: "elasticsearch-post-start"
+          app.kubernetes.io/component: "backend"
+      spec:
+        backoffLimit: 1
+        template:
+          spec:
+            serviceAccountName: "{{ quay_service_account_name }}"
+            restartPolicy: Never
+            containers:
+              - name: post-start
+                image: "{{ quay_repo }}/elasticsearch:{{ elasticsearch_kibana_version }}"
+                command:
+                  - sh
+                  - -c
+                  - |
+                    set -ex
+                    ES_URL="http://elasticsearch:9200"
+                    echo "Waiting for Elasticsearch..."
+                    until curl -sSf "${ES_URL}/_cluster/health?wait_for_status=yellow&timeout=60s"; do
+                      sleep 5
+                    done
+                    echo "Elasticsearch is ready."
+                    echo ""
+                    echo "Creating ILM retention policy..."
+                    curl -sSf -X PUT "${ES_URL}/_ilm/policy/zeebe-records-audit-logs" \
+                      -H "Content-Type: application/json" \
+                      -d '{"policy":{"phases":{"hot":{"actions":{}},"delete":{"min_age":"180d","actions":{"delete":{}}}}}}'
+                    echo "ILM policy created."
+                    echo ""
+                    echo "Applying pipeline to drop timed-out records"
+                    curl -sSf -X PUT "${ES_URL}/_ingest/pipeline/drop-timeouts" \
+                      -H "Content-Type: application/json" \
+                      -d '{"processors": [{"drop": {"if": "ctx.intent == '\''TIMED_OUT'\''"}}]}'
+                    echo "'Drop timed-out records' pipeline applied."
+                    echo ""
+                    echo "Applying Zeebe index template..."
+                    curl -sSf -X PUT "${ES_URL}/_index_template/zeebe-record-template" \
+                      -H "Content-Type: application/json" \
+                      -d @/templates/zeebe-record-template.json
+                    echo "Index template applied."
+                    echo ""
+                    echo "Registering S3 snapshot repository..."
+                    BUCKET=$(tr -d '\n' < /var/run/secrets/s3/S3_BUCKETNAME)
+                    ACCESS_KEY=$(tr -d '\n' < /var/run/secrets/s3/S3_ACCESS_KEY)
+                    SECRET_KEY=$(tr -d '\n' < /var/run/secrets/s3/S3_SECRET_KEY)
+                    curl -sSf -X PUT "${ES_URL}/_snapshot/zeebe-es-snapshots" \
+                      -H "Content-Type: application/json" \
+                      -d "{
+                      \"type\": \"s3\",
+                      \"settings\": {
+                        \"bucket\": \"${BUCKET}\",
+                        \"base_path\": \"es-snapshots\",
+                        \"endpoint\": \"https://s3.epfl.ch\",
+                        \"path_style_access\": true,
+                        \"max_retries\": 3
+                      }
+                    }"
+                    echo "S3 snapshot repository registered."
+                    echo "Waiting for Kibana..."
+                    until curl -sf "http://kibana:5601/api/status"; do
+                      sleep 5
+                    done
+                    echo "Kibana is ready."
+                    echo "Creating Kibana data view for zeebe-record-*..."
+                    curl -sS -X PUT "http://kibana:5601/api/data_views/data_view/zeebe-records" \
+                      -H "Content-Type: application/json" \
+                      -H "kbn-xsrf: true" \
+                      -d '{
+                        "data_view": {
+                          "title": "zeebe-record-*",
+                          "name": "Zeebe Records"
+                        }
+                      }'
+                    echo "Kibana data view upserted."
+                volumeMounts:
+                  - name: template-config
+                    mountPath: /templates
+                    readOnly: true
+                  - name: s3-secrets
+                    mountPath: /var/run/secrets/s3
+                    readOnly: true
+                resources:
+                  requests:
+                    cpu: "5m"
+                    memory: "200Mi"
+                  limits:
+                    memory: "200Mi"
+            volumes:
+              - name: template-config
+                configMap:
+                  name: zeebe-es-index-template
+              - name: s3-secrets
+                secret:
+                  secretName: elasticsearch-s3
+
+- name: Elasticsearch exporter statefulset
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: StatefulSet
+      metadata:
+        name: elasticsearch
+        namespace: '{{ openshift_namespace }}'
+      spec:
+        serviceName: elasticsearch
+        replicas: 1
+        selector:
+          matchLabels:
+            app: elasticsearch
+        template:
+          metadata:
+            labels:
+              app: elasticsearch
+          spec:
+            serviceAccountName: "{{ quay_service_account_name }}"
+            initContainers:
+              - name: elasticsearch-keystore-init
+                image: "{{ quay_repo }}/elasticsearch:{{ elasticsearch_kibana_version }}"
+                command:
+                  - sh
+                  - -c
+                  - |
+                    elasticsearch-keystore create || true
+                    echo "$S3_ACCESS_KEY" | elasticsearch-keystore add s3.client.default.access_key -xf || true
+                    echo "$S3_SECRET_KEY" | elasticsearch-keystore add s3.client.default.secret_key -xf || true
+                    cp /usr/share/elasticsearch/config/elasticsearch.keystore /tmp/keystore/elasticsearch.keystore
+                envFrom:
+                  - secretRef:
+                      name: elasticsearch-s3
+                volumeMounts:
+                  - name: es-keystore
+                    mountPath: /tmp/keystore
+                  - name: es-plugins
+                    mountPath: /usr/share/elasticsearch/plugins
+                resources:
+                  requests:
+                    cpu: "5m"
+                    memory: "1200Mi"
+            containers:
+              - name: elasticsearch
+                image: "{{ quay_repo }}/elasticsearch:{{ elasticsearch_kibana_version }}"
+                ports:
+                  - containerPort: 9200
+                  - containerPort: 9300
+                env:
+                  - name: discovery.type
+                    value: "single-node"
+                  - name: xpack.security.enabled
+                    value: "false"
+                  - name: ES_JAVA_OPTS
+                    value: "-Xms512m -Xmx512m"
+                volumeMounts:
+                  - name: elasticsearch-data
+                    mountPath: /usr/share/elasticsearch/data
+                  - name: es-keystore
+                    mountPath: /usr/share/elasticsearch/config/elasticsearch.keystore
+                    subPath: elasticsearch.keystore
+                    readOnly: true
+                resources:
+                  requests:
+                    cpu: "5m"
+                    memory: "1200Mi"
+            volumes:
+              - name: es-config
+                emptyDir: {}
+              - name: es-keystore
+                emptyDir: {}
+              - name: es-plugins
+                emptyDir: {}
+        volumeClaimTemplates:
+          - metadata:
+              name: elasticsearch-data
+            spec:
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 5Gi
+
+- name: Elasticsearch exporter service
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: elasticsearch
+        namespace: '{{ openshift_namespace }}'
+      spec:
+        ports:
+          - port: 9200
+            name: http
+          - port: 9300
+            name: transport
+        clusterIP: None
+        selector:
+          app: elasticsearch
+
+- name: Kibana deployment
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: kibana
+        namespace: '{{ openshift_namespace }}'
+      spec:
+        replicas: 1
+        selector:
+          matchLabels:
+            app: kibana
+        template:
+          metadata:
+            labels:
+              app: kibana
+          spec:
+            serviceAccountName: "{{ quay_service_account_name }}"
+            containers:
+              - name: kibana
+                image: "{{ quay_repo }}/kibana:{{ elasticsearch_kibana_version }}"
+                ports:
+                  - containerPort: 5601
+                env:
+                  - name: ELASTICSEARCH_HOSTS
+                    value: "http://elasticsearch:9200"
+                  - name: TELEMETRY_ENABLED
+                    value: "false"
+                resources:
+                  requests:
+                    cpu: "1m"
+                    memory: "500Mi"
+
+- name: Import Kibana saved objects
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: kibana-audit-logs-view-object
+        namespace: "{{ openshift_namespace }}"
+      files:
+        kibana_saved_objects.ndjson: ./templates/kibana-audit-logs-view.ndjson
+
+- name: Kibana post-start import view Job
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: batch/v1
+      kind: Job
+      metadata:
+        name: kibana-post-start-import-view
+        namespace: '{{ openshift_namespace }}'
+        labels:
+          app.kubernetes.io/name: "kibana-post-start"
+          app.kubernetes.io/component: "backend"
+      spec:
+        backoffLimit: 1
+        template:
+          spec:
+            serviceAccountName: "{{ quay_service_account_name }}"
+            restartPolicy: Never
+            containers:
+              - name: kibana-post-start-import-view
+                image: curlimages/curl:8.20.0
+                command:
+                  - /bin/sh
+                  - -c
+                  - |
+                    echo "Waiting for Kibana to be ready..."
+                    until curl -sSf http://kibana:5601/api/status | grep -q '"state":"green"'; do
+                      echo "Kibana not ready yet, retrying in 10s..."
+                      sleep 10
+                    done
+                    
+                    echo "Kibana is ready, importing saved objects..."
+                    curl -sSf -X POST "http://kibana:5601/api/saved_objects/_import?overwrite=true" \
+                         -H "kbn-xsrf: true" \
+                         --form file=@/import/kibana-audit-logs-view.ndjson
+                volumeMounts:
+                  - name: kibana-import
+                    mountPath: /import
+                resources:
+                  requests:
+                    cpu: "5m"
+                    memory: "200Mi"
+                  limits:
+                    memory: "200Mi"
+            volumes:
+              - name: kibana-import
+                configMap:
+                  name: kibana-audit-logs-view-object
+
+- name: Kibana service
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: kibana
+        namespace: '{{ openshift_namespace }}'
+      spec:
+        ports:
+          - port: 5601
+            targetPort: 5601
+        selector:
+          app: kibana

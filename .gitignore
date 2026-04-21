@@ -1,1 +1,2 @@
 *.pyc
+docker/elasticsearch.s3.env
