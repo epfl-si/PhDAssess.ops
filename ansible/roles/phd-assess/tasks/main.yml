@@ -5,10 +5,12 @@
       tags:
         - serviceAccounts
         - quay
+        - images
         - buildConfigs
   tags:
     - serviceAccounts
     - quay
+    - images
     - buildConfigs
     - zeebe
     - zeebe.quorum
@@ -23,9 +25,11 @@
     apply:
       tags:
         - quay
+        - images
         - never
   tags:
     - quay
+    - images
     - never
 
 - name: Secrets
@@ -53,6 +57,7 @@
     - zeebe
     - zeebe.configMaps
     - zeebe.secrets
+    - zeebe.exporter
     - zeebe.quorum
     - zeebe.service
     - zeebe.monitoring
