@@ -13,7 +13,7 @@ all:
     # Zeebe
     ## Camunda Image config
     zeebe_version:
-      '8.5.17'
+      '8.5.25'
     zeebe_repository:
       "docker.io"
     zeebe_camunda_image_path:
