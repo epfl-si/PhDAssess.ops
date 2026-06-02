@@ -18,6 +18,7 @@ Aka `phdsible`, the Ansible deployer
     * `/keybase/team/epfl_phdassess/prod/`
 * Access to the OpenShift.
 * Some basic understanding of the stack. See [the architecture of the stack](ARCHITECTURE.md).
+* Optionally, and recommended, use devenv.sh
 
 ## Usage
 
