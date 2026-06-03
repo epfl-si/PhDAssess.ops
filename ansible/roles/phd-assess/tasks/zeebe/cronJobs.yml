@@ -12,6 +12,7 @@
           app.kubernetes.io/part-of: "zeebe-quorum"
       spec:
         schedule: "{{ zeebe_backup_automatic_schedule }}"
+        backoffLimit: 0
         successfulJobsHistoryLimit: 3
         failedJobsHistoryLimit: 3
         concurrencyPolicy: Forbid
