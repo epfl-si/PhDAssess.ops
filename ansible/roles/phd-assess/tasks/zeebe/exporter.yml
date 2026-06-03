@@ -158,9 +158,9 @@
                 resources:
                   requests:
                     cpu: "5m"
-                    memory: "200Mi"
+                    memory: "2000Mi"
                   limits:
-                    memory: "200Mi"
+                    memory: "2000Mi"
             volumes:
               - name: template-config
                 configMap:
@@ -212,7 +212,9 @@
                 resources:
                   requests:
                     cpu: "5m"
-                    memory: "1200Mi"
+                    memory: "3000Mi"
+                  limits:
+                    memory: "3000Mi"
             containers:
               - name: elasticsearch
                 image: "{{ quay_repo }}/elasticsearch:{{ elasticsearch_kibana_version }}"
@@ -236,7 +238,9 @@
                 resources:
                   requests:
                     cpu: "5m"
-                    memory: "1200Mi"
+                    memory: "3000Mi"
+                  limits:
+                    memory: "3000Mi"
             volumes:
               - name: es-config
                 emptyDir: {}
@@ -305,7 +309,9 @@
                 resources:
                   requests:
                     cpu: "1m"
-                    memory: "500Mi"
+                    memory: "750Mi"
+                  limits:
+                    memory: "750Mi"
 
 - name: Import Kibana saved objects
   kubernetes.core.k8s:
@@ -360,9 +366,9 @@
                 resources:
                   requests:
                     cpu: "5m"
-                    memory: "200Mi"
+                    memory: "750Mi"
                   limits:
-                    memory: "200Mi"
+                    memory: "750Mi"
             volumes:
               - name: kibana-import
                 configMap:
