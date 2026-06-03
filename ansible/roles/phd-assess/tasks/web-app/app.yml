@@ -39,9 +39,9 @@
                 resources:
                   requests:
                     cpu: "50m"
-                    memory: "1600Mi"
+                    memory: "750Mi"
                   limits:
-                    memory: "3Gi"
+                    memory: "750Mi"
                 readinessProbe:
                   httpGet:
                     path: /metrics

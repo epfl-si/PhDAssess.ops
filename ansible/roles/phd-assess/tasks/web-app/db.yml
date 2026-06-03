@@ -31,9 +31,9 @@
                 resources:
                   requests:
                     cpu: "10m"
-                    memory: "1Gi"
+                    memory: "600Mi"
                   limits:
-                    memory: "1Gi"
+                    memory: "600Mi"
                 volumeMounts:
                   - name: data-db
                     mountPath: /data/db
