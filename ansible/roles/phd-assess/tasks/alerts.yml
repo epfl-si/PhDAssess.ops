@@ -171,6 +171,54 @@
                   description: |-
                     One or more Zeebe instances became unhealthy.
 
+              - alert: BackupFailed
+                expr: |-
+                  kube_job_status_failed{namespace="{{ openshift_namespace }}", job_name=~"zeebe-backuper.*"} != 0
+                labels:
+                  severity: critical
+                  sendto: telegram
+                annotations:
+                  description: |-
+                    A backup cronJob (Zeebe and Elasticsearch) has failed.
+
+              - alert: ZeebeExporterLagHigh
+                expr: (zeebe_exporter_last_updated_exported_position
+                  - zeebe_exporter_last_exported_position) > 5000
+                for: 5m
+                labels:
+                  severity: critical
+                annotations:
+                  description: |-
+                    Zeebe exporter is falling behind; Elasticsearch is saturated.
+
+              - alert: ZeebeExporterNotProgressing
+                expr: increase(zeebe_exporter_last_exported_position[10m]) == 0
+                for: 10m
+                labels:
+                  severity: critical
+                annotations:
+                  description: |-
+                    Exporter is not progressing. No records are being exported to Elasticsearch
+
+              - alert: ZeebeExporterStale
+                expr: time() - timestamp(zeebe_exporter_last_updated_exported_position) > 60
+                for: 5m
+                labels:
+                  severity: warning
+                annotations:
+                  description: |-
+                    Zeebe exporter to elasticsearch is stale.
+
+              - alert: ZeebeExporterEventBacklog
+                expr: rate(zeebe_exporter_events_total[5m]) > 0
+                  and increase(zeebe_exporter_last_exported_position[10m]) == 0
+                for: 10m
+                labels:
+                  severity: critical
+                annotations:
+                  description: |-
+                    Zeebe Events are flowing but ElasticSearch exporter is stuck
+
 - name: Alerting for new Zeebe Incidents - PrometheusRule
   kubernetes.core.k8s:
     definition:
