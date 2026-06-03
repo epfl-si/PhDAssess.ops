@@ -77,7 +77,7 @@
           app.kubernetes.io/name: "elasticsearch-post-start"
           app.kubernetes.io/component: "backend"
       spec:
-        backoffLimit: 1
+        backoffLimit: 0
         template:
           spec:
             serviceAccountName: "{{ quay_service_account_name }}"
@@ -309,9 +309,9 @@
                 resources:
                   requests:
                     cpu: "1m"
-                    memory: "750Mi"
+                    memory: "1250Mi"
                   limits:
-                    memory: "750Mi"
+                    memory: "1250Mi"
 
 - name: Import Kibana saved objects
   kubernetes.core.k8s:
@@ -322,8 +322,8 @@
       metadata:
         name: kibana-audit-logs-view-object
         namespace: "{{ openshift_namespace }}"
-      files:
-        kibana_saved_objects.ndjson: ./templates/kibana-audit-logs-view.ndjson
+      data:
+        kibana-audit-logs-view.ndjson: "{{ lookup('file', './templates/kibana-audit-logs-view.ndjson') }}"
 
 - name: Kibana post-start import view Job
   kubernetes.core.k8s:
@@ -338,7 +338,7 @@
           app.kubernetes.io/name: "kibana-post-start"
           app.kubernetes.io/component: "backend"
       spec:
-        backoffLimit: 1
+        backoffLimit: 0
         template:
           spec:
             serviceAccountName: "{{ quay_service_account_name }}"
@@ -351,7 +351,7 @@
                   - -c
                   - |
                     echo "Waiting for Kibana to be ready..."
-                    until curl -sSf http://kibana:5601/api/status | grep -q '"state":"green"'; do
+                    until curl -sSf http://kibana:5601/api/status | grep -q '"level":"available"'; do
                       echo "Kibana not ready yet, retrying in 10s..."
                       sleep 10
                     done
@@ -366,9 +366,9 @@
                 resources:
                   requests:
                     cpu: "5m"
-                    memory: "750Mi"
+                    memory: "1250Mi"
                   limits:
-                    memory: "750Mi"
+                    memory: "1250Mi"
             volumes:
               - name: kibana-import
                 configMap:
