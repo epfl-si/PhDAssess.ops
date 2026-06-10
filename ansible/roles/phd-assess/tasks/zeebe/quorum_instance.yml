@@ -25,9 +25,9 @@
       resources:
         requests:
           cpu: '15m'
-          memory: '4000Mi'
+          memory: "{{ '3200Mi' if openshift_namespace == 'svc1394p-phd-assess' else '1400Mi' }}"
         limits:
-          memory: '4000Mi'
+          memory: "{{ '3200Mi' if openshift_namespace == 'svc1394p-phd-assess' else '1400Mi' }}"
       ports:
         - name: metrics
           containerPort: "{{ zeebe_broker_network_monitoring_api_port }}"
