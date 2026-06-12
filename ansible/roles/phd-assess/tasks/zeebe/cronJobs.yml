@@ -23,7 +23,7 @@
                 restartPolicy: Never
                 containers:
                   - name: zeebe-backuper
-                    image: "{{ quay_repo }}/zeebe-backuper:latest"
+                    image: "{{ quay_repo }}/zeebe-backuper:prod"
                     imagePullPolicy: Always
                     env:
                       # API URL to trigger backup (your Node app may call this internally)
