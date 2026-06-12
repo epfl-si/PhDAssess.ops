@@ -30,9 +30,9 @@
         resources:
           requests:
             cpu: "10m"
-            memory: "2Gi"
+            memory: "1Gi"
           limits:
-            memory: "2Gi"
+            memory: "1Gi"
 
 - name: BuildConfig for the Zeebe backuper tool
   kubernetes.core.k8s:
@@ -66,9 +66,9 @@
         resources:
           requests:
             cpu: "10m"
-            memory: "2Gi"
+            memory: "1Gi"
           limits:
-            memory: "2Gi"
+            memory: "1Gi"
 
 - name: BuildConfig for the Meteor App
   kubernetes.core.k8s:
@@ -101,9 +101,9 @@
         resources:
           requests:
             cpu: "10m"
-            memory: "2Gi"
+            memory: "1Gi"
           limits:
-            memory: "2Gi"
+            memory: "1Gi"
 
 - name: BuildConfig for the disk usage monitor
   kubernetes.core.k8s:
@@ -137,9 +137,9 @@
         resources:
           requests:
             cpu: "10m"
-            memory: "2Gi"
+            memory: "1Gi"
           limits:
-            memory: "2Gi"
+            memory: "1Gi"
 
 - name: BuildConfig for the zeebe db monitor
   kubernetes.core.k8s:
@@ -171,6 +171,6 @@
         resources:
           requests:
             cpu: "10m"
-            memory: "2Gi"
+            memory: "1Gi"
           limits:
-            memory: "2Gi"
+            memory: "1Gi"
