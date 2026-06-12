@@ -47,7 +47,7 @@
           type: Git
           git:
             uri: "https://github.com/epfl-si/PhDAssess.ops"
-            ref: "feature/zeebe-backuper"
+            ref: "main"
           contextDir: zeebe-backuper
         strategy:
           type: Docker
