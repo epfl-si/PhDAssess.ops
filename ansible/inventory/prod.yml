@@ -34,6 +34,8 @@ all:
 
     ## Backups / Restore S3
     # Every night
+    zeebe_backuper_image_tag: "prod"
+
     zeebe_backup_automatic_schedule: "0 2 * * *"
 
     zeebe_backup_s3_bucket_name_file:

@@ -34,6 +34,8 @@ all:
 
     ## Backups / Restore S3
     # Once a month
+    zeebe_backuper_image_tag: "latest"
+
     zeebe_backup_automatic_schedule: "0 2 1-7 * 1"
 
     zeebe_backup_s3_bucket_name_file:

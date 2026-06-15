@@ -34,6 +34,8 @@ all:
 
     ## Backups / Restore S3
     # Once a week
+    zeebe_backuper_image_tag: "latest"
+
     zeebe_backup_automatic_schedule: "0 2 * * 1"
 
     s3_files_keybase_path:
