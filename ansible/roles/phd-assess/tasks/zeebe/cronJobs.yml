@@ -17,9 +17,11 @@
         concurrencyPolicy: Forbid
         jobTemplate:
           spec:
+            backoffLimit: 0
             template:
               spec:
                 serviceAccountName: "{{ quay_service_account_name }}"
+                activeDeadlineSeconds: 1200
                 restartPolicy: Never
                 containers:
                   - name: zeebe-backuper
