@@ -44,8 +44,11 @@ zeebe_route_name: "zeebe"
 meteor_entra_auth_secrets_name: 'meteor-app-entra-auth-config'
 
 # Microservices
+## Base images to build microservices
 microservice_node_22_base_tag: "22-alpine"
 microservice_node_22_base_image: "node:{{ microservice_node_22_base_tag }}"
+
+# experimental
 microservice_node_24_base_tag: "24-alpine"
 microservice_node_24_base_image: "node:{{ microservice_node_24_base_tag }}"
 
