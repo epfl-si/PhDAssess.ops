@@ -1,4 +1,2 @@
-/zeebe-hazelcast/*.jar
-/simple-monitor/*.jar
 /volumes
 /.env
