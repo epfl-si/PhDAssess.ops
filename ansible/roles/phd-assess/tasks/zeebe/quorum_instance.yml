@@ -11,9 +11,6 @@
         {{ item.quorum_name }}
       ZEEBE_BROKER_NETWORK_COMMANDAPI_ADVERTISEDHOST: >-
         {{ item.quorum_name }}
-      ZEEBE_BROKER_EXPORTERS_METRICS_ENABLED: "true"
-      ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_CLASSNAME: "io.camunda.zeebe.exporter.ElasticsearchExporter"
-      ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_ARGS_URL: "http://elasticsearch:9200"
     _zeebe_container:
       name: "zeebe"
       image: "{{ zeebe_quay_image_full_path }}"
