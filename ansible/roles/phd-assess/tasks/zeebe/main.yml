@@ -23,13 +23,11 @@
 - name: Zeebe Elasticsearch exporter
   ansible.builtin.include_tasks:
     file: zeebe/exporter.yml
-    apply:
-      tags:
-        - zeebe
-        - zeebe.exporter
   tags:
     - zeebe
     - zeebe.exporter
+    - zeebe.exporter.tear-down
+    - zeebe.exporter.destroy-es-data
 
 - name: Zeebe quorum
   ansible.builtin.include_tasks:

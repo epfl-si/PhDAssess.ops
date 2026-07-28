@@ -1,4 +1,6 @@
 - name: Elasticsearch index template ConfigMap
+  tags:
+    - zeebe.exporter
   kubernetes.core.k8s:
     state: present
     definition:
@@ -40,6 +42,8 @@
           }
 
 - name: S3 secrets for Elasticsearch snapshots
+  tags:
+    - zeebe.exporter
   kubernetes.core.k8s:
     definition:
       apiVersion: v1
@@ -65,6 +69,8 @@
         S3_PROTOCOL: "https"
 
 - name: Elasticsearch post-start setup Job
+  tags:
+    - zeebe.exporter
   kubernetes.core.k8s:
     state: present
     definition:
@@ -169,7 +175,9 @@
                 secret:
                   secretName: elasticsearch-s3
 
-- name: Elasticsearch exporter statefulset
+- name: Elasticsearch exporter Statefulset
+  tags:
+    - zeebe.exporter
   kubernetes.core.k8s:
     state: present
     definition:
@@ -258,6 +266,8 @@
                   storage: 5Gi
 
 - name: Elasticsearch exporter service
+  tags:
+    - zeebe.exporter
   kubernetes.core.k8s:
     state: present
     definition:
@@ -277,6 +287,8 @@
           app: elasticsearch
 
 - name: Kibana deployment
+  tags:
+    - zeebe.exporter
   kubernetes.core.k8s:
     state: present
     definition:
@@ -314,6 +326,8 @@
                     memory: "1250Mi"
 
 - name: Import Kibana saved objects
+  tags:
+    - zeebe.exporter
   kubernetes.core.k8s:
     state: present
     definition:
@@ -326,6 +340,8 @@
         kibana-audit-logs-view.ndjson: "{{ lookup('file', './templates/kibana-audit-logs-view.ndjson') }}"
 
 - name: Kibana post-start import view Job
+  tags:
+    - zeebe.exporter
   kubernetes.core.k8s:
     state: present
     definition:
@@ -375,6 +391,8 @@
                   name: kibana-audit-logs-view-object
 
 - name: Kibana service
+  tags:
+    - zeebe.exporter
   kubernetes.core.k8s:
     state: present
     definition:
@@ -389,3 +407,70 @@
             targetPort: 5601
         selector:
           app: kibana
+
+- name: Tear down Elasticsearch and Kibana resources
+  tags:
+    - zeebe.exporter.tear-down
+  kubernetes.core.k8s:
+    state: absent
+    wait: true
+    definition:
+      apiVersion: "{{ item.apiVersion }}"
+      kind: "{{ item.kind }}"
+      metadata:
+        name: "{{ item.name }}"
+        namespace: "{{ openshift_namespace }}"
+  loop:
+    # Jobs
+    - apiVersion: batch/v1
+      kind: Job
+      name: elasticsearch-post-start
+
+    - apiVersion: batch/v1
+      kind: Job
+      name: kibana-post-start-import-view
+
+    # Deployments / StatefulSets
+    - apiVersion: apps/v1
+      kind: Deployment
+      name: kibana
+
+    - apiVersion: apps/v1
+      kind: StatefulSet
+      name: elasticsearch
+
+    # Services
+    - apiVersion: v1
+      kind: Service
+      name: kibana
+
+    - apiVersion: v1
+      kind: Service
+      name: elasticsearch
+
+    # ConfigMaps
+    - apiVersion: v1
+      kind: ConfigMap
+      name: zeebe-es-index-template
+
+    - apiVersion: v1
+      kind: ConfigMap
+      name: kibana-audit-logs-view-object
+
+    # Secret
+    - apiVersion: v1
+      kind: Secret
+      name: elasticsearch-s3
+
+- name: Delete Elasticsearch persistent volume claim
+  tags:
+    - zeebe.exporter.destroy-es-data
+  kubernetes.core.k8s:
+    state: absent
+    wait: true
+    definition:
+      apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: elasticsearch-data-elasticsearch-0
+        namespace: "{{ openshift_namespace }}"
