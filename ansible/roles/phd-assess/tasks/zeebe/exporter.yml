@@ -372,8 +372,11 @@
                       sleep 10
                     done
                     
-                    echo "Kibana is ready, importing saved objects..."
-                    curl -sSf -X POST "http://kibana:5601/api/saved_objects/_import?overwrite=true" \
+                    echo "Kibana is ready, continuing..."
+ 
+                    echo "Importing saved objects..."
+                    curl -sS --fail-with-body \
+                         -X POST "http://kibana:5601/api/saved_objects/_import?overwrite=true" \
                          -H "kbn-xsrf: true" \
                          --form file=@/import/kibana-audit-logs-view.ndjson
                 volumeMounts:
