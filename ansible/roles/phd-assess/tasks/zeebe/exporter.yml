@@ -204,9 +204,9 @@
                 resources:
                   requests:
                     cpu: "5m"
-                    memory: "3000Mi"
+                    memory: "2000Mi"
                   limits:
-                    memory: "3000Mi"
+                    memory: "2000Mi"
             containers:
               - name: elasticsearch
                 image: "{{ quay_repo }}/elasticsearch:{{ elasticsearch_kibana_version }}"
@@ -230,9 +230,9 @@
                 resources:
                   requests:
                     cpu: "5m"
-                    memory: "3000Mi"
+                    memory: "2000Mi"
                   limits:
-                    memory: "3000Mi"
+                    memory: "2000Mi"
             volumes:
               - name: es-config
                 emptyDir: {}
