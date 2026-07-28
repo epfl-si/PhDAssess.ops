@@ -138,22 +138,6 @@
                       }
                     }"
                     echo "S3 snapshot repository registered."
-                    echo "Waiting for Kibana..."
-                    until curl -sf "http://kibana:5601/api/status"; do
-                      sleep 5
-                    done
-                    echo "Kibana is ready."
-                    echo "Creating Kibana data view for zeebe-record-*..."
-                    curl -sS -X PUT "http://kibana:5601/api/data_views/data_view/zeebe-records" \
-                      -H "Content-Type: application/json" \
-                      -H "kbn-xsrf: true" \
-                      -d '{
-                        "data_view": {
-                          "title": "zeebe-record-*",
-                          "name": "Zeebe Records"
-                        }
-                      }'
-                    echo "Kibana data view upserted."
                 volumeMounts:
                   - name: template-config
                     mountPath: /templates
