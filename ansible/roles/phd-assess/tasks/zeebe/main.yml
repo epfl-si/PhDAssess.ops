@@ -20,6 +20,15 @@
     - zeebe
     - zeebe.secrets
 
+- name: Zeebe Elasticsearch exporter
+  ansible.builtin.include_tasks:
+    file: zeebe/exporter.yml
+  tags:
+    - zeebe
+    - zeebe.exporter
+    - zeebe.exporter.tear-down
+    - zeebe.exporter.destroy-es-data
+
 - name: Zeebe quorum
   ansible.builtin.include_tasks:
     file: zeebe/quorum.yml
@@ -52,6 +61,17 @@
   tags:
     - zeebe
     - zeebe.service
+
+- name: Zeebe monitoring
+  ansible.builtin.include_tasks:
+    file: zeebe/monitoring.yml
+    apply:
+      tags:
+        - zeebe
+        - zeebe.monitoring
+  tags:
+    - zeebe
+    - zeebe.monitoring
 
 - name: Zeebe monitoring
   ansible.builtin.include_tasks:

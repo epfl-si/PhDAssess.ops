@@ -58,16 +58,17 @@
                   {% endraw %}
                 sendResolved: true
 
-- name: Alerts - PrometheusRule
+- name: Alerts
   kubernetes.core.k8s:
     definition:
       apiVersion: monitoring.coreos.com/v1
       kind: PrometheusRule
       metadata:
-        name: phd-assess-alerts
+        name: alerts
         namespace: "{{ openshift_namespace }}"
       spec:
         groups:
+
           - name: monitoring-system
             rules:
               - alert: NoMonitoring
@@ -82,7 +83,8 @@
                   description: >-
                     {% raw -%} Some Prometheus targets in PhDAssess are failing their scrapes.{%- endraw %}
 
-          - name: zeebe-db
+
+          - name: zeebe-job-health
             rules:
               - alert: ZeebeBackloggedActivatableJobs
                 expr: |-
@@ -98,22 +100,8 @@
                     Zeebe's ActivateJobs gRPC is backlogged. {{ $value }} jobs are activatable.
                     {%- endraw %}
 
-              - alert: ZeebeDbIncidents
-                expr: |-
-                  deriv(zeebe_db_column_family_incident_entries{
-                    error_message!~".*This is a safe fail.",
-                    namespace="{{ openshift_namespace }}"
-                  }[15m]) > 0.05
-                for: 5m
-                labels:
-                  severity: critical
-                  sendto: telegram
-                annotations:
-                  description: |-
-                    {% raw -%}
-                    Some Zeebe incident is trending upward at value {{ $value }}/sec
-                    {%- endraw %}
-          - name: Zeebe
+
+          - name: zeebe-quorum-health
             rules:
               - alert: ZeebeQuorumNoLeader
                 expr: >-
@@ -171,18 +159,25 @@
                   description: |-
                     One or more Zeebe instances became unhealthy.
 
-- name: Alerting for new Zeebe Incidents - PrometheusRule
-  kubernetes.core.k8s:
-    definition:
-      apiVersion: monitoring.coreos.com/v1
-      kind: PrometheusRule
-      metadata:
-        name: phd-assess-alerts
-        namespace: "{{ openshift_namespace }}"
-      spec:
-        groups:
-          - name: test-alerts
+
+          - name: zeebe-incidents-health
             rules:
+              - alert: ZeebeDbIncidents
+                expr: |-
+                  deriv(zeebe_db_column_family_incident_entries{
+                    error_message!~".*This is a safe fail.",
+                    namespace="{{ openshift_namespace }}"
+                  }[15m]) > 0.05
+                for: 5m
+                labels:
+                  severity: critical
+                  sendto: telegram
+                annotations:
+                  description: |-
+                    {% raw -%}
+                    Some Zeebe incident is trending upward at value {{ $value }}/sec
+                    {%- endraw %}
+
               - alert: ZeebeDbIncidentsNeverSeenBefore
                 expr: |-
                   (
@@ -211,6 +206,98 @@
                     {% raw -%}
                     A new incident type has appeared on Zeebe. The error message: "{{ $labels.error_message }}"
                     {%- endraw %}
+
+
+          - name: zeebe-volumes-health
+            rules:
+              - alert: ZeebeVolumeAlmostFull
+                expr: |-
+                  kubelet_volume_stats_used_bytes{namespace="{{ openshift_namespace }}", persistentvolumeclaim=~"zeebe-[0-2]-pvc"} /
+                  kubelet_volume_stats_capacity_bytes{namespace="{{ openshift_namespace }}", persistentvolumeclaim=~"zeebe-[0-2]-pvc"} * 100 > 90
+                for: 5m
+                labels:
+                  severity: critical
+                  sendto: telegram
+                annotations:
+                  summary: "Zeebe PVC almost full"
+                  description: |-
+                    {% raw -%}
+                    PVC {{ $labels.persistentvolumeclaim }}
+                    is using more than 90% of its capacity.
+                    Current usage: {{ printf "%.1f" $value }}%.
+                    {% endraw -%}
+
+
+          - name: zeebe-backup-health
+            rules:
+              - alert: BackupFailed
+                expr: |-
+                  kube_job_status_failed{namespace="{{ openshift_namespace }}", job_name=~"zeebe-backuper.*"} != 0
+                labels:
+                  severity: critical
+                  sendto: telegram
+                annotations:
+                  description: |-
+                    A backup cronJob (Zeebe and Elasticsearch) has failed.
+
+
+          - name: zeebe-exporter-health
+            rules:
+              - alert: ElasticsearchVolumeAlmostFull
+                expr: |-
+                  kubelet_volume_stats_used_bytes{namespace="{{ openshift_namespace }}", persistentvolumeclaim=~"elasticsearch-data-elasticsearch-.*"} /
+                  kubelet_volume_stats_capacity_bytes{namespace="{{ openshift_namespace }}", persistentvolumeclaim=~"elasticsearch-data-elasticsearch-.*"} * 100 > 90
+                for: 5m
+                labels:
+                  severity: critical
+                  sendto: telegram
+                annotations:
+                  summary: "Elasticsearch PVC almost full"
+                  description: |-
+                    {% raw -%}
+                    PVC {{ $labels.persistentvolumeclaim }}
+                    is using more than 90% of its capacity.
+                    Current usage: {{ printf "%.1f" $value }}%.
+                    {% endraw -%}
+
+              - alert: ZeebeExporterLagHigh
+                expr: (zeebe_exporter_last_updated_exported_position
+                  - zeebe_exporter_last_exported_position) > 5000
+                for: 5m
+                labels:
+                  severity: critical
+                annotations:
+                  description: |-
+                    Zeebe exporter is falling behind; Elasticsearch is saturated.
+
+              - alert: ZeebeExporterNotProgressing
+                expr: increase(zeebe_exporter_last_exported_position[10m]) == 0
+                for: 10m
+                labels:
+                  severity: critical
+                annotations:
+                  description: |-
+                    Exporter is not progressing. No records are being exported to Elasticsearch
+
+              - alert: ZeebeExporterStale
+                expr: time() - timestamp(zeebe_exporter_last_updated_exported_position) > 60
+                for: 5m
+                labels:
+                  severity: warning
+                annotations:
+                  description: |-
+                    Zeebe exporter to elasticsearch is stale.
+
+              - alert: ZeebeExporterEventBacklog
+                expr: rate(zeebe_exporter_events_total[5m]) > 0
+                  and increase(zeebe_exporter_last_exported_position[10m]) == 0
+                for: 10m
+                labels:
+                  severity: critical
+                annotations:
+                  description: |-
+                    Zeebe Events are flowing but ElasticSearch exporter is stuck
+
 
 - name: Alerts test - PrometheusRule
   when: >-

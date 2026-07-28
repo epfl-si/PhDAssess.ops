@@ -35,8 +35,10 @@ COPY --from=builder /app/dist ./dist
 
 # Set environment variables (can be overridden in OpenShift)
 ENV ZEEBE_API_URL=http://zeebe:9600
+ENV ES_API_URL=http://elasticsearch:9200
+ENV ES_SNAPSHOT_REPO=zeebe-es-snapshots
 ENV POLL_INTERVAL_MS=10000
 ENV MAX_POLL_MINUTES=10
 
 # Set default command
-CMD ["node", "dist/backup.js"]
+CMD ["node", "dist/main.js"]

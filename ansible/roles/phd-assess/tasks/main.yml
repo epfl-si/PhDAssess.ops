@@ -58,6 +58,8 @@
     - zeebe.configMaps
     - zeebe.secrets
     - zeebe.exporter
+    - zeebe.exporter.tear-down
+    - zeebe.exporter.destroy-es-data
     - zeebe.quorum
     - zeebe.service
     - zeebe.monitoring

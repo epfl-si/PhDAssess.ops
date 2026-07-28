@@ -12,6 +12,7 @@
           app.kubernetes.io/part-of: "zeebe-quorum"
       spec:
         schedule: "{{ zeebe_backup_automatic_schedule }}"
+        backoffLimit: 0
         successfulJobsHistoryLimit: 3
         failedJobsHistoryLimit: 3
         concurrencyPolicy: Forbid
@@ -25,12 +26,17 @@
                 restartPolicy: Never
                 containers:
                   - name: zeebe-backuper
-                    image: "{{ quay_repo }}/zeebe-backuper:prod"
+                    image: "{{ quay_repo }}/zeebe-backuper:{{ zeebe_backuper_image_tag }}"
                     imagePullPolicy: Always
                     env:
-                      # API URL to trigger backup (your Node app may call this internally)
+                      # API URL to trigger Zeebe backup
                       - name: ZEEBE_API_URL
                         value: "http://zeebe-quorum-0:9600"
+                      # API URL to trigger Elasticsearch snapshot
+                      - name: ES_API_URL
+                        value: "http://elasticsearch:9200"
+                      - name: ES_SNAPSHOT_REPO
+                        value: "zeebe-es-snapshots"
                     resources:
                       requests:
                         cpu: "5m"

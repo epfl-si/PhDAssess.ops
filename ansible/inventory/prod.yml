@@ -21,6 +21,9 @@ all:
     zeebe_camunda_image_full_path:
       "{{ zeebe_camunda_image_path }}:{{ zeebe_version }}"
 
+    ## Elasticsearch and Kibana version
+    elasticsearch_kibana_version: "8.19.13"
+
     ## Quay Image destination config
     zeebe_quay_image_name:
       "camunda/zeebe"
@@ -31,6 +34,8 @@ all:
 
     ## Backups / Restore S3
     # Every night
+    zeebe_backuper_image_tag: "prod"
+
     zeebe_backup_automatic_schedule: "0 2 * * *"
 
     zeebe_backup_s3_bucket_name_file:
