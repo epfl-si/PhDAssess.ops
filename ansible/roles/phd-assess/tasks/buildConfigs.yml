@@ -161,7 +161,7 @@
               name: quay-pull-push-secret
             buildArgs:
               - name: "BASE_IMAGE"
-                value: "{{ quay_repo }}/node:18-alpine"
+                value: "{{ quay_repo }}/node:24-alpine"
         output:
           to:
             kind: DockerImage
