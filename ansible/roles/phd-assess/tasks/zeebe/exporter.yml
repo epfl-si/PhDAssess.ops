@@ -148,9 +148,9 @@
                 resources:
                   requests:
                     cpu: "5m"
-                    memory: "2000Mi"
+                    memory: "1600Mi"
                   limits:
-                    memory: "2000Mi"
+                    memory: "1600Mi"
             volumes:
               - name: template-config
                 configMap:
