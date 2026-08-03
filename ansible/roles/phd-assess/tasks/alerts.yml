@@ -232,13 +232,23 @@
             rules:
               - alert: BackupFailed
                 expr: |-
-                  kube_job_status_failed{namespace="{{ openshift_namespace }}", job_name=~"zeebe-backuper.*"} != 0
+                  (
+                    kube_job_status_failed{namespace="{{ openshift_namespace }}", job_name=~"zeebe-backuper.*"} > 0
+                  )
+                  and on(namespace, job_name) label_replace(
+                    kube_cronjob_status_last_schedule_time{namespace="{{ openshift_namespace }}", cronjob=~"zeebe-backuper.*"},
+                    "job_name",
+                    "{% raw %}$1{% endraw %}",
+                    "cronjob",
+                    "{% raw %}(.*){% endraw %}"
+                  )
+                for: 10m
                 labels:
                   severity: critical
                   sendto: telegram
                 annotations:
                   description: |-
-                    A backup cronJob (Zeebe and Elasticsearch) has failed.
+                    The latest run of the backup cronJob (Zeebe and Elasticsearch) has failed.
 
 
           - name: zeebe-exporter-health
