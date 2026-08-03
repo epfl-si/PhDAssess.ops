@@ -246,7 +246,7 @@
               - alert: ElasticsearchVolumeAlmostFull
                 expr: |-
                   kubelet_volume_stats_used_bytes{namespace="{{ openshift_namespace }}", persistentvolumeclaim=~"elasticsearch-data-elasticsearch-.*"} /
-                  kubelet_volume_stats_capacity_bytes{namespace="{{ openshift_namespace }}", persistentvolumeclaim=~"elasticsearch-data-elasticsearch-.*"} * 100 > 90
+                  kubelet_volume_stats_capacity_bytes{namespace="{{ openshift_namespace }}", persistentvolumeclaim=~"elasticsearch-data-elasticsearch-.*"} * 100 > 75
                 for: 5m
                 labels:
                   severity: critical
@@ -256,7 +256,8 @@
                   description: |-
                     {% raw -%}
                     PVC {{ $labels.persistentvolumeclaim }}
-                    is using more than 90% of its capacity.
+                    is using more than 75% of its capacity.
+                    Keep in mind that the system will hang at 89%. 
                     Current usage: {{ printf "%.1f" $value }}%.
                     {% endraw -%}
 
