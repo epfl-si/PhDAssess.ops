@@ -13,7 +13,7 @@
       data:
         zeebe-record-template.json: |
           {
-            "index_patterns": ["zeebe-record-*"],
+            "index_patterns": ["zeebe-record*"],
             "template": {
               "settings": {
                 "number_of_shards": 1,
