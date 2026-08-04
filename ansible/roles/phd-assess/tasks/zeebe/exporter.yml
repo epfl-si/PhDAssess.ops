@@ -1,5 +1,6 @@
 - name: Elasticsearch index template ConfigMap
   tags:
+    - zeebe
     - zeebe.exporter
   kubernetes.core.k8s:
     state: present
@@ -43,6 +44,7 @@
 
 - name: S3 secrets for Elasticsearch snapshots
   tags:
+    - zeebe
     - zeebe.exporter
   kubernetes.core.k8s:
     definition:
@@ -70,6 +72,7 @@
 
 - name: Elasticsearch post-start setup Job
   tags:
+    - zeebe
     - zeebe.exporter
   kubernetes.core.k8s:
     state: present
@@ -161,6 +164,7 @@
 
 - name: Elasticsearch exporter Statefulset
   tags:
+    - zeebe
     - zeebe.exporter
   kubernetes.core.k8s:
     state: present
@@ -251,6 +255,7 @@
 
 - name: Elasticsearch exporter service
   tags:
+    - zeebe
     - zeebe.exporter
   kubernetes.core.k8s:
     state: present
@@ -272,6 +277,7 @@
 
 - name: Kibana deployment
   tags:
+    - zeebe
     - zeebe.exporter
   kubernetes.core.k8s:
     state: present
@@ -311,6 +317,7 @@
 
 - name: Import Kibana saved objects
   tags:
+    - zeebe
     - zeebe.exporter
   kubernetes.core.k8s:
     state: present
@@ -325,6 +332,7 @@
 
 - name: Kibana post-start import view Job
   tags:
+    - zeebe
     - zeebe.exporter
   kubernetes.core.k8s:
     state: present
@@ -379,6 +387,7 @@
 
 - name: Kibana service
   tags:
+    - zeebe
     - zeebe.exporter
   kubernetes.core.k8s:
     state: present
