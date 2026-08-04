@@ -438,6 +438,10 @@
     # ConfigMaps
     - apiVersion: v1
       kind: ConfigMap
+      name: zeebe-broker-es-exporter
+
+    - apiVersion: v1
+      kind: ConfigMap
       name: zeebe-es-index-template
 
     - apiVersion: v1

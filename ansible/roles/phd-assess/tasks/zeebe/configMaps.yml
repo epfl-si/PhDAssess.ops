@@ -22,7 +22,17 @@
         ZEEBE_BROKER_CLUSTER_REPLICATIONFACTOR: "3"
         ZEEBE_LOG_LEVEL: "{{ _zeebe_log_level }}"
         ATOMIX_LOG_LEVEL: "{{ _zeebe_log_level }}"
-        ZEEBE_BROKER_EXPORTERS_METRICS_ENABLED: "true"
+
+- name: Zeebe Broker Elastic Search config
+  kubernetes.core.k8s:
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: "zeebe-broker-es-exporter"
+        namespace: "{{ openshift_namespace }}"
+      data:
+        ZEEBE_BROKER_EXECUTION_METRICS_EXPORTER_ENABLED: "true"
         ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_CLASSNAME: "io.camunda.zeebe.exporter.ElasticsearchExporter"
         ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_ARGS_URL: "http://elasticsearch:9200"
         ZEEBE_BROKER_EXPORTERS_ELASTICSEARCH_ARGS_INDEX_PREFIX: "zeebe-record"

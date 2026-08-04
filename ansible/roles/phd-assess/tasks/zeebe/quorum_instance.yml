@@ -20,6 +20,8 @@
       envFrom:
         - configMapRef:
             name: "zeebe-broker"
+        - configMapRef:
+            name: "zeebe-broker-es-exporter"
         - secretRef:
             name: "{{ zeebe_secrets_name }}-s3"
       resources:
