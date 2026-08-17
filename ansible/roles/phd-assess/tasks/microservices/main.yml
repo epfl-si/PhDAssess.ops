@@ -5,6 +5,7 @@
       image_tag: "{{ notifier_image_tag }}"
       node_version: "{{ microservice_node_image_base_tag }}"
       git_url: "https://github.com/epfl-si/PhDAssess-Notifier"
+      memory_usage: "128Mi"
       additional_env:
         - ZEEBE_TASK_TYPE: "notification"
           ALFRESCO_URL: "{{ alfresco_url }}"
