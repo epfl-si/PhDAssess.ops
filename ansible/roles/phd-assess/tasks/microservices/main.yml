@@ -18,6 +18,7 @@
       image_tag: "{{ pdf_image_tag }}"
       node_version: "{{ microservice_node_image_base_tag }}"
       git_url: "https://github.com/epfl-si/PhDAssess-PDF"
+      memory_usage: "128Mi"
       additional_env:
         - ZEEBE_TASK_TYPE: "phdBuildPDF"
         - "{{ {'NODE_TLS_REJECT_UNAUTHORIZED': 0} if (alfresco_ignore_TLS_error | default(false)) else {} }}"

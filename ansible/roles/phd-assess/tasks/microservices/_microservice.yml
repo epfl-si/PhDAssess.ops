@@ -104,6 +104,6 @@
                 resources:
                   requests:
                     cpu: "5m"
-                    memory: "64Mi"
+                    memory: "{{ item.memory_usage | default('64Mi') }}"
                   limits:
-                    memory: "64Mi"
+                    memory: "{{ item.memory_usage | default('64Mi') }}"
