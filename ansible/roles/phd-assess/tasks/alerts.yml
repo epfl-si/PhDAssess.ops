@@ -83,6 +83,25 @@
                   description: >-
                     {% raw -%} Some Prometheus targets in PhDAssess are failing their scrapes.{%- endraw %}
 
+          - name: kubernetes-pods-health
+            rules:
+              - alert: PodOOMKilled
+                expr: >-
+                  kube_pod_container_status_last_terminated_reason{
+                    namespace="{{ openshift_namespace }}",
+                    reason="OOMKilled"
+                  } == 1
+                for: 1m
+                labels:
+                  severity: critical
+                  sendto: telegram
+                annotations:
+                  summary: "Pod container was OOM killed"
+                  description: |-
+                    {% raw -%}
+                    Pod {{ $labels.pod }}
+                    had its container {{ $labels.container }} terminated because it ran out of memory (OOMKilled).
+                    {%- endraw %}
 
           - name: zeebe-job-health
             rules:
