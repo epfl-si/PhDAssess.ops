@@ -101,9 +101,9 @@
         resources:
           requests:
             cpu: "10m"
-            memory: "1Gi"
+            memory: "4Gi"
           limits:
-            memory: "1Gi"
+            memory: "4Gi"
 
 - name: BuildConfig for the disk usage monitor
   kubernetes.core.k8s:
