@@ -48,7 +48,7 @@ all:
       "{{s3_files_keybase_path }}S3-zeebe-backup/SECRETKEY"
 
     # Meteor
-    node_for_meteor_image_name: 'node:22-trixie'
+    node_for_meteor_image_name: 'node:24-trixie'
 
     web_app_image_name: 'meteor-web-app'
     web_app_image_tag: 'test'
