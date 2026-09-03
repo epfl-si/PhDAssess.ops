@@ -143,3 +143,7 @@ https://docs.camunda.io/docs/self-managed/operational-guides/backup-restore/zeeb
         ./phdsible --dev -t zeebe.quorum
 
 - Hooray! Be adverted, it may take some time to allow the creation of new process (like 5 min)
+
+### Debug
+
+Top open a Zeebe backup/DB and stringify the content, you can use the [zeebe-db-monitor](https://github.com/epfl-si/zeebe-db-monitor) project.

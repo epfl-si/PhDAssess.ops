@@ -1,9 +1,7 @@
 #!/usr/bin/env -S npm exec --yes --package=zx@latest zx --
-import { userInfo } from 'os';
 import { stat } from 'fs/promises'
 
 import deployProcess from './cli/deployProcess.mjs'
-import { stringifySnapshot } from './cli/snapshots.mjs'
 import generateActivityLogs from './cli/generateActivityLogs.mjs'
 
 $.verbose = false
@@ -33,8 +31,6 @@ if (argv.help || argv._[0] === 'help') {
   await test(...argv._.slice(1));
 } else if (argv._[0] === 'clean') {
   await clean(...argv._.slice(1));
-} else if (argv._[0] === 'stringify-snapshot') {
-  await stringifySnapshot(argv);
 } else if (argv._[0] === 'git-pull-all') {
   await gitPullAll(...argv._.slice(1));
 } else if (argv._[0] === 'generate-activity-logs') {
