@@ -6,10 +6,8 @@
 
   packages = with pkgs; [
     # Deploy tools
-    python313
-    (pkgs.python313.withPackages (ps: with ps; [
-      kubernetes
-    ]))
+    python314
+    python3Packages.kubernetes
     ansible
     openshift
 
