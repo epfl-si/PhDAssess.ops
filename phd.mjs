@@ -17,7 +17,11 @@ if (argv.help || argv._[0] === 'help') {
 } else if (argv._[0] === 'zeebe') {
   if (argv._[1] === 'start') await dockerRunZeebe();
   if (argv._[1] === 'stop') await dockerStop();
-  if (argv._[1] === 'status') await $`zbctl status --port 29501 --insecure`.pipe(process.stdout);;
+  if (argv._[1] === 'status') {
+    await spinner(`Running: zbctl status --port 26500 --insecure`, async () => {
+      await $`zbctl status --port 26500 --insecure`.pipe(process.stdout);
+    });
+  }
   if (argv._[1] === 'restore') await restore();
   if (argv._[1] === 'deploy-bpmn') await deployProcess();
 } else if (argv._[0] === 'monitoring') {
