@@ -1,4 +1,6 @@
 - name: Zeebe backuper CronJob
+  when: >-
+    openshift_environnement not in ["test"]
   kubernetes.core.k8s:
     definition:
       apiVersion: batch/v1
