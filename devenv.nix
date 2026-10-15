@@ -9,6 +9,7 @@
     python314
     python3Packages.kubernetes
     ansible
+    ansible-lint
     openshift
 
     # dev stack
@@ -34,9 +35,8 @@
     exec = "zx ./phd.mjs $@";
   };
 
-  scripts.lint-ansible = {
+  scripts.lint = {
     description = "Lint the Ansible files";
-    packages = [ pkgs.ansible-lint ];
     exec = ''
       echo "Linting Ansible files..."
       ansible-lint ./ansible
@@ -56,7 +56,7 @@
     echo "📌  Running devenv shell…"
     echo ""
     echo "🔥 You are in the PhDAssess.ops operational environment ⚙️ 🚀"
-    echo "   Provided tools: ansible, zx, zbctl, oc, lint-ansible, ..."
+    echo "   Provided tools: ansible, zx, zbctl, oc, lint, ..."
     echo "Next:"
     echo "  run the 'phd' command"
     echo "  or use the './phdsible --list-tag' to prepare some deployments."
