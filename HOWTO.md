@@ -98,7 +98,7 @@ All microservices should follow the same process to be updated as they share the
 
 - ⚠ Assert you are ready to lose data on the volume you will operate on ⚠
 - Assert you are running the same version / brokers number.
-- Assert your env. vars are aiming for the backups.
+- Assert your Zeebe running instances' env. vars are aiming for the right backups' info.
 - Have the ID of the backup you want to restore. See the previous section.
 
 ---
