@@ -79,7 +79,6 @@
       {% endif %}
   kubernetes.core.k8s:
     definition:
-      state: latest
       apiVersion: apps/v1
       kind: StatefulSet
       metadata:
