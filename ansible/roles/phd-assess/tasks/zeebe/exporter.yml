@@ -363,9 +363,9 @@
                       echo "Kibana not ready yet, retrying in 10s..."
                       sleep 10
                     done
-                    
+
                     echo "Kibana is ready, continuing..."
- 
+
                     echo "Importing saved objects..."
                     curl -sS --fail-with-body \
                          -X POST "http://kibana:5601/api/saved_objects/_import?overwrite=true" \
